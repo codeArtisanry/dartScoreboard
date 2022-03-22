@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"golang.org/x/oauth2"
 )
 
@@ -30,7 +32,13 @@ var (
 var (
 	randState = fmt.Sprintf("st%d", time.Now().UnixNano())
 )
-
+// LoadENV
+func ConnectENV() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal(".env file not loaded properly")
+	}
+}
 // Homepage
 func HomePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Homepage Hit!")
@@ -65,7 +73,7 @@ func Authorize(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
+	ConnectENV()
 	// 1 - We attempt to hit our Homepage route
 	// if we attempt to hit this unauthenticated, it
 	// will automatically redirect to our Auth
@@ -79,5 +87,5 @@ func main() {
 
 	// 3 - We start up our Client on port 9094
 	log.Println("Client is running at 9094 port.")
-	log.Fatal(http.ListenAndServe(":9094", nil))
+	log.Fatal(http.ListenAndServe(os.ExpandEnv(":${PORT}"), nil))
 }
