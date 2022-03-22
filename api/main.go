@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/oauth2"
 )
@@ -26,10 +27,14 @@ var (
 	}
 )
 
+var (
+	randState = fmt.Sprintf("st%d", time.Now().UnixNano())
+)
+
 // Homepage
 func HomePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Homepage Hit!")
-	u := config.AuthCodeURL("xyz")
+	u := config.AuthCodeURL(randState)
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
@@ -37,7 +42,7 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 func Authorize(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	state := r.Form.Get("state")
-	if state != "xyz" {
+	if state != randState {
 		http.Error(w, "State invalid", http.StatusBadRequest)
 		return
 	}
