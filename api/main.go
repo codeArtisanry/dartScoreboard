@@ -12,11 +12,6 @@ import (
 	gf "github.com/shareed2k/goth_fiber"
 )
 
-const (
-	key = "152904262856-jab3ep02vvgajdc66ab7ehafenoluln4.apps.googleusercontent.com"
-	sec = "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"
-)
-
 // LoadENV
 func ConnectENV() {
 	err := godotenv.Load(".env")
@@ -29,7 +24,7 @@ func main() {
 	ConnectENV()
 	models.Database()
 	goth.UseProviders(
-		google.New(key, sec, "http://localhost:3000/auth/google/callback"),
+		google.New(os.ExpandEnv("${KEY}"),os.ExpandEnv("${SEC}"), "http://localhost:3000/auth/google/callback"),
 	)
 
 	app := fiber.New()
