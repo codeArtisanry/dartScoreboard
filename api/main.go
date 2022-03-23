@@ -59,7 +59,7 @@ func main() {
 	})
 
 	app.Get("/", func(ctx *fiber.Ctx) error {
-		ctx.Format("<p><a href='/auth/google'>google</a></p>")
+		ctx.Redirect("/auth/google/")
 		return nil
 	})
 
