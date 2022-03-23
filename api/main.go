@@ -1,7 +1,7 @@
 package main
 
 import (
-	"googleauth/models"
+	"dartscoreboard/models"
 	"log"
 	"os"
 
@@ -27,7 +27,7 @@ func ConnectENV() {
 
 func main() {
 	ConnectENV()
-	models.ConnectDatabase()
+	models.Database()
 	goth.UseProviders(
 		google.New(key, sec, "http://localhost:3000/auth/google/callback"),
 	)
