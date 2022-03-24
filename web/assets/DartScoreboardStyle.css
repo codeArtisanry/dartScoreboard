@@ -1,0 +1,65 @@
+.cards{
+    margin-top: 100px;
+   
+  }
+  
+  .buttonofcreateteam{
+    padding-left: 50px;
+    padding-right: 50px;
+    /* width: 200px; */
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: hsl(189, 73%, 54%);
+    border-radius: 5px;
+    color: white;
+  }
+
+  body{
+    background-color: hsl(0, 0%, 95%);
+  }
+  
+.card {
+  /* margin-top: .5em; */
+  /* max-height: 70em;
+  max-width: 50em auto; */
+  border-radius: 10px;
+}
+
+.dartsimg {
+  width: 42em;
+  
+}
+
+.buttonofsignin {
+  width: 250px;
+  height: 50px;
+  margin-right: 15px
+}
+
+.buttonoflogin {
+  background-color: hsl(337, 79%, 61%);
+  border-style: none;
+  border-radius: 5px;
+  width: 300px;
+  height: 50px;
+}
+
+.google {
+  margin-right: 20px;
+}
+
+.google-img{
+  height: 1.5em;
+  width: 1.5em;
+  margin-right: .8em;
+  border-radius: 9em;
+}
+
+@media screen and (max-width: 563px) {
+  .cards{
+    margin-top: 0px;
+   
+  }
+}
+
+
