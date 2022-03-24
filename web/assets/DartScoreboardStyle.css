@@ -1,3 +1,23 @@
+.cards{
+    margin-top: 100px;
+   
+  }
+  
+  .buttonofcreateteam{
+    padding-left: 50px;
+    padding-right: 50px;
+    /* width: 200px; */
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: hsl(189, 73%, 54%);
+    border-radius: 5px;
+    color: white;
+  }
+
+  body{
+    background-color: hsl(0, 0%, 95%);
+  }
+  
 .card {
   /* margin-top: .5em; */
   /* max-height: 70em;
@@ -34,3 +54,12 @@
   margin-right: .8em;
   border-radius: 9em;
 }
+
+@media screen and (max-width: 563px) {
+  .cards{
+    margin-top: 0px;
+   
+  }
+}
+
+
