@@ -24,7 +24,7 @@ func main() {
 	ConnectENV()
 	models.Database()
 	goth.UseProviders(
-		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("http://${HOST}:${PORT}/auth/google/callback")),
+		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback")),
 	)
 
 	app := fiber.New()
