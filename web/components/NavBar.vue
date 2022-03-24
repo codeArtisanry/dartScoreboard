@@ -12,12 +12,7 @@
       <div class="col pt-2 col-lg-6 col-6 col-md-12">
         <div class="text-right pt-2">
           <button
-            class="
-              col-12 col-lg-6
-              shadow
-              border border-light border-start-0
-              rounded-pill
-            "
+            class="col-12 col-lg-6 shadow border border-light border-start-0 rounded-pill"
           >
             Log Out
           </button>

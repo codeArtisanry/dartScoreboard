@@ -1,5 +1,5 @@
 <template>
-    <div>
-        <GameSelection />
-    </div>
+  <div>
+    <GameSelection />
+  </div>
 </template>
