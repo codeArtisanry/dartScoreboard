@@ -85,27 +85,26 @@ func main() {
 	// 1. Endpoint for i am logged in?
 	app.Get("/", func(c *fiber.Ctx) error {
 		// TODO: Check from cookie if user is exist
-
-		cookie := c.Cookies("jwt")
-		_, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.ExpandEnv("${SECRET_KEY}")), nil
-		})
-		// fmt.Println(token)
-
-		// claims := token.Claims.(*jwt.StandardClaims)
 		var user models.User
+		cookie := c.Cookies("user")
+		fmt.Println(cookie)
+		token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+			return []byte("key"), nil
+		})
+		fmt.Println(token)
+		// claims := token.Claims.(*jwt.StandardClaims)
 		// userData := models.User{Token: claims}
 		// fmt.Println(userData)
 		// fmt.Println(claims)
 		// database.DB.Where("id = ?", claims.Issuer).First(&user)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println(err,"key error")
 			c.Status(fiber.StatusUnauthorized)
 			return c.JSON(fiber.Map{
 				"message": "unauthenticated",
 			})
 		}
-		// c.Redirect("/auth/google")
+		c.Redirect("/auth/google")
 		// If exist then return 2xx status code
 		return c.Status(200).JSON(&fiber.Map{
 			"success": true,
@@ -139,7 +138,7 @@ func main() {
 			ExpiresAt: time.Now().Add(time.Hour * 42).Unix(), //2 day
 		})
 
-		token, err := claims.SignedString([]byte(os.ExpandEnv("${SECRET_KEY}")))
+		token, err := claims.SignedString([]byte("key"))
 
 		if err != nil {
 			ctx.Status(fiber.StatusInternalServerError)
@@ -149,7 +148,7 @@ func main() {
 		}
 
 		cookie := fiber.Cookie{
-			Name:     "jwt",
+			Name:     "user",
 			Value:    token,
 			Expires:  time.Now().Add(time.Hour * 24),
 			HTTPOnly: true,
