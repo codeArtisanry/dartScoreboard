@@ -20,15 +20,7 @@
         @keypress.enter="addPlayer"
       />
       <span
-        class="
-          btn btn-secondary btn-sm
-          shadow
-          border border-light
-          rounded-pill
-          ml-2
-          w-25
-          fw-bolder
-        "
+        class="btn btn-secondary btn-sm shadow border border-light rounded-pill ml-2 w-25 fw-bolder"
         @click="addPlayer"
       >
         Add
