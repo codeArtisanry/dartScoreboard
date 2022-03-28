@@ -53,6 +53,6 @@ func Database() *sql.DB {
 
 func InsertData(user User) {
 	db := Database()
-	insert, _ := db.Prepare("INSERT INTO dart (token, userEmail, userName) VALUES (?, ?, ?)")
-	insert.Exec(user.Id, user.Name, user.Email)
+	insert, _ := db.Prepare("INSERT INTO dart (userId, userEmail) VALUES (?, ?)")
+	insert.Exec(user.Id, user.Email)
 }

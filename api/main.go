@@ -81,6 +81,13 @@ func main() {
 			return err
 		}
 		var user models.User
+		////////////////////////changes by jeel/////////////////////////////////////
+		userData := models.User{
+			Id:    userinfo.RawData["id"],
+			Email: userinfo.RawData["email"],
+		}
+		fmt.Println(userData)
+		////////////////////////////////////////////////////////////////////////////
 		if user.Id == 0 {
 			ctx.Status(fiber.StatusNotFound)
 			return ctx.JSON(fiber.Map{
@@ -132,6 +139,13 @@ func main() {
 		})
 		// Return 200
 	})
+	///////////////////////chnages by jeel///////////////////////////////////
+	app.Get("/home/", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{
+			"message": "successfully in homepage",
+		})
+	})
+	//////////////////////////////////////////////////////////////////////////
 
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 
