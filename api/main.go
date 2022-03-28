@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
@@ -43,23 +42,76 @@ func main() {
 
 	app := fiber.New()
 
+	// 1. Endpoint for i am logged in?
+	app.Get("/", func(c *fiber.Ctx) error {
+		// TODO: Check from cookie if user is exist
+		// var user models.User
+		// userData := models.User{Token: claims}
+		// fmt.Println(userData)
+		// database.DB.Where("id = ?", claims.Issuer).First(&user)
+		// if err != nil {
+		// 	fmt.Println(err, "key error")
+		// 	c.Status(fiber.StatusUnauthorized)
+		// 	return c.JSON(fiber.Map{
+		// 		"message": "unauthenticated",
+		// 	})
+		// }
+		c.Redirect("/auth/google")
+		// If exist then return 2xx status code
+		return c.JSON(fiber.Map{"status": "success", "message": "Success login", "data": "tokens"})
+		// Else return 403 unauthorized
+	})
+
+	// 2. Initiate google signin flow
+	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
+		// TODO: Check cookie is exist [USER IS ALREADY EXIST]
+		gf.BeginAuthHandler(ctx)
+
+		// var user models.User
+
+		// IF EXIST RETURN 2xx
+		// ELSE INITIATE GLAUTH SIGNIN FLOW
+		return nil
+	})
+
 	// 3. Redirect by google
 	app.Get("/auth/:provider/callback", func(ctx *fiber.Ctx) error {
-		user, err := gf.CompleteUserAuth(ctx)
+		userinfo, err := gf.CompleteUserAuth(ctx)
 		if err != nil {
 			return err
 		}
+		var user models.User
+		if user.Id == 0 {
+			ctx.Status(fiber.StatusNotFound)
+			return ctx.JSON(fiber.Map{
+				"message": "user not found",
+			})
+		}
+		// GET TOKEN
+		token := ctx.Cookies("user")
+
+		if err != nil {
+			ctx.Status(fiber.StatusInternalServerError)
+			return ctx.JSON(fiber.Map{
+				"message": "could not login",
+			})
+		}
+
+		fmt.Println("token by google: ", token)
 
 		// TODO: Set cookie
 		cookie := new(fiber.Cookie)
-		cookie.Name = "user"
-		cookie.Value = user.IDToken
+		cookie.Name = "userinfo"
+		cookie.Value = token
 		cookie.Expires = time.Now().Add(30 * time.Hour * 24)
-		// Set cookie
+		// Set cookie from JWT
 		ctx.Cookie(cookie)
 		// TODO: Redirect user to frontend
-		ctx.Redirect("/")
-		return err
+		ctx.Redirect("/home")
+		return ctx.JSON(fiber.Map{
+			"message": "success",
+			"data":    userinfo,
+		})
 	})
 
 	// 4. Signout
@@ -79,104 +131,6 @@ func main() {
 			"message": "success",
 		})
 		// Return 200
-	})
-
-	// 1. Endpoint for i am logged in?
-	app.Get("/", func(c *fiber.Ctx) error {
-		// TODO: Check from cookie if user is exist
-		// var user models.User
-		cookie := c.Cookies("user")
-		fmt.Println(cookie)
-		// token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		// 	return []byte("key"), nil
-		// })
-		// if err != nil {
-		// 	fmt.Println(err)
-		// 	return c.SendStatus(fiber.StatusInternalServerError)
-		// }
-		// claims := token.Claims.(*jwt.StandardClaims)
-
-		// jwtware.New(jwtware.Config){
-		// SigningKey: []byte("secret"),
-		// })
-		token := jwt.New(jwt.SigningMethodHS256)
-		// token := jwt.New(jwt.SigningMethodRS256)
-		claims := token.Claims.(jwt.MapClaims)
-		claims["identity"] = "identity"
-		claims["admin"] = true
-		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-
-		t, err := token.SignedString([]byte(""))
-		if err != nil {
-			fmt.Println("Error", err.Error())
-			return c.SendStatus(fiber.StatusInternalServerError)
-		}
-		fmt.Println("New Token:", t)
-		// userData := models.User{Token: claims}
-		// fmt.Println(userData)
-		// database.DB.Where("id = ?", claims.Issuer).First(&user)
-		// if err != nil {
-		// 	fmt.Println(err, "key error")
-		// 	c.Status(fiber.StatusUnauthorized)
-		// 	return c.JSON(fiber.Map{
-		// 		"message": "unauthenticated",
-		// 	})
-		// }
-		c.Redirect("/auth/google")
-		// If exist then return 2xx status code
-		return c.JSON(fiber.Map{"status": "success", "message": "Success login", "data": t})
-		// Else return 403 unauthorized
-	})
-
-	// 2. Initiate google signin flow
-	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
-		// TODO: Check cookie is exist [USER IS ALREADY EXIST]
-		gf.BeginAuthHandler(ctx)
-
-		// var data map[string]string
-		// if err := ctx.BodyParser(&data); err != nil {
-		// 	return err
-		// }
-
-		// var user models.User
-		// // database.DB.Where("email = ?", data["email"]).First(&user)
-
-		// if user.Id == 0 {
-		// 	ctx.Status(fiber.StatusNotFound)
-		// 	return ctx.JSON(fiber.Map{
-		// 		"message": "user not found",
-		// 	})
-		// }
-
-		// claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		// 	Issuer:    strconv.Itoa(int(user.Id)),
-		// 	ExpiresAt: time.Now().Add(time.Hour * 42).Unix(), //2 day
-		// })
-
-		// token, err := claims.SignedString([]byte("key"))
-
-		// if err != nil {
-		// 	ctx.Status(fiber.StatusInternalServerError)
-		// 	return ctx.JSON(fiber.Map{
-		// 		"message": "could not login",
-		// 	})
-		// }
-
-		// cookie := fiber.Cookie{
-		// 	Name:     "user",
-		// 	Value:    token,
-		// 	Expires:  time.Now().Add(time.Hour * 24),
-		// 	HTTPOnly: true,
-		// }
-
-		// ctx.Cookie(&cookie)
-		// return ctx.Status(201).JSON(&fiber.Map{
-		// 	"success": true,
-		// 	"message": "Sign In Success",
-		// })
-		// IF EXIST RETURN 2xx
-		// ELSE INITIATE GLAUTH SIGNIN FLOW
-		return nil
 	})
 
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))

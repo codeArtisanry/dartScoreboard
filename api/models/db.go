@@ -30,17 +30,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/dgrijalva/jwt-go"
 	_ "github.com/mattn/go-sqlite3"
 	migrate "github.com/rubenv/sql-migrate"
 )
-
-type User struct {
-	Id    uint                `json:"id"`
-	Name  string              `json:"name"`
-	Email string              `json:"email"`
-	Token *jwt.StandardClaims  `json:"token"`
-}
 
 func Database() *sql.DB {
 	migrations := &migrate.FileMigrationSource{
@@ -62,5 +54,5 @@ func Database() *sql.DB {
 func InsertData(user User) {
 	db := Database()
 	insert, _ := db.Prepare("INSERT INTO dart (token, userEmail, userName) VALUES (?, ?, ?)")
-	insert.Exec(user.Token, user.Name, user.Email)
+	insert.Exec(user.Id, user.Name, user.Email)
 }
