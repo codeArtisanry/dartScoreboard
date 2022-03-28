@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
@@ -32,23 +31,6 @@ func ConnectENV() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(".env file not loaded properly")
-	}
-}
-
-var client *redis.Client
-
-func init() {
-	//Initializing redis
-	dsn := os.Getenv("REDIS_DSN")
-	if len(dsn) == 0 {
-		dsn = "localhost:6379"
-	}
-	client = redis.NewClient(&redis.Options{
-		Addr: dsn, //redis port
-	})
-	_, err := client.Ping().Result()
-	if err != nil {
-		panic(err)
 	}
 }
 
@@ -105,26 +87,31 @@ func main() {
 		// var user models.User
 		cookie := c.Cookies("user")
 		fmt.Println(cookie)
-		token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-			return []byte("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"), nil
-		})
+		// token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		// 	return []byte("key"), nil
+		// })
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return c.SendStatus(fiber.StatusInternalServerError)
+		// }
 		// claims := token.Claims.(*jwt.StandardClaims)
 
 		// jwtware.New(jwtware.Config){
 		// SigningKey: []byte("secret"),
 		// })
-		token = jwt.New(jwt.SigningMethodRS256)
+		token := jwt.New(jwt.SigningMethodHS256)
+		// token := jwt.New(jwt.SigningMethodRS256)
 		claims := token.Claims.(jwt.MapClaims)
 		claims["identity"] = "identity"
 		claims["admin"] = true
 		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
-		fmt.Println(token)
-		t, err := token.SignedString([]byte("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"))
+		t, err := token.SignedString([]byte(""))
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error", err.Error())
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
+		fmt.Println("New Token:", t)
 		// userData := models.User{Token: claims}
 		// fmt.Println(userData)
 		// database.DB.Where("id = ?", claims.Issuer).First(&user)
@@ -145,6 +132,7 @@ func main() {
 	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
 		// TODO: Check cookie is exist [USER IS ALREADY EXIST]
 		gf.BeginAuthHandler(ctx)
+
 		// var data map[string]string
 		// if err := ctx.BodyParser(&data); err != nil {
 		// 	return err
