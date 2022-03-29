@@ -1,7 +1,7 @@
 package models
 
 type User struct {
-	Id    interface{} `json:"id"`
-	Email interface{} `json:"email"`
-	Picture interface{} `json:"picture"`
+	Id      string `json:"id"`
+	Email   string `json:"email"`
+	Picture string `json:"picture"`
 }

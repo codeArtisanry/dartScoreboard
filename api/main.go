@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
@@ -77,15 +77,15 @@ func main() {
 		}
 		////////////////////////changes by jeel/////////////////////////////////////
 		user := models.User{
-			Id:      userinfo.RawData["id"],
-			Email:   userinfo.RawData["email"],
-			Picture: userinfo.RawData["picture"],
+			Id:      userinfo.UserID,
+			Email:   userinfo.Email,
+			Picture: userinfo.AvatarURL,
 		}
-		// db := models.Database()
-		// models.InsertData(db, user)
+		db := models.Database()
 		fmt.Println("from api", user)
+		models.InsertData(db, user)
 		////////////////////////////////////////////////////////////////////////////
-		if user.Id == 0 {
+		if user.Id == "" {
 			ctx.Status(fiber.StatusNotFound)
 			return ctx.JSON(fiber.Map{
 				"message": "user not found",

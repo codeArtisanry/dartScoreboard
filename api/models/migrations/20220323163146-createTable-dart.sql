@@ -1,6 +1,6 @@
 -- +migrate Up
 CREATE TABLE IF NOT EXISTS dart(
-    userId INTEGER PRIMARY KEY,
+    userId TEXT PRIMARY KEY,
     userEmail TEXT,
     userPicture TEXT
 );
