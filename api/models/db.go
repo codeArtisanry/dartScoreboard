@@ -52,7 +52,7 @@ func Database() *sql.DB {
 }
 
 func InsertUserData(db *sql.DB, user User) {
-	insert, err := db.Prepare("INSERT INTO dart (userId, userEmail, userPicture) VALUES (?, ?, ?)")
+	insert, err := db.Prepare("INSERT INTO user (userId, userEmail, userPicture) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,6 +61,7 @@ func InsertUserData(db *sql.DB, user User) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Sucessfully Data Inserted on user Table")
 }
 func InsertGameData(db *sql.DB, game Game) {
 	insert, err := db.Prepare("INSERT INTO game (gameName, gameType, playersNames, gameTargetScore) VALUES (?, ?, ?, ?)")
@@ -72,4 +73,5 @@ func InsertGameData(db *sql.DB, game Game) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Sucessfully Data Inserted on game Table")
 }

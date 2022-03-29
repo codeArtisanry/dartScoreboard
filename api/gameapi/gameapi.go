@@ -20,6 +20,8 @@ func Gameapi(app *fiber.App) {
 		}
 		c.JSON(g)
 		fmt.Println(g)
+		db := models.Database()
+		models.InsertGameData(db, *g)
 		return c.SendStatus(200)
 	})
 }
