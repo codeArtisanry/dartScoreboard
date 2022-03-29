@@ -34,7 +34,7 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-func Database() {
+func Database() *sql.DB {
 	migrations := &migrate.FileMigrationSource{
 		Dir: "models/migrations",
 	}
@@ -48,4 +48,17 @@ func Database() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Applied %d migrations!\n", n)
+	return db
+}
+
+func InsertData(db *sql.DB, user User) {
+	insert, err := db.Prepare("INSERT INTO dart (userId, userEmail, userPicture) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("from database", user.Id, user.Email, user.Picture)
+	_,err = insert.Exec(user.Id, user.Email, user.Picture)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
