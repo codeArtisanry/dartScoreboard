@@ -1,8 +1,14 @@
 # web
 
 ## Build Setup
-
 ```bash
+
+#node -version
+$ v16.14.0
+
+#npm -version
+$ 8.3.1
+
 # install dependencies
 $ npm install
 
