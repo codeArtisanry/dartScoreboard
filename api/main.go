@@ -43,22 +43,18 @@ func main() {
 
 	// 1. Endpoint for i am logged in?
 	app.Get("/", func(c *fiber.Ctx) error {
-		// TODO: Check from cookie if user is exist
-		// var user models.User
-		// userData := models.User{Token: claims}
-		// fmt.Println(userData)
-		// database.DB.Where("id = ?", claims.Issuer).First(&user)
-		// if err != nil {
-		// 	fmt.Println(err, "key error")
-		// 	c.Status(fiber.StatusUnauthorized)
-		// 	return c.JSON(fiber.Map{
-		// 		"message": "unauthenticated",
-		// 	})
-		// }
-		c.Redirect("/auth/google")
+		// TODO: Check from cookie if user is exist or not
+		// if exist then return 2xx status code
+		if c.Cookies("userinfo") == c.Cookies("userinfo") {
+			fmt.Println(c.Cookies("userinfo"))
+			return c.JSON(fiber.Map{"status": "success", "message": "Success login"})
+			// Else return 403 unauthorized
+		} else {
+			c.Redirect("/auth/google")
+		}
 		// If exist then return 2xx status code
-		return c.JSON(fiber.Map{"status": "success", "message": "Success login", "data": "tokens"})
-		// Else return 403 unauthorized
+		// return nil
+		return c.JSON(fiber.Map{"status": "Fail", "message": "unauthorized user"})
 	})
 
 	// 2. Initiate google signin flow
@@ -85,8 +81,8 @@ func main() {
 			Email:   userinfo.RawData["email"],
 			Picture: userinfo.RawData["picture"],
 		}
-		db := models.Database()
-		models.InsertData(db, user)
+		// db := models.Database()
+		// models.InsertData(db, user)
 		fmt.Println("from api", user)
 		////////////////////////////////////////////////////////////////////////////
 		if user.Id == 0 {
@@ -126,7 +122,7 @@ func main() {
 		// Set cookie from JWT
 		ctx.Cookie(cookie)
 		// TODO: Redirect user to frontend
-		ctx.Redirect("/")
+		ctx.Redirect("/home")
 		return ctx.JSON(fiber.Map{
 			"message": "success",
 			"data":    t,
@@ -151,14 +147,14 @@ func main() {
 		})
 		// Return 200
 	})
-	// ///////////////////////chnages by jeel///////////////////////////////////
-	// app.Get("/home/", func(ctx *fiber.Ctx) error {
-	// 	return ctx.JSON(fiber.Map{
-	// 		"message": "successfully in homepage",
-	// 	})
-	// })
-	// //////////////////////////////////////////////////////////////////////////
 
+	// ///////////////////////chnages by jeel///////////////////////////////////
+	//frontend ROUTE
+	app.Get("/home", func(ctx *fiber.Ctx) error {
+		return ctx.JSON(fiber.Map{
+			"message": "successfully in homepage",
+		})
+	})
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 
 }
