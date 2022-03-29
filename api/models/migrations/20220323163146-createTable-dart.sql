@@ -4,10 +4,10 @@ CREATE TABLE IF NOT EXISTS dart(
     userEmail TEXT,
     userPicture TEXT
 ); CREATE TABLE IF NOT EXISTS game(
-    GameName TEXT PRIMARY KEY,
-    GameType TEXT,
-    PlayersNames TEXT,
-    GameTargetScore TEXT
+    gameName TEXT PRIMARY KEY,
+    gameType TEXT,
+    playersNames TEXT,
+    gameTargetScore TEXT
 );
 -- +migrate Down
 DROP TABLE IF EXISTS dart(); DROP TABLE IF EXISTS game();
