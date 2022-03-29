@@ -79,13 +79,15 @@ func main() {
 		if err != nil {
 			return err
 		}
-		var user models.User
 		////////////////////////changes by jeel/////////////////////////////////////
-		userData := models.User{
-			Id:    userinfo.RawData["id"],
-			Email: userinfo.RawData["email"],
+		user := models.User{
+			Id:      userinfo.RawData["id"],
+			Email:   userinfo.RawData["email"],
+			Picture: userinfo.RawData["picture"],
 		}
-		fmt.Println(userData)
+		db := models.Database()
+		models.InsertData(db, user)
+		fmt.Println("from api", user)
 		////////////////////////////////////////////////////////////////////////////
 		if user.Id == 0 {
 			ctx.Status(fiber.StatusNotFound)

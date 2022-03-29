@@ -51,8 +51,14 @@ func Database() *sql.DB {
 	return db
 }
 
-func InsertData(user User) {
-	db := Database()
-	insert, _ := db.Prepare("INSERT INTO dart (userId, userEmail) VALUES (?, ?)")
-	insert.Exec(user.Id, user.Email)
+func InsertData(db *sql.DB, user User) {
+	insert, err := db.Prepare("INSERT INTO dart (userId, userEmail, userPicture) VALUES (?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("from database", user.Id, user.Email, user.Picture)
+	_,err = insert.Exec(user.Id, user.Email, user.Picture)
+	if err != nil{
+		log.Fatal(err)
+	}
 }
