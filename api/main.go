@@ -43,17 +43,9 @@ func main() {
 	// 1. Endpoint for i am logged in?
 	app.Get("/", func(c *fiber.Ctx) error {
 		// TODO: Check from cookie if user is exist or not
-		// if exist then return 2xx status code
-		// if c.Cookies("userinfo") == c.Cookies("frontend") {
-		// 	fmt.Println(c.Cookies("userinfo"))
-		// 	return c.JSON(fiber.Map{"status": "success", "message": "Success login"})
-		// 	// Else return 403 unauthorized
-		// } else {
-		// }
-
-		// If exist then return 2xx status code
-		// return nil
 		c.Redirect("/auth/google")
+		// If exist then return 2xx status code
+		// Else return 403 unauthorized
 		return c.JSON(fiber.Map{"status": "Fail", "message": "unauthorized user"})
 	})
 
@@ -73,7 +65,6 @@ func main() {
 		if err != nil {
 			return err
 		}
-		fmt.Println(userinfo.IDToken)
 		user := models.User{
 			Id:      userinfo.UserID,
 			Email:   userinfo.Email,
@@ -83,13 +74,6 @@ func main() {
 		fmt.Println("from api", user)
 		models.InsertData(db, user)
 
-		// if user.Id == "" {
-		// 	ctx.Status(fiber.StatusNotFound)
-		// 	return ctx.JSON(fiber.Map{
-		// 		"message": "user not found",
-		// 	})
-		// }
-		fmt.Println(userinfo)
 		// GET TOKEN
 		fmt.Println("ID TOKEN", userinfo.IDToken)
 
