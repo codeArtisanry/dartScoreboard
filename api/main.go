@@ -37,9 +37,8 @@ func main() {
 	ConnectENV()
 	models.Database()
 	goth.UseProviders(
-		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback")),
-	)
-
+		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback"), os.ExpandEnv("[]string{${SCOPES}}")))
+	fmt.Println(os.Getenv("${SCOPES}"))
 	app := fiber.New()
 
 	// 1. Endpoint for i am logged in?
