@@ -45,24 +45,23 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		// TODO: Check from cookie if user is exist or not
 		// if exist then return 2xx status code
-		if c.Cookies("userinfo") == c.Cookies("userinfo") {
+		if c.Cookies("userinfo") == c.Cookies("frontend") {
 			fmt.Println(c.Cookies("userinfo"))
 			return c.JSON(fiber.Map{"status": "success", "message": "Success login"})
 			// Else return 403 unauthorized
 		} else {
-			c.Redirect("/auth/google")
+			return c.Redirect("/auth/google")
 		}
+
 		// If exist then return 2xx status code
 		// return nil
-		return c.JSON(fiber.Map{"status": "Fail", "message": "unauthorized user"})
+		// return c.JSON(fiber.Map{"status": "Fail", "message": "unauthorized user"})
 	})
 
 	// 2. Initiate google signin flow
 	app.Get("/auth/:provider", func(ctx *fiber.Ctx) error {
 		// TODO: Check cookie is exist [USER IS ALREADY EXIST]
 		gf.BeginAuthHandler(ctx)
-
-		// var user models.User
 
 		// IF EXIST RETURN 2xx
 		// ELSE INITIATE GLAUTH SIGNIN FLOW
@@ -75,7 +74,6 @@ func main() {
 		if err != nil {
 			return err
 		}
-		////////////////////////changes by jeel/////////////////////////////////////
 		user := models.User{
 			Id:      userinfo.UserID,
 			Email:   userinfo.Email,
@@ -84,7 +82,7 @@ func main() {
 		db := models.Database()
 		fmt.Println("from api", user)
 		models.InsertData(db, user)
-		////////////////////////////////////////////////////////////////////////////
+
 		if user.Id == "" {
 			ctx.Status(fiber.StatusNotFound)
 			return ctx.JSON(fiber.Map{
@@ -106,13 +104,6 @@ func main() {
 		if err != nil {
 			return ctx.SendStatus(fiber.StatusInternalServerError)
 		}
-
-		// if err != nil {
-		// 	ctx.Status(fiber.StatusInternalServerError)
-		// 	return ctx.JSON(fiber.Map{
-		// 		"message": "could not login",
-		// 	})
-		// }
 
 		// TODO: Set cookie
 		cookie := new(fiber.Cookie)
@@ -148,7 +139,6 @@ func main() {
 		// Return 200
 	})
 
-	// ///////////////////////chnages by jeel///////////////////////////////////
 	//frontend ROUTE
 	app.Get("/home", func(ctx *fiber.Ctx) error {
 		return ctx.JSON(fiber.Map{
