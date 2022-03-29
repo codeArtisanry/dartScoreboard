@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
@@ -37,8 +38,7 @@ func main() {
 	ConnectENV()
 	models.Database()
 	goth.UseProviders(
-		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback"), os.ExpandEnv("[]string{${SCOPES}}")))
-	fmt.Println(os.Getenv("${SCOPES}"))
+		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback")))
 	app := fiber.New()
 
 	// 1. Endpoint for i am logged in?
@@ -93,30 +93,41 @@ func main() {
 				"message": "user not found",
 			})
 		}
+		fmt.Println(userinfo)
 		// GET TOKEN
-		token := ctx.Cookies("user")
+		// token := ctx.Cookies("userinfo")
+		token := jwt.New(jwt.SigningMethodHS256)
 
+		claims := token.Claims.(jwt.MapClaims)
+		claims["identity"] = userinfo
+		claims["admin"] = true
+		claims["exp"] = time.Now().Add(24 * time.Hour * 72).Unix()
+
+		t, err := token.SignedString([]byte(`eyJhbGciOiJSUzI1NiIsImtpZCI6IjU4YjQyOTY2MmRiMDc4NmYyZWZlZmUxM2MxZWIxMmEyOGRjNDQyZDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIxNTI5MDQyNjI4NTYtamFiM2VwMDJ2dmdhamRjNjZhYjdlaGFmZW5vbHVsbjQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIxNTI5MDQyNjI4NTYtamFiM2VwMDJ2dmdhamRjNjZhYjdlaGFmZW5vbHVsbjQuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTM1MzEyMjk1MzA4MTgyNjU4ODMiLCJoZCI6ImltcHJvd2lzZWQuY29tIiwiZW1haWwiOiJ2YXRzYWxAaW1wcm93aXNlZC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IlNvUGV4aGdoRlJ2bXNQN3FPNWZ5V0EiLCJpYXQiOjE2NDg1MzAwMTUsImV4cCI6MTY0ODUzMzYxNX0.MzHc_mGAF3tdeeklVWVlbV_8KiInfXcv_cVvz9P-2CJIEHW2HA63eO1W3VxT22sXGZkegvhFYdpMyYo_L8fugSX-4TbaRUjSOPzmQXAgoiXMfedHNGejQH50ciGxp4KZVo3P8sC4vZJglzyEh8pFOlISFjAQiIh3vWkLDZTcmAuEmzo5KlM4O88e5k7F47dS_qArqpPNRpvr1gOddf5HvYYYkRVLem2njLxc9qe7oqX80GGZW32zkUoPe4467TRsh0T9uihPj6ue8SBAN60vnEqtnrZ7c_YPjNGXJaPG3HfilxraBtWNp1Jl_8t4vSLtq9wbKHISLibXGaXLs8ykFQ`))
+		fmt.Println("token by google: ", t)
 		if err != nil {
-			ctx.Status(fiber.StatusInternalServerError)
-			return ctx.JSON(fiber.Map{
-				"message": "could not login",
-			})
+			return ctx.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		fmt.Println("token by google: ", token)
+		// if err != nil {
+		// 	ctx.Status(fiber.StatusInternalServerError)
+		// 	return ctx.JSON(fiber.Map{
+		// 		"message": "could not login",
+		// 	})
+		// }
 
 		// TODO: Set cookie
 		cookie := new(fiber.Cookie)
 		cookie.Name = "userinfo"
-		cookie.Value = token
+		cookie.Value = t
 		cookie.Expires = time.Now().Add(30 * time.Hour * 24)
 		// Set cookie from JWT
 		ctx.Cookie(cookie)
 		// TODO: Redirect user to frontend
-		ctx.Redirect("/home")
+		ctx.Redirect("/")
 		return ctx.JSON(fiber.Map{
 			"message": "success",
-			"data":    userinfo,
+			"data":    t,
 		})
 	})
 
@@ -138,13 +149,13 @@ func main() {
 		})
 		// Return 200
 	})
-	///////////////////////chnages by jeel///////////////////////////////////
-	app.Get("/home/", func(ctx *fiber.Ctx) error {
-		return ctx.JSON(fiber.Map{
-			"message": "successfully in homepage",
-		})
-	})
-	//////////////////////////////////////////////////////////////////////////
+	// ///////////////////////chnages by jeel///////////////////////////////////
+	// app.Get("/home/", func(ctx *fiber.Ctx) error {
+	// 	return ctx.JSON(fiber.Map{
+	// 		"message": "successfully in homepage",
+	// 	})
+	// })
+	// //////////////////////////////////////////////////////////////////////////
 
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 

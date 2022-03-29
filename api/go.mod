@@ -13,7 +13,6 @@ require (
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/markbates/goth v1.69.0
 	github.com/mattn/go-sqlite3 v1.14.12
@@ -32,8 +31,6 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.1.1 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/onsi/gomega v1.19.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914 // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 )
