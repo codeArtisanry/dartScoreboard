@@ -5,3 +5,10 @@ type User struct {
 	Email   string `json:"email"`
 	Picture string `json:"picture"`
 }
+
+type Game struct {
+	GameName        string
+	GameType        string
+	PlayersNames    []string
+	GameTargetScore string
+}

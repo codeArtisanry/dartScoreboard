@@ -25,7 +25,6 @@ require (
 
 require (
 	cloud.google.com/go v0.81.0 // indirect
-	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dartscoreboard/gameapi"
 	"dartscoreboard/models"
 	"fmt"
 	"log"
@@ -72,7 +73,7 @@ func main() {
 		}
 		db := models.Database()
 		fmt.Println("from api", user)
-		models.InsertData(db, user)
+		models.InsertUserData(db, user)
 
 		// GET TOKEN
 		fmt.Println("ID TOKEN", userinfo.IDToken)
@@ -118,6 +119,7 @@ func main() {
 			"message": "successfully in homepage",
 		})
 	})
+	api.Gameapi(app)
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 
 }
