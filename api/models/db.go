@@ -39,12 +39,12 @@ func InsertUserData(db *sql.DB, user User) {
 	fmt.Println("Sucessfully Data Inserted on users Table")
 }
 func InsertGameData(db *sql.DB, game Game) {
-	insert, err := db.Prepare("INSERT INTO games (name, type, creater_email) VALUES (?, ?, ?)")
+	insert, err := db.Prepare("INSERT INTO games (name, type, creater_user_id) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("from database", game.Name, game.Type, game.CreaterEmail)
-	_, err = insert.Exec(game.Name, game.Type, game.CreaterEmail)
+	fmt.Println("from database", game.Name, game.Type, game.CreaterUserId)
+	_, err = insert.Exec(game.Name, game.Type, game.CreaterUserId)
 	if err != nil {
 		log.Fatal(err)
 	}

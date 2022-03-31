@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS users(
     first_name TEXT,
     last_name TEXT,
     email TEXT,
-    avatar TEXT,
+    avatar_url TEXT,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
     ),
@@ -16,20 +16,43 @@ CREATE TABLE IF NOT EXISTS games(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     type TEXT,
-    creater_email TEXT,
+    creater_user_id TEXT,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
     ),
     updated_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
-    )
+    ),
+    FOREIGN KEY(creater_user_id) REFERENCES users (id)
+);
+CREATE TABLE IF NOT EXISTS rounds(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    round INTEGER,
+    game_player_id INTEGER,
+    created_at DATETIME DEFAULT (
+        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
+    ),
+    updated_at DATETIME DEFAULT (
+        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
+    ),
+    FOREIGN KEY(game_player_id) REFERENCES game_players (id)
 );
 CREATE TABLE IF NOT EXISTS scores(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id TEXT
-    round INTEGER,
-    throw INTEGER,
-    point INTEGER,
+    round_id INTEGER,
+    dart INTEGER,
+    score INTEGER,
+    created_at DATETIME DEFAULT (
+        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
+    ),
+    updated_at DATETIME DEFAULT (
+        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
+    ),
+    FOREIGN KEY(round_id) REFERENCES rounds (id)
+);
+CREATE TABLE IF NOT EXISTS game_players(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
     game_id INTEGER,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
@@ -37,22 +60,12 @@ CREATE TABLE IF NOT EXISTS scores(
     updated_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
     ),
-    FOREIGN KEY(game_id) REFERENCES games (id)
-    FOREIGN KEY(user_id) REFERENCES games (id)
-);
-CREATE TABLE IF NOT EXISTS players(
-    user_id INTEGER NOT NULL,
-    created_at DATETIME DEFAULT (
-        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
-    ),
-    updated_at DATETIME DEFAULT (
-        STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
-    ),
     FOREIGN KEY(user_id) REFERENCES users (id),
-    PRIMARY KEY(email, game_id)
+    FOREIGN KEY(game_id) REFERENCES games (id)
 );
 -- +migrate Down
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS games;
+DROP TABLE IF EXISTS rounds;
 DROP TABLE IF EXISTS scores;
-DROP TABLE IF EXISTS players;
+DROP TABLE IF EXISTS game_players;

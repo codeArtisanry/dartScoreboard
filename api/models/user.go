@@ -13,25 +13,34 @@ type User struct {
 }
 
 type Game struct {
+	Id            int        `json:"id"`
+	Name          string     `json:"gameName"`
+	Type          string     `json:"gameType"`
+	CreaterUserId string     `json:"createrUserId"`
+	CreatedAt     *time.Time `json:"created_at,omitempty"`
+	UpdatedAt     *time.Time `json:"updated_at,omitempty"`
+}
+
+type Score struct {
+	Id        int        `json:"id"`
+	RoundId   int        `json:"roundId"`
+	Dart      int        `json:"dart"`
+	Score     int        `json:"score"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+}
+
+type Round struct {
 	Id           int        `json:"id"`
-	Name         string     `json:"gameName"`
-	Type         string     `json:"gameType"`
-	CreaterEmail string     `json:"createrEmail"`
+	GamePlayesId int        `json:"gamePlayerId"`
+	Round        int        `json:"round"`
 	CreatedAt    *time.Time `json:"created_at,omitempty"`
 	UpdatedAt    *time.Time `json:"updated_at,omitempty"`
 }
 
-type Score struct {
-	Id         int        `json:"id"`
-	Round      int        `json:"round"`
-	Point      int        `json:"point"`
-	PlayerName string     `json:"playerName"`
-	Throw      int        `json:"throw"`
-	CreatedAt  *time.Time `json:"created_at,omitempty"`
-	UpdatedAt  *time.Time `json:"updated_at,omitempty"`
-}
-
-type Player struct {
+type GamePlayes struct {
+	Id        int        `json:"id"`
+	GameId    int        `json:"gameId"`
 	UserId    int        `json:"userId"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
