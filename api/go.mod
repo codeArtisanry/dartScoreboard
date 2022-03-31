@@ -22,7 +22,13 @@ require (
 )
 
 require (
+	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/rubenv/sql-migrate v1.1.1
+)
+
+require (
 	cloud.google.com/go v0.81.0 // indirect
+	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
