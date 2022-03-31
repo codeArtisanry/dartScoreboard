@@ -1,28 +1,3 @@
-// package models
-
-// import (
-// 	"database/sql"
-// 	"fmt"
-// 	"log"
-// 	"os"
-
-// 	_ "github.com/mattn/go-sqlite3"
-// )
-
-// var DB *sql.DB
-
-// func ConnectDatabase() {
-// 	os.ExpandEnv("")
-// 	db, err := sql.Open("sqlite3", os.ExpandEnv("./${DB_NAME}"))
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println("successfully connected database")
-// 	create, _ := db.Prepare("CREATE TABLE IF NOT EXISTS dart (token INTEGER PRIMARY KEY, userEmail TEXT,userName TEXT)")
-// 	create.Exec()
-// 	insert, _ := db.Prepare("INSERT INTO dart (token, userEmail, userName) VALUES (?, ?, ?)")
-// 	insert.Exec(738473847, "jeel@improwied.com", "Jeel")
-// }
 package models
 
 import (
@@ -52,26 +27,26 @@ func Database() *sql.DB {
 }
 
 func InsertUserData(db *sql.DB, user User) {
-	insert, err := db.Prepare("INSERT INTO user (userId, userEmail, userPicture) VALUES (?, ?, ?)")
+	insert, err := db.Prepare("INSERT INTO users (id, first_name, last_name, email, avatar) VALUES (?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("from database", user.Id, user.Email, user.Picture)
-	_, err = insert.Exec(user.Id, user.Email, user.Picture)
+	fmt.Println("from database", user.FirstName, user.LastName, user.Email, user.AvatarURL)
+	_, err = insert.Exec(user.FirstName, user.LastName, user.Email, user.AvatarURL)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Sucessfully Data Inserted on user Table")
+	fmt.Println("Sucessfully Data Inserted on users Table")
 }
 func InsertGameData(db *sql.DB, game Game) {
-	insert, err := db.Prepare("INSERT INTO game (gameName, gameType, playersNames, gameTargetScore) VALUES (?, ?, ?, ?)")
+	insert, err := db.Prepare("INSERT INTO games (name, type, creater_email) VALUES (?, ?, ?)")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("from database", game.GameName, game.GameType, game.PlayersNames, game.GameTargetScore)
-	_, err = insert.Exec(game.GameName, game.GameType, game.PlayersNames, game.GameTargetScore)
+	fmt.Println("from database", game.Name, game.Type, game.CreaterEmail)
+	_, err = insert.Exec(game.Name, game.Type, game.CreaterEmail)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Sucessfully Data Inserted on game Table")
+	fmt.Println("Sucessfully Data Inserted on games Table")
 }

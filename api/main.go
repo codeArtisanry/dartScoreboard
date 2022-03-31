@@ -67,9 +67,10 @@ func main() {
 			return err
 		}
 		user := models.User{
-			Id:      userinfo.UserID,
+			FirstName:      userinfo.FirstName,
+			LastName: userinfo.LastName,
 			Email:   userinfo.Email,
-			Picture: userinfo.AvatarURL,
+			AvatarURL: userinfo.AvatarURL,
 		}
 		db := models.Database()
 		fmt.Println("from api", user)
@@ -119,7 +120,7 @@ func main() {
 			"message": "successfully in homepage",
 		})
 	})
-	api.Gameapi(app)
+	api.GameApi(app)
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 
 }

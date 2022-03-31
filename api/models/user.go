@@ -1,14 +1,25 @@
 package models
 
 type User struct {
-	Id      string `json:"id"`
+	FirstName string `json:"firstName"`
+	LastName string `json:"lastName"`
 	Email   string `json:"email"`
-	Picture string `json:"picture"`
+	AvatarURL string `json:"avatarUrl"`
 }
 
 type Game struct {
-	GameName        string
-	GameType        string
-	PlayersNames    []string
-	GameTargetScore string
+	Name        string `json:"gameName"`
+	Type        string `json:"gameType"`
+	CreaterEmail string `json:"createrEmail"`
+}
+
+type Score struct {
+	Round int `json:"round"`
+	Point int `json:"point"`
+	PlayerName string `json:"playerName"`
+	Throw int `json:"throw"`
+}
+
+type Player struct {
+	UserId int `json:"userId"`
 }
