@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dartscoreboard/gameapi"
 	"dartscoreboard/models"
 	"fmt"
 	"log"
@@ -120,7 +119,6 @@ func main() {
 			"message": "successfully in homepage",
 		})
 	})
-	api.GameApi(app)
 	log.Fatal(app.Listen(os.ExpandEnv(":${PORT}")))
 
 }
