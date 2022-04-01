@@ -25,3 +25,4 @@ func Database() *sql.DB {
 	fmt.Printf("Applied %d migrations!\n", n)
 	return db
 }
+

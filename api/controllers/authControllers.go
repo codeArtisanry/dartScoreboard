@@ -24,7 +24,6 @@ type Cookie struct {
 	SameSite string // lax, strict, none
 }
 
-
 // 2. Initiate google signin flow
 func Signinflow(ctx *fiber.Ctx) error {
 	// TODO: Check cookie is exist [USER IS ALREADY EXIST]
@@ -43,9 +42,10 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	}
 	// fmt.Println(user)
 	userinfo := models.User{
-		// Id:      user.UserID,
-		// Email:   user.Email,
-		// Picture: user.AvatarURL,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Email:     user.Email,
+		AvatarURL: user.AvatarURL,
 	}
 	// db := models.Database()
 	fmt.Println("from api", userinfo)
