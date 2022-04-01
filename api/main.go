@@ -1,7 +1,6 @@
 package main
 
 import (
-	"dartscoreboard/models"
 	"fmt"
 	"log"
 	"os"
@@ -35,7 +34,6 @@ func ConnectENV() {
 
 func main() {
 	ConnectENV()
-	models.Database()
 	goth.UseProviders(
 		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback")))
 	app := fiber.New()
@@ -65,15 +63,6 @@ func main() {
 		if err != nil {
 			return err
 		}
-		user := models.User{
-			Id:      userinfo.UserID,
-			Email:   userinfo.Email,
-			Picture: userinfo.AvatarURL,
-		}
-		db := models.Database()
-		fmt.Println("from api", user)
-		models.InsertData(db, user)
-
 		// GET TOKEN
 		fmt.Println("ID TOKEN", userinfo.IDToken)
 

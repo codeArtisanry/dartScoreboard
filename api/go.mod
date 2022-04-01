@@ -14,8 +14,6 @@ require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/markbates/goth v1.69.0
-	github.com/mattn/go-sqlite3 v1.14.12
-	github.com/rubenv/sql-migrate v1.1.1
 	github.com/shareed2k/goth_fiber v0.2.6
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.34.0 // indirect
@@ -24,8 +22,12 @@ require (
 )
 
 require (
+	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/rubenv/sql-migrate v1.1.1
+)
+
+require (
 	cloud.google.com/go v0.81.0 // indirect
-	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/go-gorp/gorp/v3 v3.0.2 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
