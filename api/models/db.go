@@ -57,7 +57,7 @@ func SelectUserIdByEmail(db *sql.DB, user User) (int, error) {
 }
 
 //Verify User Exists or Not? Then Insert User Data to Users Table and return userid
-func VerifyAndInsertUser(db *sql.DB, user User) int {
+func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
 	userId, err := SelectUserIdByEmail(db, user)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -68,11 +68,13 @@ func VerifyAndInsertUser(db *sql.DB, user User) int {
 			userId, err := SelectUserIdByEmail(db, user)
 			if err != nil {
 				fmt.Println(err)
+				return userId, err
 			}
-			return userId
+			return userId, nil
 		} else {
 			fmt.Println(err)
+			return userId, err
 		}
 	}
-	return userId
+	return userId, nil
 }
