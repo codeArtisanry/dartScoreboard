@@ -19,3 +19,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  methods: {
+    creategame() {
+      this.$router.push('/home/creategame')
+    },
+  },
+}
+</script>

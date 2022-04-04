@@ -30,6 +30,7 @@ export default {
   methods: {
     login() {
       this.$router.push('/home')
+      console.log(process.env.base_URL)
     },
   },
 }

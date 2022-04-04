@@ -43,6 +43,7 @@ export default {
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
     '@nuxtjs/fontawesome',
+    '@nuxtjs/dotenv',
   ],
   fontawesome: {
     component: 'fa',

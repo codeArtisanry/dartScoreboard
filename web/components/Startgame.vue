@@ -9,13 +9,13 @@
           <tbody>
             <tr>
               <th class="text-left" scope="row">Round</th>
-              <td scope="col">{{ round }}</td>
+              <td scope="col">{{ points.round }}</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
               <th class="text-left" scope="row">Player Name</th>
-              <td scope="col">{{ name }}</td>
+              <td scope="col">{{ points.playername }}</td>
             </tr>
           </tbody>
           <tbody>
@@ -32,7 +32,7 @@
             >
             <input
               id="enterThrow"
-              v-model="singlescore"
+              v-model="points.point"
               type="Number"
               class="form-control"
               autofocus
@@ -50,34 +50,63 @@
 export default {
   props: {
     gameType: Object,
-    registerGame: Object,
+   // registerGame: Object,
   },
   data() {
     return {
+     registerGame: '',
       count: 0,
-      round: 1,
       counter: 0,
-      name: this.$store.state.players[0].content,
-      singlescore: 0,
       total: 0,
+      points: {
+        round: 1,
+        playername: this.$store.state.players[0].content,
+        throw: 0,
+        point: 0,
+      },
     }
+  },
+  created(){
+    this.getGameData()
   },
   methods: {
     increment() {
       this.count++
+      this.points.throw++
+     // console.log(this.points.throw)
       if (this.count === 9 * this.$store.state.players.length) {
         this.$router.push('/highestscoreboard')
       }
+      this.postgamedata()
       if (this.count % (3 * this.$store.state.players.length) === 0) {
-        this.round = this.round + 1
+        this.points.round = this.points.round + 1
       }
       if (this.count % 3 === 0) {
         this.counter = this.counter + 1
         this.counter = this.counter % this.$store.state.players.length
-        this.name = this.$store.state.players[this.counter].content
+        this.points.playername = this.$store.state.players[this.counter].content
+        console.log(this.points.playername)
       }
-      this.total = Number(this.total) + Number(this.singlescore)
+      this.total = Number(this.total) + Number(this.points.point)
+      if(this.count % 3 === 0){
+        console.log(this.total)
+        this.total=0
+      }
+      if (this.count % 3 === 0) {
+        this.points.throw = 0
+      }
     },
+    async postgamedata() {
+      await this.$axios.$post(`${process.env.base_URL}/points`, this.points)
+    },
+    async getGameData() {
+      const res = await this.$axios.$get(
+        `${process.env.base_URL}/registerGame/` + this.$route.params.id
+      )
+      this.registerGame = res
+      console.log(this.registerGame);
+    },
+    
   },
 }
 </script>

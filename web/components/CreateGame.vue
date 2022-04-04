@@ -108,15 +108,19 @@
         </button>
       </div>
       <div class="col text-left">
-        <button class="btn btn-secondary" @click="startgame">Start Game</button>
+        <button class="btn btn-secondary"  @click="startgame(id)">
+          Start Game
+        </button>
       </div>
     </div>
   </main>
 </template>
+
 <script>
 export default {
   data() {
     return {
+      registerGames: '',
       gameType: '',
       gameName: '',
       registerGame: {
@@ -128,11 +132,11 @@ export default {
       newPlayer: '',
     }
   },
+
   methods: {
     addPlayer() {
       if (this.newPlayer) {
         this.$store.commit('ADD_PLAYER', this.newPlayer)
-        console.log(this.$store.state.players)
         this.newPlayer = ''
       }
     },
@@ -142,20 +146,41 @@ export default {
       for (let i = 0; i <= playerArr.length - 1; i++) {
         this.registerGame.PlayersNames.push(playerArr[i].content)
       }
-      console.log(this.registerGame)
+      this.postgamedata()
+      if (
+        this.registerGame.PlayersNames.length === 0 ||
+        this.registerGame.PlayersNames.length === 1
+      ) {
+        alert('please enter players name more then one')
+      } else {
       this.$router.push('/home')
+    }
     },
+    
+  
+
     startgame() {
       this.gamenamefunc()
       const playerArr = this.$store.state.players
       for (let i = 0; i <= playerArr.length - 1; i++) {
         this.registerGame.PlayersNames.push(playerArr[i].content)
       }
-      console.log(this.registerGame)
-      if (this.registerGame.gameType === 'Highest Score Game') {
-        this.$router.push('/start/highscoregame')
+      this.postgamedata()
+      this.getGameData()
+     
+     
+      if (
+        this.registerGame.PlayersNames.length === 0 ||
+        this.registerGame.PlayersNames.length === 1
+      ) {
+        alert('please enter players name more then one')
       } else {
-        this.$router.push('/start/targetscoregame')
+        console.log(this.registerGame)
+        if (this.registerGame.gameType === 'Highest Score Game') {
+          this.$router.push('/start/highscoregame/')
+        } else {
+           this.$router.push('/start/highscoregame/')
+        }
       }
     },
     onChange(event) {
@@ -164,12 +189,29 @@ export default {
       this.registerGame.gameType = this.gameType[0]
       this.registerGame.gameTargetScore = Number(this.gameType[1])
     },
+
     gamenamefunc() {
       if (this.gameName === '') {
         this.registerGame.gameName = new Date().toLocaleString()
       } else {
         this.registerGame.gameName = this.gameName
       }
+    },
+    async postgamedata() {
+      await this.$axios.$post(
+       `${process.env.base_URL}/registerGame`,
+        this.registerGame
+      )
+    },
+    // clicked(id) {
+    //   this.$router.push('/start/highscoregame' + id)
+    // },
+    async getGameData() {
+      const res = await this.$axios.$get(
+        `${process.env.base_URL}/registerGame` + this.$route.params.id
+      )
+      this.registerGames = res
+
     },
   },
 }

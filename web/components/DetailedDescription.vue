@@ -10,14 +10,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr @click="clicked">
-            <th scope="row">alpha</th>
-            <td>TargetScore</td>
-          </tr>
-
-          <tr @click="clicked">
-            <th scope="row">delta</th>
-            <td>HighScore</td>
+          <tr
+            v-for="gameData in registerGame"
+            :key="gameData.id"
+            @click="clicked(gameData.id)"
+          >
+            <th scope="row">{{ gameData.gameName }}</th>
+            <td>{{ gameData.gameType }}</td>
           </tr>
         </tbody>
       </table>
@@ -26,9 +25,21 @@
 </template>
 <script>
 export default {
+  data() {
+    return {
+      registerGame: '',
+    }
+  },
+  created() {
+    this.getGameData()
+  },
   methods: {
-    clicked() {
-      this.$router.push('/home/creategame')
+    clicked(id) {
+      this.$router.push('/home/' + id + '/conformGame')
+    },
+    async getGameData() {
+      const res = await this.$axios.$get('http://localhost:3000/registerGame')
+      this.registerGame = res
     },
   },
 }
