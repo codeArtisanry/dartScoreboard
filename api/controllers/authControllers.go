@@ -33,13 +33,15 @@ func Endpoint(ctx *fiber.Ctx) error {
 	fmt.Println("claims :", claims)
 	if err != nil {
 		fmt.Println("err  :", err)
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "User NOT Exist",
-		})
+		return ctx.Redirect("/auth/google")
+		// return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+		// 	"message": "User NOT Exist",
+		// })
 	} else {
-		return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
-			"message": "User Exist",
-		})
+		return ctx.Redirect("/home")
+		// return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		// 	"message": "User Exist",
+		// })
 	}
 	// c.Redirect("/auth/google")
 	// If exist then return 2xx status code
