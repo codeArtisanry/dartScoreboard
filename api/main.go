@@ -1,6 +1,7 @@
 package main
 
 import (
+	"dartscoreboard/middleware"
 	"dartscoreboard/routes"
 	"log"
 	"os"
@@ -29,6 +30,8 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
 	}))
+
+	app.Use(middleware.Validate())
 
 	routes.Setup(app)
 
