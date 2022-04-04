@@ -14,6 +14,9 @@ import (
 func Validate(config ...fiber.Config) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		cookie := ctx.Cookies("user")
+		if cookie == "" {
+			return ctx.Redirect("auth/google")
+		}
 		fmt.Println("this is cookie", cookie)
 		token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 			pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))

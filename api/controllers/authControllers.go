@@ -4,48 +4,47 @@ import (
 	"dartscoreboard/models"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	gf "github.com/shareed2k/goth_fiber"
 )
 
 // 1. Endpoint for i am logged in?
 func Endpoint(ctx *fiber.Ctx) error {
-	cookie := ctx.Cookies("user")
-	fmt.Println("this is cookie", cookie)
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
-		pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
-		if err != nil {
-			return nil, err
-		}
-		key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(pem))
-		if err != nil {
-			return nil, err
-		}
-		return key, nil
-	})
-	claims := token.Claims.(*jwt.StandardClaims)
-	fmt.Println("claims :", claims)
-	if err != nil {
-		fmt.Println("err  :", err)
-		return ctx.Redirect("/auth/google")
-		// return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-		// 	"message": "User NOT Exist",
-		// })
-	} else {
-		return ctx.Redirect("/home")
-		// return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
-		// 	"message": "User Exist",
-		// })
-	}
+	// cookie := ctx.Cookies("user")
+	// fmt.Println("this is cookie", cookie)
+	// token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	// 	pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(pem))
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	return key, nil
+	// })
+	// claims := token.Claims.(*jwt.StandardClaims)
+	// fmt.Println("claims :", claims)
+	// if err != nil {
+	// 	fmt.Println("err  :", err)
+	// 	return ctx.Redirect("/auth/google")
+	// 	// return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+	// 	// 	"message": "User NOT Exist",
+	// 	// })
+	// } else {
+	// 	return ctx.Redirect("/home")
+	// 	// return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
+	// 	// 	"message": "User Exist",
+	// 	// })
+	// }
 	// c.Redirect("/auth/google")
 	// If exist then return 2xx status code
 	// Else return 403 unauthorized
+	return nil
 }
 
 // 2. Initiate google signin flow
