@@ -28,39 +28,51 @@ func Database() *sql.DB {
 	return db
 }
 
-// Insert User Data to users Table
-func InsertUserDetails(db *sql.DB, user User) {
+// Insert User Data to users Table and return error
+func InsertUserDetails(db *sql.DB, user User) error {
 	insert, err := db.Prepare("INSERT INTO users (first_name, last_name, email, avatar_url) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)
+		return err
 	}
 	_, err = insert.Exec(user.FirstName, user.LastName, user.Email, user.AvatarURL)
 	if err != nil {
 		fmt.Println(err)
+		return err
 	}
 	fmt.Println("Sucessfully Data Inserted on users Table")
+	return nil
 }
 
-// Select user id using user email and return user id
-func SelectUserByEmail(db *sql.DB, user User) int {
+// Select user id using user email and return user id and error
+func SelectUserIdByEmail(db *sql.DB, user User) (int, error) {
 	email := user.Email
 	readUserIdQuery := fmt.Sprintf("SELECT id FROM users WHERE email = '%s'", email)
 	row := db.QueryRow(readUserIdQuery)
-	row.Scan(&user.Id)
-	return user.Id
+	err := row.Scan(&user.Id)
+	if err != nil {
+		return user.Id, err
+	}
+	return user.Id, nil
 }
 
-//Verify User Exists or Not? Then Insert User Data to Users Table
-func VerifyUser(user User) int {
-	db := Database()
-	id := SelectUserByEmail(db, user)
-	if id == 0 {
-		fmt.Println("user not found")
-		InsertUserDetails(db, user)
-		id := SelectUserByEmail(db, user)
-		return id
-	} else {
-		fmt.Printf("user found and user id is : %d ", user.Id)
-		return id
+//Verify User Exists or Not? Then Insert User Data to Users Table and return userid
+func VerifyAndInsertUser(db *sql.DB, user User) int {
+	userId, err := SelectUserIdByEmail(db, user)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err := InsertUserDetails(db, user)
+			if err != nil {
+				fmt.Println(err)
+			}
+			userId, err := SelectUserIdByEmail(db, user)
+			if err != nil {
+				fmt.Println(err)
+			}
+			return userId
+		} else {
+			fmt.Println(err)
+		}
 	}
+	return userId
 }
