@@ -20,7 +20,7 @@ func Database() *sql.DB {
 		log.Fatal("Database Not Connected Due To: ", err)
 	}
 	// Apply Migration
-	n, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up) 
+	n, err := migrate.Exec(db, "sqlite3", migrations, migrate.Up)
 	if err != nil {
 		log.Fatal("Migration Not Applay Due To: ", err)
 	}
@@ -29,7 +29,7 @@ func Database() *sql.DB {
 }
 
 // Insert User Data to users Table
-func InsertUserData(db *sql.DB, user User) {
+func InsertUserDetails(db *sql.DB, user User) {
 	insert, err := db.Prepare("INSERT INTO users (first_name, last_name, email, avatar_url) VALUES (?, ?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)
@@ -44,8 +44,8 @@ func InsertUserData(db *sql.DB, user User) {
 // Select user id using user email and return user id
 func SelectUserByEmail(db *sql.DB, user User) int {
 	email := user.Email
-	readQuery := fmt.Sprintf("SELECT id FROM users WHERE email = '%s'", email)
-	row := db.QueryRow(readQuery)
+	readUserIdQuery := fmt.Sprintf("SELECT id FROM users WHERE email = '%s'", email)
+	row := db.QueryRow(readUserIdQuery)
 	row.Scan(&user.Id)
 	return user.Id
 }
@@ -56,7 +56,7 @@ func VerifyUser(user User) int {
 	id := SelectUserByEmail(db, user)
 	if id == 0 {
 		fmt.Println("user not found")
-		InsertUserData(db, user)
+		InsertUserDetails(db, user)
 		id := SelectUserByEmail(db, user)
 		return id
 	} else {
