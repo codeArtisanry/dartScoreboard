@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="container-fluid text-center mt-4">
-      <div class="shadow bg-white py-5 px-5 rounded">
+    <div class="container text-center mt-4">
+      <div class="bg-white pb-4 px-5 rounded">
         <h5 class="heading">Welcome to</h5>
         <h4 class="font-weight-bolder">{{ gameType.type }}</h4>
 
@@ -9,49 +9,39 @@
           <tbody>
             <tr>
               <th class="text-left" scope="row">Round</th>
-              <td scope="col">1</td>
+              <td scope="col">{{ round }}</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
               <th class="text-left" scope="row">Player Name</th>
-              <td scope="col">jeel</td>
+              <td scope="col">{{ name }}</td>
             </tr>
           </tbody>
           <tbody>
             <tr>
               <th class="text-left" scope="row">{{ gameType.score }}</th>
-              <td>100</td>
+              <td>{{ total }}</td>
             </tr>
           </tbody>
         </table>
-        <div>
-          <div class="mt-2">
+        <form class="pt-3">
+          <div class="form-group">
+            <label for="enterThrow" class="text-muted font-weight-bolder"
+              >Enter Points in Dart Throw :</label
+            >
             <input
-              class="form-control shadow border border-light rounded-pill p-3 bg-white"
-              type="number"
-              placeholder="First try point..."
+              id="enterThrow"
+              v-model="singlescore"
+              type="Number"
+              class="form-control"
+              autofocus
             />
           </div>
-          <div class="mt-2">
-            <input
-              class="form-control shadow border border-light rounded-pill p-3 bg-white"
-              type="number"
-              placeholder="Second try point..."
-            />
-          </div>
-          <div class="mt-2">
-            <input
-              class="form-control shadow border border-light rounded-pill p-3 bg-white"
-              type="number"
-              placeholder="Third try point..."
-            />
-          </div>
-        </div>
-
-        <div class="mt-4 mb-2">
-          <button class="btn btn-secondary">Next player</button>
-        </div>
+          <button type="button" class="btn btn-success" @click="increment">
+            Submit
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -60,6 +50,34 @@
 export default {
   props: {
     gameType: Object,
+    registerGame: Object,
+  },
+  data() {
+    return {
+      count: 0,
+      round: 1,
+      counter: 0,
+      name: this.$store.state.players[0].content,
+      singlescore: 0,
+      total: 0,
+    }
+  },
+  methods: {
+    increment() {
+      this.count++
+      if (this.count === 9 * this.$store.state.players.length) {
+        this.$router.push('/highestscoreboard')
+      }
+      if (this.count % (3 * this.$store.state.players.length) === 0) {
+        this.round = this.round + 1
+      }
+      if (this.count % 3 === 0) {
+        this.counter = this.counter + 1
+        this.counter = this.counter % this.$store.state.players.length
+        this.name = this.$store.state.players[this.counter].content
+      }
+      this.total = Number(this.total) + Number(this.singlescore)
+    },
   },
 }
 </script>
