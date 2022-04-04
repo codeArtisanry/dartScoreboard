@@ -18,10 +18,6 @@
           </button>
         </div>
       </div>
-      <div class="col pt-2 text-center">
-        <h3 class="text-muted">Welcome</h3>
-        <h1 class="bold font-weight-bold">To Dart Scoreboard</h1>
-      </div>
     </div>
   </div>
 </template>
