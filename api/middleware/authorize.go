@@ -29,8 +29,7 @@ func Validate(config ...fiber.Config) fiber.Handler {
 			}
 			return key, nil
 		})
-		claims := token.Claims.(*jwt.StandardClaims)
-		fmt.Println("claims :", claims)
+
 		if err != nil {
 			fmt.Println("err  :", err)
 			return ctx.Redirect("/auth/google")
