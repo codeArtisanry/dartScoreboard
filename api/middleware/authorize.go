@@ -28,18 +28,17 @@ func Validate(config ...fiber.Config) fiber.Handler {
 		})
 		claims := token.Claims.(*jwt.StandardClaims)
 		fmt.Println("claims :", claims)
-		ctx.Redirect("/auth/google")
 		if err != nil {
 			fmt.Println("err  :", err)
-			ctx.Redirect("/auth/google")
-			return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"message": "User NOT Exist",
-			})
+			return ctx.Redirect("/auth/google")
+			// return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			// 	"message": "User NOT Exist",
+			// })
 		} else {
-			ctx.Redirect("/home")
-			return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
-				"message": "User Exist",
-			})
+			return ctx.Redirect("/home")
+			// return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
+			// 	"message": "User Exist",
+			// })
 		}
 	}
 }
