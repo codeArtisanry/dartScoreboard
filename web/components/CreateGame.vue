@@ -84,23 +84,15 @@
         </span>
       </small>
     </div>
-    <div class="d-inline-flex w-100 my-4">
-      <input
-        v-model="newPlayer"
-        class="form-control w-75 ml-1"
-        type="text"
-        placeholder="Add a new Player"
-        @keypress.enter="addPlayer"
-      />
-      <span class="btn btn-secondary ml-2 w-25" @click="addPlayer"> Add </span>
-    </div>
-    <div>
-      <Player
-        v-for="(player, i) in $store.state.players"
-        :key="i"
-        :player="player"
-      />
-    </div>
+    <br>
+   <div>
+  <label class="typo__label">Select PlayersNames</label>
+  <multiselect v-model="value" :options="options" :custom-label="nameWithLang" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some" label="firstname" track-by="firstname" :preselect-first="true">
+    <template slot="selection" slot-scope="{ values, isOpen }" ><span v-if="values.length &amp;&amp; !isOpen" class="multiselect__single" >{{ values.length }} options selected</span></template>
+  </multiselect>
+  <pre class="language-json"><code v-for="i in value" :key="i">{{ i.firstname }} {{i.lastname}}<br></code><br></pre><br>
+</div>
+
     <div class="row">
       <div class="col text-right">
         <button class="btn btn-secondary" @click="register">
@@ -117,9 +109,20 @@
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect';
 export default {
+  components: { Multiselect },
   data() {
     return {
+      value: [],
+      options: [
+        {firstname:'payal', lastname:'raviya', email:'payal@improwised.com' },
+        {firstname:'jeel', lastname:'rupapara', email:'jeel@improwised.com' },
+        {firstname:'vatsal', lastname:'chauhan', email:'vatsal@improwised.com' },
+        {firstname:'munir', lastname:'khakhi', email:'munir@improwised.com' },
+        {firstname:'tapan', lastname:'bavaliya', email:'tapan@improwised.com' },
+       {firstname:'rakshit', lastname:'menpara', email:'rakshit@improwised.com' },
+      ],
       registerGames: '',
       gameType: '',
       gameName: '',
@@ -130,45 +133,42 @@ export default {
         gameTargetScore: 0,
       },
       newPlayer: '',
+      pname:[]
     }
   },
 
   methods: {
-    addPlayer() {
-      if (this.newPlayer) {
-        this.$store.commit('ADD_PLAYER', this.newPlayer)
-        this.newPlayer = ''
-      }
+   
+    nameWithLang ({ firstname,lastname, email }) {
+      return `${firstname} ${lastname} — [${email}]`
     },
+   
     register() {
       this.gamenamefunc()
-      const playerArr = this.$store.state.players
-      for (let i = 0; i <= playerArr.length - 1; i++) {
-        this.registerGame.PlayersNames.push(playerArr[i].content)
-      }
-      this.postgamedata()
       if (
-        this.registerGame.PlayersNames.length === 0 ||
-        this.registerGame.PlayersNames.length === 1
+        this.value.length === 0 ||
+        this.value.length === 1
       ) {
         alert('please enter players name more then one')
       } else {
         this.$router.push('/home')
+      console.log(this.value[0].firstname);
+      for(let i=0; i<=this.value.length-1;i++){
+        this.registerGame.PlayersNames.push(this.value[i].firstname)
       }
-    },
+      console.log(this.registerGame.PlayersNames)
+     this.postgamedata()
+        }
+      },
 
     startgame() {
       this.gamenamefunc()
-      const playerArr = this.$store.state.players
-      for (let i = 0; i <= playerArr.length - 1; i++) {
-        this.registerGame.PlayersNames.push(playerArr[i].content)
-      }
       this.postgamedata()
-      this.getGameData()
+      // this.getGameData()
 
       if (
-        this.registerGame.PlayersNames.length === 0 ||
-        this.registerGame.PlayersNames.length === 1
+        this.value.length === 0 ||
+        this.value.length === 1
       ) {
         alert('please enter players name more then one')
       } else {
@@ -199,16 +199,17 @@ export default {
         `${process.env.base_URL}/registerGame`,
         this.registerGame
       )
+      console.log(this.registerGame)
     },
-    // clicked(id) {
-    //   this.$router.push('/start/highscoregame' + id)
+    // async getGameData() {
+    //   const res = await this.$axios.$get(
+    //     `${process.env.base_URL}/registerGame`
+    //   )
+    //   this.registerGames = res
+    //   console.log(this.registerGame)
     // },
-    async getGameData() {
-      const res = await this.$axios.$get(
-        `${process.env.base_URL}/registerGame` + this.$route.params.id
-      )
-      this.registerGames = res
-    },
   },
 }
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css">

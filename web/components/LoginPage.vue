@@ -11,7 +11,6 @@
           alt="Responsive image"
         />
         <hr />
-        <h4>Not a member? <fa icon="down-long" /></h4>
         <br />
         <a
           :href="loginUrl"

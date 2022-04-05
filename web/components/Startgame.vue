@@ -28,7 +28,7 @@
         <form class="pt-3">
           <div class="form-group">
             <label for="enterThrow" class="text-muted font-weight-bolder"
-              >Enter Points in Dart Throw :</label
+              >Enter Points in Dart Throw :{{ points.throw + 1 }}</label
             >
             <input
               id="enterThrow"
@@ -52,39 +52,47 @@ export default {
     gameType: Object,
     // registerGame: Object,
   },
+
   data() {
     return {
       registerGame: '',
+      // p1: this.registerGame.PlayersNames[0],
       count: 0,
       counter: 0,
       total: 0,
       points: {
         round: 1,
-        playername: this.$store.state.players[0].content,
+        playername: '',
         throw: 0,
         point: 0,
       },
     }
   },
-  created() {
-    this.getGameData()
+  async created() {
+    await this.getGameData()
+     this.points.playername = this.registerGame.PlayersNames[0]
   },
   methods: {
     increment() {
+      console.log(this.registerGame.PlayersNames[0])
+      // console.log(this.p1);
+      if (this.count === 0) {
+        this.points.playername = this.registerGame.PlayersNames[0]
+      }
       this.count++
       this.points.throw++
-      // console.log(this.points.throw)
-      if (this.count === 9 * this.$store.state.players.length) {
+      console.log(this.points.throw)
+      if (this.count === 9 * this.registerGame.PlayersNames.length) {
         this.$router.push('/highestscoreboard')
       }
       this.postgamedata()
-      if (this.count % (3 * this.$store.state.players.length) === 0) {
+      if (this.count % (3 * this.registerGame.PlayersNames.length) === 0) {
         this.points.round = this.points.round + 1
       }
       if (this.count % 3 === 0) {
         this.counter = this.counter + 1
-        this.counter = this.counter % this.$store.state.players.length
-        this.points.playername = this.$store.state.players[this.counter].content
+        this.counter = this.counter % this.registerGame.PlayersNames.length
+        this.points.playername = this.registerGame.PlayersNames[this.counter]
         console.log(this.points.playername)
       }
       this.total = Number(this.total) + Number(this.points.point)
@@ -104,7 +112,6 @@ export default {
         `${process.env.base_URL}/registerGame/` + this.$route.params.id
       )
       this.registerGame = res
-      console.log(this.registerGame)
     },
   },
 }
