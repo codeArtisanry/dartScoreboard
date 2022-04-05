@@ -13,12 +13,12 @@
         <hr />
         <h4>Not a member? <fa icon="down-long" /></h4>
         <br />
-        <button
+        <a
+          :href="loginUrl"
           class="btn btn-primary mb-5 py-2 px-5"
           type="button"
-          @click="login"
         >
-          Sign In With Google</button
+          Sign In With Google </a
         ><br />
       </b-card>
     </center>
@@ -27,11 +27,10 @@
 
 <script>
 export default {
-  methods: {
-    login() {
-      this.$router.push('/home')
-      console.log(process.env.base_URL)
-    },
+  data() {
+    return {
+      loginUrl: process.env.LOGIN_URL,
+    }
   },
 }
 </script>

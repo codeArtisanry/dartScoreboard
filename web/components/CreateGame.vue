@@ -108,7 +108,7 @@
         </button>
       </div>
       <div class="col text-left">
-        <button class="btn btn-secondary"  @click="startgame(id)">
+        <button class="btn btn-secondary" @click="startgame(id)">
           Start Game
         </button>
       </div>
@@ -153,11 +153,9 @@ export default {
       ) {
         alert('please enter players name more then one')
       } else {
-      this.$router.push('/home')
-    }
+        this.$router.push('/home')
+      }
     },
-    
-  
 
     startgame() {
       this.gamenamefunc()
@@ -167,8 +165,7 @@ export default {
       }
       this.postgamedata()
       this.getGameData()
-     
-     
+
       if (
         this.registerGame.PlayersNames.length === 0 ||
         this.registerGame.PlayersNames.length === 1
@@ -179,7 +176,7 @@ export default {
         if (this.registerGame.gameType === 'Highest Score Game') {
           this.$router.push('/start/highscoregame/')
         } else {
-           this.$router.push('/start/highscoregame/')
+          this.$router.push('/start/highscoregame/')
         }
       }
     },
@@ -199,7 +196,7 @@ export default {
     },
     async postgamedata() {
       await this.$axios.$post(
-       `${process.env.base_URL}/registerGame`,
+        `${process.env.base_URL}/registerGame`,
         this.registerGame
       )
     },
@@ -211,7 +208,6 @@ export default {
         `${process.env.base_URL}/registerGame` + this.$route.params.id
       )
       this.registerGames = res
-
     },
   },
 }

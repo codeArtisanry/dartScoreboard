@@ -28,6 +28,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
+		AllowOrigins:     os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}"),
 	}))
 	routes.Setup(app)
 	// app.Group("/", middleware.Validate())

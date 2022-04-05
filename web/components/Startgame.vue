@@ -50,11 +50,11 @@
 export default {
   props: {
     gameType: Object,
-   // registerGame: Object,
+    // registerGame: Object,
   },
   data() {
     return {
-     registerGame: '',
+      registerGame: '',
       count: 0,
       counter: 0,
       total: 0,
@@ -66,14 +66,14 @@ export default {
       },
     }
   },
-  created(){
+  created() {
     this.getGameData()
   },
   methods: {
     increment() {
       this.count++
       this.points.throw++
-     // console.log(this.points.throw)
+      // console.log(this.points.throw)
       if (this.count === 9 * this.$store.state.players.length) {
         this.$router.push('/highestscoreboard')
       }
@@ -88,9 +88,9 @@ export default {
         console.log(this.points.playername)
       }
       this.total = Number(this.total) + Number(this.points.point)
-      if(this.count % 3 === 0){
+      if (this.count % 3 === 0) {
         console.log(this.total)
-        this.total=0
+        this.total = 0
       }
       if (this.count % 3 === 0) {
         this.points.throw = 0
@@ -104,9 +104,8 @@ export default {
         `${process.env.base_URL}/registerGame/` + this.$route.params.id
       )
       this.registerGame = res
-      console.log(this.registerGame);
+      console.log(this.registerGame)
     },
-    
   },
 }
 </script>

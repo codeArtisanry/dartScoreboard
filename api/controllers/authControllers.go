@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -43,10 +44,8 @@ func Endpoint(ctx *fiber.Ctx) error {
 			"message": "User Exist",
 		})
 	}
-	// c.Redirect("/auth/google")
 	// If exist then return 2xx status code
 	// Else return 403 unauthorized
-	// return nil
 }
 
 // 2. Initiate google signin flow
@@ -73,9 +72,12 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 		Email:     user.Email,
 		AvatarURL: user.AvatarURL,
 	}
-	// db := models.Database()
-	// models.InsertData(db, userinfo)
-	// GET TOKEN &
+	db := models.Database()
+	id, err := models.VerifyAndInsertUser(db, userinfo)
+	fmt.Println(id)
+	if err != nil {
+		fmt.Println(err)
+	} // GET TOKEN &
 	// TODO: Set cookie
 	cookie := new(fiber.Cookie)
 	cookie.Name = "user"
@@ -85,11 +87,11 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	// Set cookie from JWT
 	ctx.Cookie(cookie)
 	// TODO: Redirect user to frontend
+	endPointURL := fmt.Sprintf(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/${REDIRECTPOINT}"))
+	return ctx.Redirect(endPointURL)
+	// return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/home"))
 	// ctx.Redirect("/home/:id")
-	return ctx.JSON(fiber.Map{
-		"message": "success",
-		"data":    userinfo,
-	})
+
 }
 
 // 4. Signout
@@ -106,9 +108,10 @@ func Signout(ctx *fiber.Ctx) error {
 	ctx.Cookie(&cookie)
 
 	// Return 200
-	return ctx.JSON(fiber.Map{
-		"message": "success",
-	})
+	return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}"))
+	// return ctx.JSON(fiber.Map{
+	// 	"message": "success",
+	// })
 }
 
 func getGooglePublicKey(keyID string) (string, error) {

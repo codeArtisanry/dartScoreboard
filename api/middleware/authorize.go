@@ -29,7 +29,7 @@ func Validate(config ...fiber.Config) fiber.Handler {
 			}
 			return key, nil
 		})
-
+		fmt.Println(token)
 		if err != nil {
 			fmt.Println("err  :", err)
 			return ctx.Redirect("/auth/google")
