@@ -7,10 +7,17 @@
       </div>
       <div class="px-3">
         <button
-          class="col col-lg-12 shadow p-3 mb-3 border border-light border-start-0 rounded-pill"
+          class="
+            col col-lg-12
+            shadow
+            p-3
+            mb-3
+            border border-light border-start-0
+            rounded-pill
+          "
           @click="creategame"
         >
-          <b>Create Game</b>
+          <b @click="fetch">Create Game</b>
         </button>
         <br />
       </div>
@@ -20,7 +27,19 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
+import jwtDecode from 'jwt-decode'
 export default {
+  mounted() {
+    const auth = Cookies.get('user')
+    const token = jwtDecode(auth)
+    this.$store.dispatch('cookie/getAndSetCookie', { auth, token })
+  },
+  // updated() {
+  //   const auth = Cookies.get('user')
+  //   const token = jwtDecode(auth)
+  //   this.$store.dispatch('cookie/getAndSetCookie', { auth, token })
+  // },
   methods: {
     creategame() {
       this.$router.push('/home/creategame')

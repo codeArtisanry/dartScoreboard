@@ -83,7 +83,8 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	cookie.Name = "user"
 	cookie.Value = user.IDToken
 	cookie.Expires = time.Now().Add(30 * time.Hour * 24)
-	cookie.HTTPOnly = true
+	cookie.HTTPOnly = false
+	cookie.SameSite = fiber.CookieSameSiteNoneMode
 	// Set cookie from JWT
 	ctx.Cookie(cookie)
 	// TODO: Redirect user to frontend
@@ -102,7 +103,7 @@ func Signout(ctx *fiber.Ctx) error {
 		Name:     "user",
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
-		HTTPOnly: true,
+		HTTPOnly: false,
 	}
 
 	ctx.Cookie(&cookie)
