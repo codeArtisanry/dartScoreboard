@@ -48,15 +48,24 @@ export default {
   methods: {
     async getGameData() {
       const res = await this.$axios.$get(
-        `${process.env.base_URL}/registerGame/` + this.$route.params.id
+        `${process.env.base_URL}/registerGame/` + this.$route.params.gameid
       )
       this.registerGame = res
     },
     updateGame() {
-      this.$router.push('/home/creategame')
+      this.$router.push('/games/'+this.$route.params.gameid+'/update')
     },
     startgame() {
-      this.$router.push('/start/highscoregame/' + this.$route.params.id)
+      this.$router.push(
+        'games/' +
+          this.$route.params.gameid +
+          '/round/' +
+          this.$route.params.roundid +
+          'player' +
+          this.$route.params.playerid +
+          'turn' +
+          this.$route.params.turnid
+      )
     },
   },
 }

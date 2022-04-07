@@ -1,11 +1,7 @@
 <template>
   <div>
-    <LoginPage />
+    <NavBar />
+    <Header />
+    <DetailedDescription />
   </div>
 </template>
-
-<script>
-export default {
-  name: 'IndexPage',
-}
-</script>

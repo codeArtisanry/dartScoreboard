@@ -90,7 +90,7 @@ export default {
   },
   methods: {
     homepage() {
-      this.$router.push('/home')
+      this.$router.push('/')
     },
   },
 }

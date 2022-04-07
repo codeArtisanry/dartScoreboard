@@ -1,4 +1,45 @@
 {
-  "registerGame": [],
+  "registerGame": [
+    {
+      "id": 1
+    },
+    {
+      "gameName": "adsd",
+      "PlayersNames": [
+        "das",
+        "sdad",
+        "lefklf"
+      ],
+      "gameType": "Target Score Game",
+      "gameTargetScore": 101,
+      "gameStatus": "not started",
+      "id": 2
+    },
+    {
+      "gameName": "alpha",
+      "PlayersNames": [
+        "j",
+        "v"
+      ],
+      "gameType": "Highest Score Game",
+      "gameTargetScore": null,
+      "gameStatus": "not started",
+      "id": 3
+    },
+    {
+      "gameName": "4/5/2022, 4:07:19 PM",
+      "PlayersNames": [],
+      "gameType": "",
+      "gameTargetScore": 0,
+      "id": 4
+    },
+    {
+      "gameName": "4/5/2022, 4:07:23 PM",
+      "PlayersNames": [],
+      "gameType": "",
+      "gameTargetScore": 0,
+      "id": 5
+    }
+  ],
   "points": []
 }

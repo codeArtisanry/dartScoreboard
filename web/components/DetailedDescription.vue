@@ -7,6 +7,7 @@
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Type</th>
+            <th scope="col">Status</th>
           </tr>
         </thead>
         <tbody>
@@ -17,6 +18,7 @@
           >
             <th scope="row">{{ gameData.gameName }}</th>
             <td>{{ gameData.gameType }}</td>
+            <td>{{ gameData.gameStatus }}</td>
           </tr>
         </tbody>
       </table>
@@ -35,10 +37,10 @@ export default {
   },
   methods: {
     clicked(id) {
-      this.$router.push('/home/' + id + '/conformGame')
+      this.$router.push('/games/' + id + '/verify')
     },
     async getGameData() {
-      const res = await this.$axios.$get('http://localhost:3000/registerGame')
+      const res = await this.$axios.$get(`${process.env.base_URL}/registerGame`)
       this.registerGame = res
     },
   },

@@ -3,7 +3,7 @@
     <div class="container text-center mt-4">
       <div class="bg-white pb-4 px-5 rounded">
         <h5 class="heading">Welcome to</h5>
-        <h4 class="font-weight-bolder">{{ gameType.type }}</h4>
+        <h4 class="font-weight-bolder">{{ registerGame.gameType }}</h4>
 
         <table class="table table-striped shadow mt-3">
           <tbody>
@@ -20,7 +20,7 @@
           </tbody>
           <tbody>
             <tr>
-              <th class="text-left" scope="row">{{ gameType.score }}</th>
+              <th class="text-left" scope="row">{{ gameScore }}</th>
               <td>{{ total }}</td>
             </tr>
           </tbody>
@@ -56,6 +56,7 @@ export default {
   data() {
     return {
       registerGame: '',
+      gameScore: '',
       // p1: this.registerGame.PlayersNames[0],
       count: 0,
       counter: 0,
@@ -70,7 +71,12 @@ export default {
   },
   async created() {
     await this.getGameData()
-     this.points.playername = this.registerGame.PlayersNames[0]
+    if (this.registerGame.gameType === 'Target Score Game') {
+      this.gameScore = 'Remaining Score'
+    } else {
+      this.gameScore = 'Score'
+    }
+    //
   },
   methods: {
     increment() {
@@ -109,9 +115,12 @@ export default {
     },
     async getGameData() {
       const res = await this.$axios.$get(
-        `${process.env.base_URL}/registerGame/` + this.$route.params.id
+        `${process.env.base_URL}/registerGame/` + this.$route.params.gameid
       )
       this.registerGame = res
+    },
+    playname() {
+      // this.playname = this.registerGame.PlayersNames[0]
     },
   },
 }

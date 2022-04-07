@@ -1,5 +1,5 @@
 <template>
   <div>
-    <ConformGame />
+    <Scoreboard />
   </div>
 </template>
