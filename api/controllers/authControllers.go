@@ -15,6 +15,8 @@ import (
 	gf "github.com/shareed2k/goth_fiber"
 )
 
+var db = models.Database()
+
 // 1. Endpoint for i am logged in?
 func Endpoint(ctx *fiber.Ctx) error {
 	cookie := ctx.Cookies("user")
@@ -72,7 +74,6 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 		Email:     user.Email,
 		AvatarURL: user.AvatarURL,
 	}
-	db := models.Database()
 	id, err := models.VerifyAndInsertUser(db, userinfo)
 	fmt.Println(id)
 	if err != nil {
