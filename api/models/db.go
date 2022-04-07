@@ -78,3 +78,120 @@ func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
 	}
 	return userId, nil
 }
+
+// Get All User From Users Table
+func GetUsers(db *sql.DB, user User) ([]User, error) {
+	var users []User
+	rows, err := db.Query("SELECT id, first_name, last_name, email FROM users")
+	if err != nil {
+		fmt.Println(err)
+		return users, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email)
+		if err != nil {
+			return users, err
+		}
+		userJson := User{
+			Id:        user.Id,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email}
+		users = append(users, userJson)
+	}
+	return users, nil
+}
+
+// Insert Games in to Games Table
+func InsertGames(db *sql.DB, game Game) (Game, error) {
+	insert, err := db.Prepare("INSERT INTO games(name, type, creater_user_id) VALUES(?, ?, ?)")
+	if err != nil {
+		fmt.Println(err)
+	}
+	result, err := insert.Exec(game.Name, game.Type, game.CreaterUserId)
+	if err != nil {
+		fmt.Println(err)
+	}
+	gameId, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println(err)
+	}
+	gameJson := Game{
+		Id:            int(gameId),
+		Name:          game.Name,
+		Type:          game.Type,
+		CreaterUserId: game.CreaterUserId,
+	}
+	return gameJson, err
+}
+
+// Delete Games From Games Table By Game Id
+func DeleteGames(db *sql.DB, id int) error {
+	delete, err := db.Prepare("DELETE FROM games WHERE id= ?;")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	_, err = delete.Exec(id)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
+// Update Games From Games Table By Game Id
+func UpdateGame(db *sql.DB, id int, game Game) (Game, error) {
+	gameJson := Game{
+		Id:            id,
+		Name:          game.Name,
+		Type:          game.Type,
+		CreaterUserId: game.CreaterUserId,
+	}
+	query, err := db.Prepare("UPDATE games SET name = ?, type = ? WHERE id = ?;")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = query.Exec(game.Name, game.Type, id)
+	if err != nil {
+		fmt.Println(err)
+		return gameJson, err
+	}
+	return gameJson, nil
+}
+
+// Get Game From Games Table By Game Id
+func GetGame(db *sql.DB, id int, game Game) (Game, error) {
+	query := fmt.Sprintf("SELECT id, name, type FROM games WHERE id = %d;", id)
+	row := db.QueryRow(query)
+	err := row.Scan(&game.Id, &game.Name, &game.Type)
+	if err != nil {
+		return game, err
+	}
+	return game, nil
+}
+
+//Get All Games From Game Table
+func GetGames(db *sql.DB, game Game) ([]Game, error) {
+	var games []Game
+	rows, err := db.Query("SELECT id, name, type, creater_user_id FROM games")
+	if err != nil {
+		fmt.Println(err)
+		return games, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&game.Id, &game.Name, &game.Type, &game.CreaterUserId)
+		if err != nil {
+			return games, err
+		}
+		gameJson := Game{
+			Id:            game.Id,
+			Name:          game.Name,
+			Type:          game.Type,
+			CreaterUserId: game.CreaterUserId}
+		games = append(games, gameJson)
+	}
+	return games, nil
+}
