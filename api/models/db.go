@@ -82,7 +82,7 @@ func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
 // Get All User From Users Table
 func GetUsers(db *sql.DB, user User) ([]User, error) {
 	var users []User
-	rows, err := db.Query("SELECT id, first_name, last_name, email FROM users")
+	rows, err := db.Query("SELECT id, first_name, last_name, email FROM users ORDER BY first_name ASC;")
 	if err != nil {
 		fmt.Println(err)
 		return users, err
@@ -175,7 +175,7 @@ func GetGame(db *sql.DB, id int, game Game) (Game, error) {
 //Get All Games From Game Table
 func GetGames(db *sql.DB, game Game) ([]Game, error) {
 	var games []Game
-	rows, err := db.Query("SELECT id, name, type, creater_user_id FROM games")
+	rows, err := db.Query("SELECT id, name, type, creater_user_id FROM games ORDER BY created_at DESC;")
 	if err != nil {
 		fmt.Println(err)
 		return games, err
