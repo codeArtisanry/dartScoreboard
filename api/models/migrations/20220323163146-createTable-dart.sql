@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS games(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     type TEXT,
+    status TEXT,
     creater_user_id TEXT,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
@@ -28,7 +29,6 @@ CREATE TABLE IF NOT EXISTS games(
 CREATE TABLE IF NOT EXISTS rounds(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     round INTEGER,
-    game_player_id INTEGER,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
     ),
@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS rounds(
 CREATE TABLE IF NOT EXISTS scores(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     round_id INTEGER,
-    dart INTEGER,
+    player_id INTEGER,
+    throw INTEGER,
     score INTEGER,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
