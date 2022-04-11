@@ -68,13 +68,13 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 		return err
 	}
 	// fmt.Println(user)
-	userinfo := models.User{
+	UserInfo := models.User{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
 		AvatarURL: user.AvatarURL,
 	}
-	id, err := models.VerifyAndInsertUser(db, userinfo)
+	id, err := models.VerifyAndInsertUser(db, UserInfo)
 	fmt.Println(id)
 	if err != nil {
 		fmt.Println(err)

@@ -2,6 +2,7 @@ package models
 
 import "time"
 
+// swagger: response User
 type User struct {
 	Id        int        `json:"id"`
 	FirstName string     `json:"firstName"`
