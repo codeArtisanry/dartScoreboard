@@ -42,7 +42,7 @@ export default {
   // },
   methods: {
     creategame() {
-      this.$router.push('/home/creategame')
+      this.$router.push('/games/new')
     },
   },
 }

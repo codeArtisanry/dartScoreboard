@@ -89,9 +89,7 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	// Set cookie from JWT
 	ctx.Cookie(cookie)
 	// TODO: Redirect user to frontend
-	endPointURL := fmt.Sprintf(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/${REDIRECTPOINT}"))
-	return ctx.Redirect(endPointURL)
-	// return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/home"))
+	return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/"))
 	// ctx.Redirect("/home/:id")
 
 }
@@ -110,7 +108,7 @@ func Signout(ctx *fiber.Ctx) error {
 	ctx.Cookie(&cookie)
 
 	// Return 200
-	return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}"))
+	return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/${SIGNOUT}"))
 	// return ctx.JSON(fiber.Map{
 	// 	"message": "success",
 	// })

@@ -6,18 +6,18 @@
     </div>
     <div class="">
       <input
-        v-model="gameName"
+        v-model="registerGame.gameName"
         class="form-control ml-1"
         type="text"
         placeholder="Game Name..."
       />
 
       <div class="mt-5 mb-3 form-control ml-1">
-        <select class="border-0 bg-white w-100" @change="onChange($event)">
+        <select v-model="registerGame.gameType" class="border-0 bg-white w-100" @change="onChange($event)">
           <option value="0">--select--</option>
           <option value="Highest Score Game">Highest Score Game</option>
           <option id="101" value="Target Score Game-101">
-            Target Score Game 101
+            Target Score Game
           </option>
           <option id="301" value="Target Score Game-301">
             Target Score Game 301
@@ -94,14 +94,9 @@
 </div>
 
     <div class="row">
-      <div class="col text-right">
+      <div class="col text-center">
         <button class="btn btn-secondary" @click="register">
           Register Game
-        </button>
-      </div>
-      <div class="col text-left">
-        <button class="btn btn-secondary" @click="startgame(id)">
-          Start Game
         </button>
       </div>
     </div>
@@ -131,18 +126,24 @@ export default {
         PlayersNames: [],
         gameType: '',
         gameTargetScore: 0,
+        gameStatus: 'not started',
       },
       newPlayer: '',
       pname:[]
     }
   },
+  async created() {
+    if (this.$route.params.gameid !== undefined){
+      await this.getGameData()
+    }
+  },
 
   methods: {
-   
+
     nameWithLang ({ firstname,lastname, email }) {
       return `${firstname} ${lastname} — [${email}]`
     },
-   
+
     register() {
       this.gamenamefunc()
       if (
@@ -151,7 +152,7 @@ export default {
       ) {
         alert('please enter players name more then one')
       } else {
-        this.$router.push('/home')
+        this.$router.push('/')
       console.log(this.value[0].firstname);
       for(let i=0; i<=this.value.length-1;i++){
         this.registerGame.PlayersNames.push(this.value[i].firstname)
@@ -194,20 +195,20 @@ export default {
         this.registerGame.gameName = this.gameName
       }
     },
-    async postgamedata() {
+    async postGameData() {
       await this.$axios.$post(
         `${process.env.base_URL}/registerGame`,
         this.registerGame
       )
       console.log(this.registerGame)
     },
-    // async getGameData() {
-    //   const res = await this.$axios.$get(
-    //     `${process.env.base_URL}/registerGame`
-    //   )
-    //   this.registerGames = res
-    //   console.log(this.registerGame)
-    // },
+    async getGameData() {
+      const res = await this.$axios.$get(
+        `${process.env.base_URL}/registerGame/` + this.$route.params.gameid
+      )
+      this.registerGame = res
+      console.log(res)
+    },
   },
 }
 </script>
