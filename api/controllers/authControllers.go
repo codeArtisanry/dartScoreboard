@@ -12,6 +12,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/markbates/goth"
 	gf "github.com/shareed2k/goth_fiber"
 )
 
@@ -66,7 +67,6 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
 	// fmt.Println(user)
 	userinfo := models.User{
 		FirstName: user.FirstName,
@@ -136,4 +136,12 @@ func getGooglePublicKey(keyID string) (string, error) {
 		return "", errors.New("key not found")
 	}
 	return key, nil
+}
+
+func UserJson(ctx *fiber.Ctx) (goth.User, error) {
+	user, err := gf.CompleteUserAuth(ctx)
+	if err != nil {
+		return user, err
+	}
+	return user, err
 }
