@@ -43,7 +43,15 @@ func InsertGame(ctx *fiber.Ctx) error {
 // DeleteGame are Delete that game which is you want to delete
 func DeleteGame(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	email := UserInfo.Email
+	LoginUser, err := UserJson(ctx)
+	if err != nil {
+		fmt.Println(err)
+		return ctx.JSON(models.StatusCode{
+			StatusCode: 400,
+			Message:    "Bad Request",
+		})
+	}
+	email := LoginUser.Email
 	user := models.User{}
 	gameRes := models.GameResponce{}
 	gameId, err := strconv.Atoi(id)
@@ -99,7 +107,15 @@ func DeleteGame(ctx *fiber.Ctx) error {
 // UpdateGame are Update that game which is you want to Update
 func UpdateGame(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
-	email := UserInfo.Email
+	LoginUser, err := UserJson(ctx)
+	if err != nil {
+		fmt.Println(err)
+		return ctx.JSON(models.StatusCode{
+			StatusCode: 400,
+			Message:    "Bad Request",
+		})
+	}
+	email := LoginUser.Email
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
