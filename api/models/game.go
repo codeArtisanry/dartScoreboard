@@ -17,7 +17,7 @@ type Game struct {
 }
 
 // swagger:response GameResponse
-type GameResponce struct {
+type GameResponse struct {
 	Id               int                  `json:"id"`
 	Name             string               `json:"game_name"`
 	Type             string               `json:"game_type"`
@@ -25,5 +25,5 @@ type GameResponce struct {
 	CreaterUserId    int                  `json:"creater_user_id,omitempty"`
 	CreaterFirstName string               `json:"creater_first_name"`
 	CreaterLastName  string               `json:"creater_last_name"`
-	PlayersInfo      []GamePlayerResponce `json:"players_info"`
+	PlayersInfo      []GamePlayerResponse `json:"players_info"`
 }

@@ -2,8 +2,8 @@ package models
 
 import "time"
 
-// swagger:response PlayerResponce
-type GamePlayerResponce struct {
+// swagger:response GamePlayerResponse
+type GamePlayerResponse struct {
 	Id        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`

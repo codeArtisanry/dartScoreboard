@@ -116,8 +116,8 @@ func GetUsers(db *sql.DB, page int, user User) ([]User, error) {
 	return users, nil
 }
 
-func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponce) ([]GamePlayerResponce, error) {
-	var PlayersInfo []GamePlayerResponce
+func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponse) ([]GamePlayerResponse, error) {
+	var PlayersInfo []GamePlayerResponse
 	query := fmt.Sprintf("SELECT DISTINCT users.first_name,users.last_name,users.email from users LEFT JOIN game_players ON game_players.user_id=users.id where game_players.game_id = %d;", id)
 	rows, err := db.Query(query)
 	if err != nil {
@@ -131,7 +131,7 @@ func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponce
 			fmt.Println(err)
 			return PlayersInfo, err
 		}
-		gamePlayerInfo := GamePlayerResponce{
+		gamePlayerInfo := GamePlayerResponse{
 			Id:        gamePlayerRes.Id,
 			FirstName: gamePlayerRes.FirstName,
 			LastName:  gamePlayerRes.LastName,
@@ -140,8 +140,8 @@ func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponce
 	}
 	return PlayersInfo, nil
 }
-func InsertPlayers(db *sql.DB, game Game, gameId int, playerRes GamePlayerResponce) ([]GamePlayerResponce, error) {
-	var playersInfo []GamePlayerResponce
+func InsertPlayers(db *sql.DB, game Game, gameId int, playerRes GamePlayerResponse) ([]GamePlayerResponse, error) {
+	var playersInfo []GamePlayerResponse
 	gamePlayerIds := game.PlayerIds
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(gamePlayerIds), func(i, j int) { gamePlayerIds[i], gamePlayerIds[j] = gamePlayerIds[j], gamePlayerIds[i] })
@@ -168,8 +168,8 @@ func InsertPlayers(db *sql.DB, game Game, gameId int, playerRes GamePlayerRespon
 }
 
 // Insert Games in to Games Table
-func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponce, gamePlayer GamePlayer, gamePlayerRes GamePlayerResponce) (GameResponce, error) {
-	var gameResJson GameResponce
+func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePlayer GamePlayer, gamePlayerRes GamePlayerResponse) (GameResponse, error) {
+	var gameResJson GameResponse
 	user, err := SelectUserInfoByEmail(db, game.CreaterUserEmail, user)
 	if err != nil {
 		fmt.Println(err)
@@ -197,7 +197,7 @@ func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponce, gamePla
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	gameResJson = GameResponce{
+	gameResJson = GameResponse{
 		Id:               int(gameId),
 		Name:             gameRes.Name,
 		Type:             gameRes.Type,
@@ -235,8 +235,8 @@ func DeleteGames(db *sql.DB, id int) error {
 }
 
 // Update Games From Games Table By Game Id
-func UpdateGame(db *sql.DB, id int, user User, game Game, playerRes GamePlayerResponce) (GameResponce, error) {
-	var gameResJson GameResponce
+func UpdateGame(db *sql.DB, id int, user User, game Game, playerRes GamePlayerResponse) (GameResponse, error) {
+	var gameResJson GameResponse
 	createrInfo, err := SelectUserInfoByEmail(db, game.CreaterUserEmail, user)
 	if err != nil {
 		fmt.Println(err)
@@ -268,7 +268,7 @@ func UpdateGame(db *sql.DB, id int, user User, game Game, playerRes GamePlayerRe
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	gameResJson = GameResponce{
+	gameResJson = GameResponse{
 		Id:               id,
 		Name:             game.Name,
 		Type:             game.Type,
@@ -281,8 +281,8 @@ func UpdateGame(db *sql.DB, id int, user User, game Game, playerRes GamePlayerRe
 }
 
 // Get Game From Games Table By Game Id
-func GetGame(db *sql.DB, id int, gameRes GameResponce, user User, gamePlayerRes GamePlayerResponce) (GameResponce, error) {
-	var gameResJson GameResponce
+func GetGame(db *sql.DB, id int, gameRes GameResponse, user User, gamePlayerRes GamePlayerResponse) (GameResponse, error) {
+	var gameResJson GameResponse
 	query := fmt.Sprintf("SELECT id, name, type, status, creater_user_id FROM games WHERE id = %d;", id)
 	row := db.QueryRow(query)
 	err := row.Scan(&gameRes.Id, &gameRes.Name, &gameRes.Type, &gameRes.Status, &gameRes.CreaterUserId)
@@ -298,7 +298,7 @@ func GetGame(db *sql.DB, id int, gameRes GameResponce, user User, gamePlayerRes 
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	gameResJson = GameResponce{
+	gameResJson = GameResponse{
 		Id:               gameRes.Id,
 		Name:             gameRes.Name,
 		Type:             gameRes.Type,
@@ -311,8 +311,8 @@ func GetGame(db *sql.DB, id int, gameRes GameResponce, user User, gamePlayerRes 
 }
 
 //Get All Games From Game Table
-func GetGames(db *sql.DB, page int, gameRes GameResponce, user User, gamePlayerRes GamePlayerResponce) ([]GameResponce, error) {
-	var gamesResJson []GameResponce
+func GetGames(db *sql.DB, page int, gameRes GameResponse, user User, gamePlayerRes GamePlayerResponse) ([]GameResponse, error) {
+	var gamesResJson []GameResponse
 	offset := page * 10
 	query := fmt.Sprintf("SELECT DISTINCT games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d LIMIT 10, %d ORDER BY games.created_at DESC;", user.Id, offset)
 	rows, err := db.Query(query)
@@ -335,7 +335,7 @@ func GetGames(db *sql.DB, page int, gameRes GameResponce, user User, gamePlayerR
 			fmt.Println(err)
 			return gamesResJson, err
 		}
-		gameResJson := GameResponce{
+		gameResJson := GameResponse{
 			Id:               gameRes.Id,
 			Name:             gameRes.Name,
 			Type:             gameRes.Type,
@@ -348,7 +348,7 @@ func GetGames(db *sql.DB, page int, gameRes GameResponce, user User, gamePlayerR
 	return gamesResJson, nil
 }
 
-func FindCreaterIdByGameId(db *sql.DB, id int, gameRes GameResponce) (int, error) {
+func FindCreaterIdByGameId(db *sql.DB, id int, gameRes GameResponse) (int, error) {
 	query := fmt.Sprintf("SELECT creater_user_id FROM games WHERE id = %d;", id)
 	row := db.QueryRow(query)
 	err := row.Scan(&gameRes.CreaterUserId)

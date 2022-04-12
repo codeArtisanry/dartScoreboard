@@ -17,9 +17,9 @@ import (
 func InsertGame(ctx *fiber.Ctx) error {
 	user := models.User{}
 	game := models.Game{}
-	gameRes := models.GameResponce{}
+	gameRes := models.GameResponse{}
 	gamePlayer := models.GamePlayer{}
-	gamePlayerRes := models.GamePlayerResponce{}
+	gamePlayerRes := models.GamePlayerResponse{}
 	ctx.BodyParser(&game)
 	gameJson, err := models.InsertGames(db, user, game, gameRes, gamePlayer, gamePlayerRes)
 	if err != nil {
@@ -53,7 +53,7 @@ func DeleteGame(ctx *fiber.Ctx) error {
 	}
 	email := LoginUser.Email
 	user := models.User{}
-	gameRes := models.GameResponce{}
+	gameRes := models.GameResponse{}
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
@@ -124,8 +124,8 @@ func UpdateGame(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	playerRes := models.GamePlayerResponce{}
-	gameRes := models.GameResponce{}
+	playerRes := models.GamePlayerResponse{}
+	gameRes := models.GameResponse{}
 	game := models.Game{}
 	user := models.User{}
 	ctx.BodyParser(&game)
@@ -180,9 +180,9 @@ func GetGame(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	gameRes := models.GameResponce{}
+	gameRes := models.GameResponse{}
 	user := models.User{}
-	gamePlayerRes := models.GamePlayerResponce{}
+	gamePlayerRes := models.GamePlayerResponse{}
 
 	gameJson, err := models.GetGame(db, gameId, gameRes, user, gamePlayerRes)
 	if err != nil {
@@ -204,8 +204,8 @@ func GetGame(ctx *fiber.Ctx) error {
 //  500: StatusCode
 // GetGames are get that games which participate and register by perticuler user
 func GetGames(ctx *fiber.Ctx) error {
-	gamePlayer := models.GamePlayerResponce{}
-	game := models.GameResponce{}
+	gamePlayer := models.GamePlayerResponse{}
+	game := models.GameResponse{}
 	user := models.User{}
 	page, err := strconv.Atoi(ctx.Params("page"))
 	if err != nil {
