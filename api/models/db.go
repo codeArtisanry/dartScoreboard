@@ -91,9 +91,8 @@ func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
 }
 
 // Get All User From Users Table
-func GetUsers(db *sql.DB, page int, user User) ([]User, error) {
+func GetUsers(db *sql.DB, page int, offset int, user User) ([]User, error) {
 	var users []User
-	offset := page * 5
 	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users LIMIT 5, %d ORDER BY first_name ASC;", offset)
 	rows, err := db.Query(query)
 	if err != nil {
@@ -192,7 +191,7 @@ func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePla
 	}
 
 	id := int(gameId)
-	PlayersInfo, err := GetPlayersInfoByGameId(db, id, gamePlayerRes)
+	PlayersInfo, err := InsertPlayers(db, game, id, gamePlayerRes)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
@@ -311,9 +310,8 @@ func GetGame(db *sql.DB, id int, gameRes GameResponse, user User, gamePlayerRes 
 }
 
 //Get All Games From Game Table
-func GetGames(db *sql.DB, page int, gameRes GameResponse, user User, gamePlayerRes GamePlayerResponse) ([]GameResponse, error) {
+func GetGames(db *sql.DB, page int, offset int, gameRes GameResponse, user User, gamePlayerRes GamePlayerResponse) ([]GameResponse, error) {
 	var gamesResJson []GameResponse
-	offset := page * 10
 	query := fmt.Sprintf("SELECT DISTINCT games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d LIMIT 10, %d ORDER BY games.created_at DESC;", user.Id, offset)
 	rows, err := db.Query(query)
 	if err != nil {
@@ -330,7 +328,7 @@ func GetGames(db *sql.DB, page int, gameRes GameResponse, user User, gamePlayerR
 		if err != nil {
 			return gamesResJson, err
 		}
-		PlayersInfo, err := GetPlayersInfoByGameId(db, gameRes.Id, gamePlayerRes)
+		playersInfo, err := GetPlayersInfoByGameId(db, gameRes.Id, gamePlayerRes)
 		if err != nil {
 			fmt.Println(err)
 			return gamesResJson, err
@@ -342,7 +340,7 @@ func GetGames(db *sql.DB, page int, gameRes GameResponse, user User, gamePlayerR
 			Status:           gameRes.Status,
 			CreaterFirstName: createrInfo.FirstName,
 			CreaterLastName:  createrInfo.LastName,
-			PlayersInfo:      PlayersInfo}
+			PlayersInfo:      playersInfo}
 		gamesResJson = append(gamesResJson, gameResJson)
 	}
 	return gamesResJson, nil

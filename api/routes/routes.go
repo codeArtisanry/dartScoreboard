@@ -8,7 +8,7 @@ import (
 )
 
 func Setup(app *fiber.App) {
-	app.Get("api/v1/games/:page", controllers.GetGames)
+	app.Get("api/v1/games", controllers.GetGames)
 	app.Get("api/v1/games/:id", controllers.GetGame)
 	app.Put("api/v1/games/:id/", controllers.UpdateGame)
 	app.Delete("api/v1/games/:id", controllers.DeleteGame)

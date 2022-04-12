@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// swagger:route POST/games games
+// swagger:route POST/games Games addGame
 // Insert game in game table and also players in game_player table
 // Responses:
 //  201: GameResponse
@@ -33,7 +33,7 @@ func InsertGame(ctx *fiber.Ctx) error {
 	return ctx.JSON(gameJson)
 }
 
-// swagger:route DELETE/games/{id} games
+// swagger:route DELETE/games/{id} Games deleteGame
 // Delete game using game id
 // Responses:
 //  204: StatusCode
@@ -97,7 +97,7 @@ func DeleteGame(ctx *fiber.Ctx) error {
 	})
 }
 
-// swagger:route PUT/games/{id} games
+// swagger:route PUT/games/{id} Games editGame
 // Update game using game id
 // Responses:
 //  201: GameResponse
@@ -162,7 +162,7 @@ func UpdateGame(ctx *fiber.Ctx) error {
 	})
 }
 
-// swagger:route GET/games/{id} games
+// swagger:route GET/games/{id} Games getGame
 // Get game using game id
 // Responses:
 //  200: GameResponse
@@ -196,10 +196,10 @@ func GetGame(ctx *fiber.Ctx) error {
 	return ctx.JSON(gameJson)
 }
 
-// swagger:route GET/games games
+// swagger:route GET/games Games ListGame
 // Get all the game that is by login user
 // Responses:
-//  200: GameResponse
+//  200: GamesPaginationResponse
 //  400: StatusCode
 //  500: StatusCode
 // GetGames are get that games which participate and register by perticuler user
@@ -207,14 +207,15 @@ func GetGames(ctx *fiber.Ctx) error {
 	gamePlayer := models.GamePlayerResponse{}
 	game := models.GameResponse{}
 	user := models.User{}
-	page, err := strconv.Atoi(ctx.Params("page"))
+	page, err := strconv.Atoi(ctx.Query("page"))
 	if err != nil {
 		return ctx.JSON(models.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",
 		})
 	}
-	games, err := models.GetGames(db, page, game, user, gamePlayer)
+	offset := (page + 1) * 10
+	games, err := models.GetGames(db, page, offset, game, user, gamePlayer)
 	if err != nil {
 		fmt.Println(err)
 		return ctx.JSON(models.StatusCode{
@@ -222,6 +223,20 @@ func GetGames(ctx *fiber.Ctx) error {
 			Message:    "Internal Server Error",
 		})
 	}
+	prePage := page - 1
+	postPage := page + 1
+	prePageLink := fmt.Sprintf("api/v1/games/?page=%d", prePage)
+	postPageLink := fmt.Sprintf("api/v1/games/?page=%d", postPage)
+	if len(games) < 10 {
+		postPageLink = "cross limits"
+	}
+	if prePage == 0 {
+		prePageLink = "cross limits"
+	}
 	ctx.SendStatus(200)
-	return ctx.JSON(games)
+	return ctx.JSON(models.GamesPaginationResponse{
+		GameResponses: games,
+		PrePageLink:   prePageLink,
+		PostPageLink:  postPageLink,
+	})
 }

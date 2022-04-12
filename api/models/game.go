@@ -26,4 +26,20 @@ type GameResponse struct {
 	CreaterFirstName string               `json:"creater_first_name"`
 	CreaterLastName  string               `json:"creater_last_name"`
 	PlayersInfo      []GamePlayerResponse `json:"players_info"`
+	PreviousPage     string               `json:"previous_page,omitempty"`
+	NextPage         string               `json:"next_page,omitempty"`
+}
+
+// swagger:response GamesPaginationResponse
+type GamesPaginationResponse struct {
+	GameResponses []GameResponse `json:"game_responses"`
+	PrePageLink   string         `json:"pre_page_link"`
+	PostPageLink  string         `json:"post_page_link"`
+}
+
+// swagger:parameters getGame editGame deleteGame
+type _ struct {
+
+	// In: path
+	Id int `json:"id"`
 }
