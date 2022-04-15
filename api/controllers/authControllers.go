@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"dartscoreboard/models"
+	models "dartscoreboard/models/database"
+	types "dartscoreboard/models/types"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"github.com/markbates/goth"
 	gf "github.com/shareed2k/goth_fiber"
 )
 
@@ -68,7 +68,7 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 		return err
 	}
 	// fmt.Println(user)
-	UserInfo := models.User{
+	UserInfo := types.User{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
@@ -134,12 +134,4 @@ func getGooglePublicKey(keyID string) (string, error) {
 		return "", errors.New("key not found")
 	}
 	return key, nil
-}
-
-func UserJson(ctx *fiber.Ctx) (goth.User, error) {
-	user, err := gf.CompleteUserAuth(ctx)
-	if err != nil {
-		return user, err
-	}
-	return user, err
 }

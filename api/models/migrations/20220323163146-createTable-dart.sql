@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS scores(
     game_player_id INTEGER,
     throw INTEGER,
     score INTEGER,
+    is_valid TEXT,
     created_at DATETIME DEFAULT (
         STRFTIME('%d-%m-%Y   %H:%M:%S', 'NOW', 'localtime')
     ),

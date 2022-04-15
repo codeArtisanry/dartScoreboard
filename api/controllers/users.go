@@ -15,7 +15,8 @@
 package controllers
 
 import (
-	"dartscoreboard/models"
+	models "dartscoreboard/models/database"
+	types "dartscoreboard/models/types"
 	"fmt"
 	"strconv"
 
@@ -30,10 +31,10 @@ import (
 //  500: StatusCode
 // GetUsers are get all users that login in dart-scoreboard
 func GetUsers(ctx *fiber.Ctx) error {
-	user:= models.User{}
+	user := types.User{}
 	page, err := strconv.Atoi(ctx.Query("page"))
 	if err != nil {
-		return ctx.JSON(models.StatusCode{
+		return ctx.JSON(types.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",
 		})
@@ -41,7 +42,7 @@ func GetUsers(ctx *fiber.Ctx) error {
 	offset := (page - 1) * 5
 	users, err := models.GetUsers(db, offset, user)
 	if err != nil {
-		return ctx.JSON(models.StatusCode{
+		return ctx.JSON(types.StatusCode{
 			StatusCode: 500,
 			Message:    "Internal Server Error",
 		})
@@ -57,7 +58,7 @@ func GetUsers(ctx *fiber.Ctx) error {
 		prePageLink = "cross limits"
 	}
 	ctx.SendStatus(200)
-	return ctx.JSON(models.UsersPaginationResponse{
+	return ctx.JSON(types.UsersPaginationResponse{
 		UserResponses: users,
 		PrePageLink:   prePageLink,
 		PostPageLink:  postPageLink,

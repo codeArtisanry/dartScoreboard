@@ -1,4 +1,4 @@
-package models
+package types
 
 // swagger:response StatusCode
 type StatusCode struct {
