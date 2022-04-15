@@ -48,16 +48,19 @@ func InsertUserDetails(db *sql.DB, user User) error {
 
 // Select user id using user email and return user id and error
 func SelectUserInfoByEmail(db *sql.DB, email string, user User) (User, error) {
-	readUserIdQuery := fmt.Sprintf("SELECT id,first_name,last_name,email FROM users WHERE email = '%s'", email)
+	readUserIdQuery := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE email = '%s'", email)
 	row := db.QueryRow(readUserIdQuery)
 	err := row.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email)
 	if err != nil {
+		fmt.Println(err)
 		return user, err
 	}
 	return user, nil
 }
+
+// Select user infomation by user id
 func SelectUserInfoById(db *sql.DB, id int, user User) (User, error) {
-	readUserIdQuery := fmt.Sprintf("SELECT first_name,last_name FROM users WHERE id = '%d'", id)
+	readUserIdQuery := fmt.Sprintf("SELECT first_name,last_name FROM users WHERE id = %d", id)
 	row := db.QueryRow(readUserIdQuery)
 	err := row.Scan(&user.FirstName, &user.LastName)
 	if err != nil {
@@ -66,24 +69,24 @@ func SelectUserInfoById(db *sql.DB, id int, user User) (User, error) {
 	return user, nil
 }
 
-//Verify User Exists or Not? Then Insert User Data to Users Table and return userid
+// Verify User Exists or Not? Then Insert User Data to Users Table and return userid
 func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
-	email := user.Email
-	user, err := SelectUserInfoByEmail(db, email, user)
+	user, err := SelectUserInfoByEmail(db, user.Email, user)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			fmt.Println("no row", err)
 			err := InsertUserDetails(db, user)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("InsertUserDetails", err)
 			}
-			user, err := SelectUserInfoByEmail(db, email, user)
+			user, err := SelectUserInfoByEmail(db, user.Email, user)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("SelectUserInfoByEmail", err)
 				return user.Id, err
 			}
 			return user.Id, nil
 		} else {
-			fmt.Println(err)
+			fmt.Println("without no row", err)
 			return user.Id, err
 		}
 	}
@@ -91,9 +94,9 @@ func VerifyAndInsertUser(db *sql.DB, user User) (int, error) {
 }
 
 // Get All User From Users Table
-func GetUsers(db *sql.DB, page int, offset int, user User) ([]User, error) {
+func GetUsers(db *sql.DB, offset int, user User) ([]User, error) {
 	var users []User
-	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users LIMIT 5, %d ORDER BY first_name ASC;", offset)
+	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users ORDER BY first_name ASC LIMIT 5 OFFSET %d;", offset)
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -115,9 +118,10 @@ func GetUsers(db *sql.DB, page int, offset int, user User) ([]User, error) {
 	return users, nil
 }
 
+// Get all perticuler game of players infomation list by game id
 func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponse) ([]GamePlayerResponse, error) {
 	var PlayersInfo []GamePlayerResponse
-	query := fmt.Sprintf("SELECT DISTINCT users.first_name,users.last_name,users.email from users LEFT JOIN game_players ON game_players.user_id=users.id where game_players.game_id = %d;", id)
+	query := fmt.Sprintf("SELECT DISTINCT users.id,users.first_name,users.last_name,users.email from users LEFT JOIN game_players ON game_players.user_id=users.id where game_players.game_id = %d;", id)
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -139,37 +143,39 @@ func GetPlayersInfoByGameId(db *sql.DB, id int, gamePlayerRes GamePlayerResponse
 	}
 	return PlayersInfo, nil
 }
+
+// Insert periculer game releted all players id in to game players table
 func InsertPlayers(db *sql.DB, game Game, gameId int, playerRes GamePlayerResponse) ([]GamePlayerResponse, error) {
 	var playersInfo []GamePlayerResponse
 	gamePlayerIds := game.PlayerIds
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(gamePlayerIds), func(i, j int) { gamePlayerIds[i], gamePlayerIds[j] = gamePlayerIds[j], gamePlayerIds[i] })
-	fmt.Println(gamePlayerIds)
-
-	for i := 0; i < len(gamePlayerIds); i++ {
+	for i := 0; i <= len(gamePlayerIds)-1; i++ {
 		insert, err := db.Prepare("INSERT INTO game_players(user_id, game_id) VALUES(?, ?)")
 		if err != nil {
 			fmt.Println(err)
 			return playersInfo, err
 		}
+		fmt.Println(gamePlayerIds[i], gameId)
 		_, err = insert.Exec(gamePlayerIds[i], gameId)
 		if err != nil {
 			fmt.Println(err)
 			return playersInfo, err
 		}
 	}
-	playerInfo, err := GetPlayersInfoByGameId(db, gameId, playerRes)
+	playersInfo, err := GetPlayersInfoByGameId(db, gameId, playerRes)
 	if err != nil {
 		fmt.Println(err)
-		return playerInfo, err
+		return playersInfo, err
 	}
-	return playerInfo, nil
+	fmt.Println(playersInfo)
+	return playersInfo, nil
 }
 
 // Insert Games in to Games Table
-func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePlayer GamePlayer, gamePlayerRes GamePlayerResponse) (GameResponse, error) {
+func InsertGames(db *sql.DB, user User, game Game, gamePlayer GamePlayer, gamePlayerRes GamePlayerResponse) (GameResponse, error) {
 	var gameResJson GameResponse
-	user, err := SelectUserInfoByEmail(db, game.CreaterUserEmail, user)
+	createrInfo, err := SelectUserInfoByEmail(db, game.CreaterUserEmail, user)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
@@ -179,7 +185,7 @@ func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePla
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	result, err := insert.Exec(game.Name, game.Type, game.Status, user.Id)
+	result, err := insert.Exec(game.Name, game.Type, game.Status, createrInfo.Id)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
@@ -197,12 +203,12 @@ func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePla
 		return gameResJson, err
 	}
 	gameResJson = GameResponse{
-		Id:               int(gameId),
-		Name:             gameRes.Name,
-		Type:             gameRes.Type,
-		Status:           gameRes.Status,
-		CreaterFirstName: gameRes.CreaterFirstName,
-		CreaterLastName:  gameRes.CreaterLastName,
+		Id:               id,
+		Name:             game.Name,
+		Type:             game.Type,
+		Status:           game.Status,
+		CreaterFirstName: createrInfo.FirstName,
+		CreaterLastName:  createrInfo.LastName,
 		PlayersInfo:      PlayersInfo,
 	}
 	return gameResJson, nil
@@ -210,6 +216,7 @@ func InsertGames(db *sql.DB, user User, game Game, gameRes GameResponse, gamePla
 
 // Delete Games From Games Table By Game Id
 func DeleteGames(db *sql.DB, id int) error {
+	fmt.Println(id)
 	deleteGamePlayers, err := db.Prepare("DELETE * FROM game_players WHERE game_id = ?;")
 	if err != nil {
 		fmt.Println(err)
@@ -312,7 +319,8 @@ func GetGame(db *sql.DB, id int, gameRes GameResponse, user User, gamePlayerRes 
 //Get All Games From Game Table
 func GetGames(db *sql.DB, page int, offset int, gameRes GameResponse, user User, gamePlayerRes GamePlayerResponse) ([]GameResponse, error) {
 	var gamesResJson []GameResponse
-	query := fmt.Sprintf("SELECT DISTINCT games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d LIMIT 10, %d ORDER BY games.created_at DESC;", user.Id, offset)
+	id := 1
+	query := fmt.Sprintf("SELECT games.id, games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d ORDER BY games.created_at DESC LIMIT 10 OFFSET %d;", id, offset)
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
@@ -346,6 +354,7 @@ func GetGames(db *sql.DB, page int, offset int, gameRes GameResponse, user User,
 	return gamesResJson, nil
 }
 
+// Find creater id by game id
 func FindCreaterIdByGameId(db *sql.DB, id int, gameRes GameResponse) (int, error) {
 	query := fmt.Sprintf("SELECT creater_user_id FROM games WHERE id = %d;", id)
 	row := db.QueryRow(query)

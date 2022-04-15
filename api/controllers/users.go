@@ -30,7 +30,7 @@ import (
 //  500: StatusCode
 // GetUsers are get all users that login in dart-scoreboard
 func GetUsers(ctx *fiber.Ctx) error {
-	user := models.User{}
+	user:= models.User{}
 	page, err := strconv.Atoi(ctx.Query("page"))
 	if err != nil {
 		return ctx.JSON(models.StatusCode{
@@ -38,8 +38,8 @@ func GetUsers(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	offset := (page + 1) * 10
-	users, err := models.GetUsers(db, page, offset, user)
+	offset := (page - 1) * 5
+	users, err := models.GetUsers(db, offset, user)
 	if err != nil {
 		return ctx.JSON(models.StatusCode{
 			StatusCode: 500,
@@ -48,9 +48,9 @@ func GetUsers(ctx *fiber.Ctx) error {
 	}
 	prePage := page - 1
 	postPage := page + 1
-	prePageLink := fmt.Sprintf("api/v1/users/?page=%d", prePage)
-	postPageLink := fmt.Sprintf("api/v1/users/?page=%d", postPage)
-	if len(users) < 10 {
+	prePageLink := fmt.Sprintf("/api/v1/users?page=%d", prePage)
+	postPageLink := fmt.Sprintf("/api/v1/users?page=%d", postPage)
+	if len(users) < 5 {
 		postPageLink = "cross limits"
 	}
 	if prePage == 0 {
