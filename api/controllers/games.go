@@ -152,7 +152,6 @@ func UpdateGame(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	creater_id = 2
 	if creater_id == user.Id {
 		row, err := models.UpdateGame(db, gameId, user, game, playerRes)
 		if err != nil {
