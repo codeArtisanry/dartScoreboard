@@ -47,9 +47,8 @@ func UpdateGame(db *sql.DB, id int, user types.User, game types.Game, playerRes 
 		Name:             game.Name,
 		Type:             game.Type,
 		Status:           game.Status,
-		CreaterFirstName: createrInfo.FirstName,
-		CreaterLastName:  createrInfo.LastName,
-		PlayersInfo:      playersInfo,
+		CreaterName: createrInfo.FirstName+createrInfo.LastName,
+		Players:          playersInfo,
 	}
 	return gameResJson, nil
 }

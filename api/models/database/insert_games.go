@@ -9,7 +9,7 @@ import (
 )
 
 // Insert Games in to Games Table
-func InsertGames(db *sql.DB,createrEmail string, user types.User, game types.Game, gamePlayer types.GamePlayer, gamePlayerRes types.GamePlayerResponse) (types.GameResponse, error) {
+func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Game, gamePlayer types.GamePlayer, gamePlayerRes types.GamePlayerResponse) (types.GameResponse, error) {
 	var gameResJson types.GameResponse
 	createrInfo, err := SelectUserInfoByEmail(db, createrEmail, user)
 	if err != nil {
@@ -39,13 +39,12 @@ func InsertGames(db *sql.DB,createrEmail string, user types.User, game types.Gam
 		return gameResJson, err
 	}
 	gameResJson = types.GameResponse{
-		Id:               id,
-		Name:             game.Name,
-		Type:             game.Type,
-		Status:           game.Status,
-		CreaterFirstName: createrInfo.FirstName,
-		CreaterLastName:  createrInfo.LastName,
-		PlayersInfo:      PlayersInfo,
+		Id:          id,
+		Name:        game.Name,
+		Type:        game.Type,
+		Status:      game.Status,
+		CreaterName: createrInfo.FirstName + createrInfo.LastName,
+		Players:     PlayersInfo,
 	}
 	return gameResJson, nil
 }

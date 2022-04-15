@@ -18,16 +18,15 @@ type Game struct {
 
 // swagger:response GameResponse
 type GameResponse struct {
-	Id               int                  `json:"id"`
-	Name             string               `json:"game_name"`
-	Type             string               `json:"game_type"`
-	Status           string               `json:"game_status"`
-	CreaterUserId    int                  `json:"creater_user_id,omitempty"`
-	CreaterFirstName string               `json:"creater_first_name"`
-	CreaterLastName  string               `json:"creater_last_name"`
-	PlayersInfo      []GamePlayerResponse `json:"players_info"`
-	PreviousPage     string               `json:"previous_page,omitempty"`
-	NextPage         string               `json:"next_page,omitempty"`
+	Id            int                  `json:"id"`
+	Name          string               `json:"game_name"`
+	Type          string               `json:"game_type"`
+	Status        string               `json:"game_status"`
+	CreaterUserId int                  `json:"creater_user_id,omitempty"`
+	CreaterName   string               `json:"creater_name"`
+	Players       []GamePlayerResponse `json:"players"`
+	PreviousPage  string               `json:"previous_page,omitempty"`
+	NextPage      string               `json:"next_page,omitempty"`
 }
 
 // swagger:response GamesPaginationResponse
