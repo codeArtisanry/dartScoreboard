@@ -26,6 +26,7 @@ func SelectUserInfoById(db *sql.DB, id int, user types.User) (types.User, error)
 	row := db.QueryRow(readUserIdQuery)
 	err := row.Scan(&user.FirstName, &user.LastName)
 	if err != nil {
+		fmt.Println(err)
 		return user, err
 	}
 	return user, nil

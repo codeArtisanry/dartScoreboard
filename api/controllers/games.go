@@ -27,18 +27,25 @@ func InsertGame(ctx *fiber.Ctx) error {
 	email := LoginUser.(string)
 	user := types.User{}
 	game := types.Game{}
+	gameRes := types.GameResponse{}
 	gamePlayer := types.GamePlayer{}
 	gamePlayerRes := types.GamePlayerResponse{}
 	ctx.BodyParser(&game)
-	gameJson, err := models.InsertGames(db, email, user, game, gamePlayer, gamePlayerRes)
-	if err != nil {
-		fmt.Println(err)
-		return ctx.Status(500).JSON(types.StatusCode{
-			StatusCode: 500,
-			Message:    "Internal Server Error",
-		})
+	if game.Type == "High Score" || game.Type == "Target Score-101" || game.Type == "Target Score-301" || game.Type == "Target Score-501" {
+		gameJson, err := models.InsertGames(db, email, user, game, gameRes, gamePlayer, gamePlayerRes)
+		if err != nil {
+			fmt.Println(err)
+			return ctx.Status(500).JSON(types.StatusCode{
+				StatusCode: 500,
+				Message:    "Internal Server Error",
+			})
+		}
+		return ctx.Status(201).JSON(gameJson)
 	}
-	return ctx.Status(201).JSON(gameJson)
+	return ctx.Status(400).JSON(types.StatusCode{
+		StatusCode: 400,
+		Message:    "Can't find your matching game type",
+	})
 }
 
 // swagger:route DELETE/games/{id} Games deleteGame
@@ -131,10 +138,10 @@ func UpdateGame(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	playerRes := types.GamePlayerResponse{}
-	gameRes := types.GameResponse{}
 	game := types.Game{}
 	user := types.User{}
+	gameRes := types.GameResponse{}
+	playerRes := types.GamePlayerResponse{}
 	ctx.BodyParser(&game)
 	creater_id, err := models.FindCreaterIdByGameId(db, gameId, gameRes)
 	if err != nil {
@@ -153,15 +160,21 @@ func UpdateGame(ctx *fiber.Ctx) error {
 		})
 	}
 	if creater_id == user.Id {
-		row, err := models.UpdateGame(db, gameId, user, game, playerRes)
-		if err != nil {
-			return ctx.Status(500).JSON(types.StatusCode{
-				StatusCode: 500,
-				Message:    "Internal Server Error",
-			})
+		if game.Type == "High Score" || game.Type == "Target Score-101" || game.Type == "Target Score-301" || game.Type == "Target Score-501" {
+			gameJson, err := models.UpdateGame(db, gameId, email, user, game, gameRes, playerRes)
+			if err != nil {
+				return ctx.Status(500).JSON(types.StatusCode{
+					StatusCode: 500,
+					Message:    "Internal Server Error",
+				})
+			}
+			ctx.SendStatus(201)
+			return ctx.Status(201).JSON(gameJson)
 		}
-		ctx.SendStatus(201)
-		return ctx.Status(201).JSON(row)
+		return ctx.Status(400).JSON(types.StatusCode{
+			StatusCode: 400,
+			Message:    "Can't find your matching game type",
+		})
 	}
 	return ctx.Status(403).JSON(types.StatusCode{
 		StatusCode: 403,
@@ -213,7 +226,6 @@ func GetGames(ctx *fiber.Ctx) error {
 
 	LoginUser := ctx.Locals("claims")
 	if LoginUser == nil {
-		// fmt.Println(err)
 		return ctx.JSON(types.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",

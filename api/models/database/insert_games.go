@@ -9,7 +9,7 @@ import (
 )
 
 // Insert Games in to Games Table
-func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Game, gamePlayer types.GamePlayer, gamePlayerRes types.GamePlayerResponse) (types.GameResponse, error) {
+func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Game, gameRes types.GameResponse, gamePlayer types.GamePlayer, gamePlayerRes types.GamePlayerResponse) (types.GameResponse, error) {
 	var gameResJson types.GameResponse
 	createrInfo, err := SelectUserInfoByEmail(db, createrEmail, user)
 	if err != nil {
@@ -21,7 +21,7 @@ func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Ga
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	result, err := insert.Exec(game.Name, game.Type, game.Status, createrInfo.Id)
+	result, err := insert.Exec(game.Name, game.Type, "Not Started", createrInfo.Id)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
@@ -33,18 +33,15 @@ func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Ga
 	}
 
 	id := int(gameId)
-	PlayersInfo, err := InsertPlayers(db, game, id, gamePlayerRes)
+	_, err = InsertPlayers(db, game, id, gamePlayerRes)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	gameResJson = types.GameResponse{
-		Id:          id,
-		Name:        game.Name,
-		Type:        game.Type,
-		Status:      game.Status,
-		CreaterName: createrInfo.FirstName + createrInfo.LastName,
-		Players:     PlayersInfo,
+	gameResJson, err = GetGame(db, id, gameRes, user, gamePlayerRes)
+	if err != nil {
+		fmt.Println(err)
+		return gameResJson, err
 	}
 	return gameResJson, nil
 }

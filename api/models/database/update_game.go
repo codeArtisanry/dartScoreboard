@@ -9,23 +9,25 @@ import (
 )
 
 // Update Games From Games Table By Game Id
-func UpdateGame(db *sql.DB, id int, user types.User, game types.Game, playerRes types.GamePlayerResponse) (types.GameResponse, error) {
+func UpdateGame(db *sql.DB, id int, email string, user types.User, game types.Game, gameRes types.GameResponse, playerRes types.GamePlayerResponse) (types.GameResponse, error) {
 	var gameResJson types.GameResponse
-	createrInfo, err := SelectUserInfoByEmail(db, game.CreaterUserEmail, user)
+	createrInfo, err := SelectUserInfoByEmail(db, email, user)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
 	}
+
 	query, err := db.Prepare("UPDATE games SET name = ?, type = ?, status = ?, creater_user_id = ? WHERE id = ?;")
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	_, err = query.Exec(game.Name, game.Type, game.Status, createrInfo.Id, id)
+	_, err = query.Exec(game.Name, game.Type, "Not Started", createrInfo.Id, id)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
 	}
+
 	deleteGamePlayers, err := db.Prepare("DELETE FROM game_players WHERE game_id = ?;")
 	if err != nil {
 		fmt.Println(err)
@@ -37,18 +39,16 @@ func UpdateGame(db *sql.DB, id int, user types.User, game types.Game, playerRes 
 		return gameResJson, err
 	}
 
-	playersInfo, err := InsertPlayers(db, game, id, playerRes)
+	_, err = InsertPlayers(db, game, id, playerRes)
 	if err != nil {
 		fmt.Println(err)
 		return gameResJson, err
 	}
-	gameResJson = types.GameResponse{
-		Id:               id,
-		Name:             game.Name,
-		Type:             game.Type,
-		Status:           game.Status,
-		CreaterName: createrInfo.FirstName+createrInfo.LastName,
-		Players:          playersInfo,
+
+	gameResJson, err = GetGame(db, id, gameRes, user, playerRes)
+	if err != nil {
+		fmt.Println(err)
+		return gameResJson, err
 	}
 	return gameResJson, nil
 }

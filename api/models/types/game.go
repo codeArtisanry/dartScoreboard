@@ -8,9 +8,9 @@ import "time"
 type Game struct {
 	Id               int        `json:"id"`
 	Name             string     `json:"game_name"`
-	Type             string     `json:"game_type"`
+	Type             string     `json:"game_type,omitempty"`
 	Status           string     `json:"game_status"`
-	PlayerIds        []int      `json:"player_ids"`
+	PlayersIds        []int      `json:"players_ids"`
 	CreaterUserEmail string     `json:"creater_user_email"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
 	UpdatedAt        *time.Time `json:"updated_at,omitempty"`
