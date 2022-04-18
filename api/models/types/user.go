@@ -2,7 +2,8 @@ package types
 
 import "time"
 
-// swagger:response User
+// User user
+// swagger:model user
 type User struct {
 	Id        int        `json:"id"`
 	FirstName string     `json:"firstName"`
@@ -15,6 +16,7 @@ type User struct {
 
 // swagger:response UsersPaginationResponse
 type UsersPaginationResponse struct {
+	// in: body
 	UserResponses []User `json:"user_responses"`
 	PrePageLink   string `json:"pre_page_link"`
 	PostPageLink  string `json:"post_page_link"`

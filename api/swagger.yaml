@@ -1,6 +1,61 @@
 basePath: /api/v1
 definitions:
-  Game:
+  GamePlayerResponse:
+    properties:
+      email:
+        type: string
+        x-go-name: Email
+      first_name:
+        type: string
+        x-go-name: FirstName
+      id:
+        format: int64
+        type: integer
+        x-go-name: Id
+      last_name:
+        type: string
+        x-go-name: LastName
+    type: object
+    x-go-package: dartscoreboard/models/types
+  GameResponse:
+    properties:
+      creater_name:
+        type: string
+        x-go-name: CreaterName
+      creater_user_id:
+        format: int64
+        type: integer
+        x-go-name: CreaterUserId
+      game_name:
+        type: string
+        x-go-name: Name
+      game_status:
+        type: string
+        x-go-name: Status
+      game_type:
+        type: string
+        x-go-name: Type
+      id:
+        description: 'in: body'
+        format: int64
+        type: integer
+        x-go-name: Id
+      next_page:
+        type: string
+        x-go-name: NextPage
+      players:
+        description: 'in: body'
+        items:
+          $ref: '#/definitions/GamePlayerResponse'
+        type: array
+        x-go-name: Players
+      previous_page:
+        type: string
+        x-go-name: PreviousPage
+    type: object
+    x-go-package: dartscoreboard/models/types
+  game:
+    description: Game game
     properties:
       created_at:
         format: date-time
@@ -22,19 +77,21 @@ definitions:
         format: int64
         type: integer
         x-go-name: Id
-      player_ids:
+      players_ids:
         items:
           format: int64
           type: integer
         type: array
-        x-go-name: PlayerIds
+        x-go-name: PlayersIds
       updated_at:
         format: date-time
         type: string
         x-go-name: UpdatedAt
     type: object
+    x-go-name: Game
     x-go-package: dartscoreboard/models/types
-  GamePlayer:
+  gamePlayer:
+    description: GamePlayer gamePlayer
     properties:
       created_at:
         format: date-time
@@ -57,63 +114,10 @@ definitions:
         type: integer
         x-go-name: UserId
     type: object
+    x-go-name: GamePlayer
     x-go-package: dartscoreboard/models/types
-  GamePlayerResponse:
-    properties:
-      email:
-        type: string
-        x-go-name: Email
-      first_name:
-        type: string
-        x-go-name: FirstName
-      id:
-        format: int64
-        type: integer
-        x-go-name: Id
-      last_name:
-        type: string
-        x-go-name: LastName
-    type: object
-    x-go-package: dartscoreboard/models/types
-  GameResponse:
-    properties:
-      creater_first_name:
-        type: string
-        x-go-name: CreaterFirstName
-      creater_last_name:
-        type: string
-        x-go-name: CreaterLastName
-      creater_user_id:
-        format: int64
-        type: integer
-        x-go-name: CreaterUserId
-      game_name:
-        type: string
-        x-go-name: Name
-      game_status:
-        type: string
-        x-go-name: Status
-      game_type:
-        type: string
-        x-go-name: Type
-      id:
-        format: int64
-        type: integer
-        x-go-name: Id
-      next_page:
-        type: string
-        x-go-name: NextPage
-      players_info:
-        items:
-          $ref: '#/definitions/GamePlayerResponse'
-        type: array
-        x-go-name: PlayersInfo
-      previous_page:
-        type: string
-        x-go-name: PreviousPage
-    type: object
-    x-go-package: dartscoreboard/models/types
-  User:
+  user:
+    description: User user
     properties:
       avatarUrl:
         type: string
@@ -140,6 +144,7 @@ definitions:
         type: string
         x-go-name: UpdatedAt
     type: object
+    x-go-name: User
     x-go-package: dartscoreboard/models/types
 host: localhost:8080
 info:
@@ -262,9 +267,7 @@ responses:
   GameResponse:
     description: ""
     headers:
-      creater_first_name:
-        type: string
-      creater_last_name:
+      creater_name:
         type: string
       creater_user_id:
         format: int64
@@ -275,28 +278,25 @@ responses:
         type: string
       game_type:
         type: string
-      id:
-        format: int64
-        type: integer
       next_page:
         type: string
-      players_info:
-        items:
-          $ref: '#/definitions/GamePlayerResponse'
-        type: array
       previous_page:
         type: string
+    schema:
+      items:
+        $ref: '#/definitions/GamePlayerResponse'
+      type: array
   GamesPaginationResponse:
     description: ""
     headers:
-      game_responses:
-        items:
-          $ref: '#/definitions/GameResponse'
-        type: array
       post_page_link:
         type: string
       pre_page_link:
         type: string
+    schema:
+      items:
+        $ref: '#/definitions/GameResponse'
+      type: array
   StatusCode:
     description: ""
     headers:
@@ -305,26 +305,6 @@ responses:
       status_code:
         format: int64
         type: integer
-  User:
-    description: ""
-    headers:
-      avatarUrl:
-        type: string
-      created_at:
-        format: date-time
-        type: string
-      email:
-        type: string
-      firstName:
-        type: string
-      id:
-        format: int64
-        type: integer
-      lastName:
-        type: string
-      updated_at:
-        format: date-time
-        type: string
   UsersPaginationResponse:
     description: ""
     headers:
@@ -332,10 +312,10 @@ responses:
         type: string
       pre_page_link:
         type: string
-      user_responses:
-        items:
-          $ref: '#/definitions/User'
-        type: array
+    schema:
+      items:
+        $ref: '#/definitions/user'
+      type: array
 schemes:
 - http
 swagger: "2.0"
