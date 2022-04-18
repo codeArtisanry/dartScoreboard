@@ -1,0 +1,321 @@
+basePath: /api/v1
+definitions:
+  GamePlayerResponse:
+    properties:
+      email:
+        type: string
+        x-go-name: Email
+      first_name:
+        type: string
+        x-go-name: FirstName
+      id:
+        format: int64
+        type: integer
+        x-go-name: Id
+      last_name:
+        type: string
+        x-go-name: LastName
+    type: object
+    x-go-package: dartscoreboard/models/types
+  GameResponse:
+    properties:
+      creater_name:
+        type: string
+        x-go-name: CreaterName
+      creater_user_id:
+        format: int64
+        type: integer
+        x-go-name: CreaterUserId
+      game_name:
+        type: string
+        x-go-name: Name
+      game_status:
+        type: string
+        x-go-name: Status
+      game_type:
+        type: string
+        x-go-name: Type
+      id:
+        description: 'in: body'
+        format: int64
+        type: integer
+        x-go-name: Id
+      next_page:
+        type: string
+        x-go-name: NextPage
+      players:
+        description: 'in: body'
+        items:
+          $ref: '#/definitions/GamePlayerResponse'
+        type: array
+        x-go-name: Players
+      previous_page:
+        type: string
+        x-go-name: PreviousPage
+    type: object
+    x-go-package: dartscoreboard/models/types
+  game:
+    description: Game game
+    properties:
+      created_at:
+        format: date-time
+        type: string
+        x-go-name: CreatedAt
+      creater_user_email:
+        type: string
+        x-go-name: CreaterUserEmail
+      game_name:
+        type: string
+        x-go-name: Name
+      game_status:
+        type: string
+        x-go-name: Status
+      game_type:
+        type: string
+        x-go-name: Type
+      id:
+        format: int64
+        type: integer
+        x-go-name: Id
+      players_ids:
+        items:
+          format: int64
+          type: integer
+        type: array
+        x-go-name: PlayersIds
+      updated_at:
+        format: date-time
+        type: string
+        x-go-name: UpdatedAt
+    type: object
+    x-go-name: Game
+    x-go-package: dartscoreboard/models/types
+  gamePlayer:
+    description: GamePlayer gamePlayer
+    properties:
+      created_at:
+        format: date-time
+        type: string
+        x-go-name: CreatedAt
+      game_id:
+        format: int64
+        type: integer
+        x-go-name: GameId
+      id:
+        format: int64
+        type: integer
+        x-go-name: Id
+      updated_at:
+        format: date-time
+        type: string
+        x-go-name: UpdatedAt
+      user_id:
+        format: int64
+        type: integer
+        x-go-name: UserId
+    type: object
+    x-go-name: GamePlayer
+    x-go-package: dartscoreboard/models/types
+  user:
+    description: User user
+    properties:
+      avatarUrl:
+        type: string
+        x-go-name: AvatarURL
+      created_at:
+        format: date-time
+        type: string
+        x-go-name: CreatedAt
+      email:
+        type: string
+        x-go-name: Email
+      firstName:
+        type: string
+        x-go-name: FirstName
+      id:
+        format: int64
+        type: integer
+        x-go-name: Id
+      lastName:
+        type: string
+        x-go-name: LastName
+      updated_at:
+        format: date-time
+        type: string
+        x-go-name: UpdatedAt
+    type: object
+    x-go-name: User
+    x-go-package: dartscoreboard/models/types
+host: localhost:8080
+info:
+  title: Dart-Scoreboard APIs.
+  version: v1
+paths:
+  /games:
+    get:
+      description: Get all the game that is by login user
+      operationId: ListGame
+      responses:
+        "200":
+          $ref: '#/responses/GamesPaginationResponse'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Games
+    post:
+      description: Insert game in game table and also players in game_player table
+      operationId: addGame
+      responses:
+        "201":
+          $ref: '#/responses/GameResponse'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Games
+  /games/{id}:
+    delete:
+      description: Delete game using game id
+      operationId: deleteGame
+      parameters:
+      - format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: Id
+      responses:
+        "204":
+          $ref: '#/responses/StatusCode'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "403":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Games
+    get:
+      description: Get game using game id
+      operationId: getGame
+      parameters:
+      - format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: Id
+      responses:
+        "200":
+          $ref: '#/responses/GameResponse'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "404":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Games
+    put:
+      description: Update game using game id
+      operationId: editGame
+      parameters:
+      - format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: Id
+      responses:
+        "201":
+          $ref: '#/responses/GameResponse'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "403":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Games
+  /users:
+    get:
+      description: Returns a list of users
+      operationId: ListUsers
+      responses:
+        "200":
+          $ref: '#/responses/UsersPaginationResponse'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Users
+responses:
+  GamePlayerResponse:
+    description: ""
+    headers:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        format: int64
+        type: integer
+      last_name:
+        type: string
+  GameResponse:
+    description: ""
+    headers:
+      creater_name:
+        type: string
+      creater_user_id:
+        format: int64
+        type: integer
+      game_name:
+        type: string
+      game_status:
+        type: string
+      game_type:
+        type: string
+      next_page:
+        type: string
+      previous_page:
+        type: string
+    schema:
+      items:
+        $ref: '#/definitions/GamePlayerResponse'
+      type: array
+  GamesPaginationResponse:
+    description: ""
+    headers:
+      post_page_link:
+        type: string
+      pre_page_link:
+        type: string
+    schema:
+      items:
+        $ref: '#/definitions/GameResponse'
+      type: array
+  StatusCode:
+    description: ""
+    headers:
+      msg:
+        type: string
+      status_code:
+        format: int64
+        type: integer
+  UsersPaginationResponse:
+    description: ""
+    headers:
+      post_page_link:
+        type: string
+      pre_page_link:
+        type: string
+    schema:
+      items:
+        $ref: '#/definitions/user'
+      type: array
+schemes:
+- http
+swagger: "2.0"

@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"dartscoreboard/models"
+	models "dartscoreboard/models/database"
+	types "dartscoreboard/models/types"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +15,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	gf "github.com/shareed2k/goth_fiber"
 )
+
+var db = models.Database()
 
 // 1. Endpoint for i am logged in?
 func Endpoint(ctx *fiber.Ctx) error {
@@ -64,16 +67,14 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
 	// fmt.Println(user)
-	userinfo := models.User{
+	UserInfo := types.User{
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Email:     user.Email,
 		AvatarURL: user.AvatarURL,
 	}
-	db := models.Database()
-	id, err := models.VerifyAndInsertUser(db, userinfo)
+	id, err := models.VerifyAndInsertUser(db, UserInfo)
 	fmt.Println(id)
 	if err != nil {
 		fmt.Println(err)

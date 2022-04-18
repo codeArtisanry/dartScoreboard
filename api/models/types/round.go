@@ -1,11 +1,10 @@
-package models
+package types
 
 import "time"
 
-type GamePlayer struct {
+type Round struct {
 	Id        int        `json:"id"`
-	GameId    int        `json:"gameId"`
-	UserId    int        `json:"userId"`
+	Round     int        `json:"round"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }

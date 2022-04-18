@@ -15,10 +15,11 @@ func Validate(config ...fiber.Config) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		cookie := ctx.Cookies("user")
 		if cookie == "" {
-			return ctx.Redirect("auth/google")
+			return ctx.Redirect("/auth/google")
 		}
+		claims := jwt.MapClaims{}
 		fmt.Println("this is cookie", cookie)
-		token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(cookie, claims, func(token *jwt.Token) (interface{}, error) {
 			pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
 			if err != nil {
 				return nil, err
@@ -29,22 +30,20 @@ func Validate(config ...fiber.Config) fiber.Handler {
 			}
 			return key, nil
 		})
+		ctx.Locals("claims", claims["email"])
 		fmt.Println(token)
+		// ... error handling
 		if err != nil {
 			fmt.Println("err  :", err)
 			return ctx.Redirect("/auth/google")
-			// return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			// 	"message": "User NOT Exist",
-			// })
 		} else {
-			return ctx.Redirect("/home")
-			// return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
-			// 	"message": "User Exist",
-			// })
+			ctx.Redirect("/home")
+			return ctx.Next()
 		}
 	}
 }
 
+// Google Public key 
 func getGooglePublicKey(keyID string) (string, error) {
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v1/certs")
 	if err != nil {
