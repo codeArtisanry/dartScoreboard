@@ -10,7 +10,8 @@ type GamePlayerResponse struct {
 	Email     string `json:"email"`
 }
 
-// swagger:model GamePlayer
+// GamePlayer gamePlayer
+// swagger:model gamePlayer
 type GamePlayer struct {
 	Id        int        `json:"id"`
 	GameId    int        `json:"game_id"`
