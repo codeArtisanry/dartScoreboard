@@ -9,14 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// swagger:route GET/games/{id}/active-status Games getGame
-// Get game using game id
-// Responses:
-//  200: GetActiveStatusRes
-//  400: StatusCode
-//  404: StatusCode
-//  500: StatusCode
-// GetActiveStatusRes are get next round,player and dart data for verify with frontend URL
 func GetActiveStatusRes(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
