@@ -21,11 +21,8 @@ func GetActiveStatusRes(ctx *fiber.Ctx) error {
 		})
 	}
 	activeRes := types.ActiveStatus{}
-	players := types.NextTurn{}
-
-	activejson, err := models.GetActiveStatusRes(db, gameId, activeRes, players)
+	activejson, err := models.GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
-
 		fmt.Println(err)
 		return ctx.Status(404).JSON(types.StatusCode{
 			StatusCode: 404,
