@@ -29,7 +29,7 @@ func GetActiveStatusRes(ctx *fiber.Ctx) error {
 		})
 	}
 	activeRes := types.ActiveStatus{}
-	players := types.Extra{}
+	players := types.NextTurn{}
 
 	activejson, err := models.GetActiveStatusRes(db, gameId, activeRes, players)
 	if err != nil {

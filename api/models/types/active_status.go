@@ -9,7 +9,7 @@ type ActiveStatus struct {
 }
 
 //swagger: responce Extra
-type Extra struct {
+type NextTurn struct {
 	Count  int    `json:"count"`
 	Player int    `json:"player"`
 	Type   string `json:"type"`
