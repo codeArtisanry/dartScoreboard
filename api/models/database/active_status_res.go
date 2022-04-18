@@ -74,7 +74,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus, player
 
 	} else {
 
-		query := fmt.Sprintf("SELECT rounds.round , game_players.user_id as player_id, scores.throw from game_players inner join rounds on game_players.game_id =rounds.game_id INNER  JOIN scores on scores.game_player_id = game_players.id WHERE game_players.game_id = %d GROUP  BY rounds.round ,game_players.id , scores.throw ORDER BY rounds.round DESC ,game_players.id DESC , scores.throw DESC LIMIT 1; ", id)
+		query := fmt.Sprintf("SELECT rounds.round , game_players.user_id as player_id, scores.throw from scores inner join rounds on scores.round_id =rounds.id INNER  JOIN game_players  on scores.game_player_id = game_players.id WHERE rounds.game_id = %d ORDER BY scores.id DESC LIMIT 1 ; ", id)
 		row3 := db.QueryRow(query)
 		err22 := row3.Scan(&activeRes.Round, &activeRes.PlayerId, &activeRes.Throw)
 		if err22 != nil {
