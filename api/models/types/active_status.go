@@ -8,7 +8,6 @@ type ActiveStatus struct {
 	Throw    int `json:"throw"`
 }
 
-//swagger: responce Extra
 type NextTurn struct {
 	Count  int    `json:"count"`
 	Player int    `json:"player"`
