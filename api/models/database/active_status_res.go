@@ -12,9 +12,9 @@ import (
 func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types.ActiveStatus, error) {
 	var (
 		activeResJson types.ActiveStatus
-		arrofplayers  []int
+		playersIds  []int
 		count         int
-		typeofgame    string
+		typeOfGame    string
 		status        string
 		playerId      int
 	)
@@ -27,7 +27,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 	}
 	queryoftype := fmt.Sprintf("SELECT type, status from games WHERE id=%d", id)
 	rowoftype := db.QueryRow(queryoftype)
-	err = rowoftype.Scan(&typeofgame, &status)
+	err = rowoftype.Scan(&typeOfGame, &status)
 	if err != nil {
 		fmt.Println()
 		return activeResJson, err
@@ -44,7 +44,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		if err != nil {
 			return activeRes, err
 		}
-		arrofplayers = append(arrofplayers, playerId)
+		playersIds = append(playersIds, playerId)
 	}
 	if count == 0 {
 		insert, err := db.Prepare("UPDATE games set status='In Progress' WHERE id = ?")
@@ -59,7 +59,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		}
 		activeRes.Round = 1
 		activeRes.Throw = 1
-		activeRes.PlayerId = arrofplayers[0]
+		activeRes.PlayerId = playersIds[0]
 
 	} else {
 		query := fmt.Sprintf("SELECT rounds.round, game_players.user_id as player_id, scores.throw FROM scores INNER JOIN rounds ON scores.round_id = rounds.id INNER JOIN game_players ON scores.game_player_id = game_players.id WHERE rounds.game_id = %d ORDER BY scores.id DESC LIMIT 1 ;", id)
@@ -70,7 +70,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 			return activeResJson, err
 		}
 
-		if typeofgame == "High Score" && count%(9*len(arrofplayers)) == 0 {
+		if typeOfGame == "High Score" && count%(9*len(playersIds)) == 0 {
 			activeRes.Round = 0
 			activeRes.PlayerId = 0
 			activeRes.Throw = 0
@@ -87,7 +87,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 			}
 		} else {
 			currentplayer := activeRes.PlayerId
-			if count%(3*len(arrofplayers)) == 0 {
+			if count%(3*len(playersIds)) == 0 {
 				activeRes.Round = activeRes.Round + 1
 			}
 			if activeRes.Throw == 3 {
@@ -96,8 +96,8 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 				activeRes.Throw = activeRes.Throw + 1
 			}
 			if count%3 == 0 {
-				currentplayer = currentplayer % len(arrofplayers)
-				nextplayer := arrofplayers[currentplayer]
+				currentplayer = currentplayer % len(playersIds)
+				nextplayer := playersIds[currentplayer]
 				activeRes.PlayerId = nextplayer
 			}
 			if status == "Completed" {

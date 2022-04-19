@@ -4,9 +4,8 @@ import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
 	"fmt"
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
+	"strconv"
 )
 
 func GetActiveStatusRes(ctx *fiber.Ctx) error {
@@ -14,7 +13,6 @@ func GetActiveStatusRes(ctx *fiber.Ctx) error {
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
-
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",
