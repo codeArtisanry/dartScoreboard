@@ -19,6 +19,15 @@ func InsertScore(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	models.InsertScore(db, gameId)
-	return nil
+	score := types.Score{}
+	ctx.BodyParser(&score)
+	scoreRes, err := models.InsertScore(db, gameId, score)
+	if err != nil {
+		fmt.Println(err)
+		return ctx.Status(500).JSON(types.StatusCode{
+			StatusCode: 500,
+			Message:    "Internal Server Error",
+		})
+	}
+	return ctx.JSON(scoreRes)
 }
