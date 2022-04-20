@@ -24,7 +24,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		fmt.Println(err)
 		return scoreRes, err
 	}
-	if activeRes.Round == 0 {
+	if activejson.Round == 0 {
 		scoreRes := types.ResScore{
 			Score:       0,
 			TotalScore:  0,
@@ -193,7 +193,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 
 func FindTotalScore(db *sql.DB, gamePlayerId int) (int, error) {
 	var totalScore int
-	findTotalScore := fmt.Sprintf("SELECT sum(scores.score) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
+	findTotalScore := fmt.Sprintf("SELECT IFNULL(sum(scores.score),0) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
 	row := db.QueryRow(findTotalScore)
 	err := row.Scan(&totalScore)
 	if err != nil {
