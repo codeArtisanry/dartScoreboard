@@ -248,6 +248,28 @@ paths:
           $ref: '#/responses/StatusCode'
       tags:
       - Games
+  /games/{id}/active-status:
+    get:
+      description: Get activestatus using game id
+      operationId: activeStatus
+      parameters:
+      - format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: Id
+      responses:
+        "200":
+          $ref: '#/responses/ActiveStatus'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "404":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - ActiveStatus
   /games/{id}/score:
     post:
       description: Insert Score and Round in scores and rounds table
@@ -282,6 +304,21 @@ paths:
       tags:
       - Users
 responses:
+  ActiveStatus:
+    description: ""
+    headers:
+      game_id:
+        format: int64
+        type: integer
+      player_id:
+        format: int64
+        type: integer
+      round:
+        format: int64
+        type: integer
+      throw:
+        format: int64
+        type: integer
   GamePlayerResponse:
     description: ""
     headers:

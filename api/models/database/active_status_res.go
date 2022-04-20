@@ -8,11 +8,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Get active-status from for last round,player and dart to vertify with frontend URL
+// GetActiveStatusRes from from Games table By Game Id
 func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types.ActiveStatus, error) {
 	var (
 		activeResJson types.ActiveStatus
-		playersIds  []int
+		playersIds    []int
 		count         int
 		typeOfGame    string
 		status        string
