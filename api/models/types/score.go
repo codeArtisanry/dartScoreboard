@@ -1,13 +1,15 @@
 package types
 
-import "time"
-
+// Score score
+// swagger:model score
 type Score struct {
-	Id        int        `json:"id"`
-	RoundId   int        `json:"roundId"`
-	PlayerID  int        `json:"playerId"`
-	Throw     int        `json:"throw"`
-	Score     int        `json:"score"`
-	CreatedAt *time.Time `json:"created_at,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	Score int `json:"score"`
+}
+
+// swagger:response ResScore
+type ResScore struct {
+	// in: body
+	Score       int  `json:"score"`
+	TotalScore  int  `json:"total_score"`
+	FoundWinner bool `json:"found_winner"`
 }

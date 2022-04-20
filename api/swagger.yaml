@@ -116,6 +116,16 @@ definitions:
     type: object
     x-go-name: GamePlayer
     x-go-package: dartscoreboard/models/types
+  score:
+    description: Score score
+    properties:
+      score:
+        format: int64
+        type: integer
+        x-go-name: Score
+    type: object
+    x-go-name: Score
+    x-go-package: dartscoreboard/models/types
   user:
     description: User user
     properties:
@@ -260,6 +270,26 @@ paths:
           $ref: '#/responses/StatusCode'
       tags:
       - ActiveStatus
+  /games/{id}/score:
+    post:
+      description: Insert Score and Round in scores and rounds table
+      operationId: addScore
+      parameters:
+      - format: int64
+        in: path
+        name: id
+        required: true
+        type: integer
+        x-go-name: Id
+      responses:
+        "201":
+          $ref: '#/responses/ResScore'
+        "400":
+          $ref: '#/responses/StatusCode'
+        "500":
+          $ref: '#/responses/StatusCode'
+      tags:
+      - Scores
   /users:
     get:
       description: Returns a list of users
@@ -334,6 +364,14 @@ responses:
       items:
         $ref: '#/definitions/GameResponse'
       type: array
+  ResScore:
+    description: ""
+    headers:
+      found_winner:
+        type: boolean
+      total_score:
+        format: int64
+        type: integer
   StatusCode:
     description: ""
     headers:

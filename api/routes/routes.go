@@ -9,6 +9,7 @@ import (
 
 // Routes for diffrent Endpoints
 func Setup(app *fiber.App) {
+	app.Post("api/v1/games/:id/score", controllers.InsertScore)
 	app.Get("api/v1/games/:id/active-status", controllers.GetActiveStatusRes)
 	app.Get("/auth/:provider", controllers.Signinflow)
 	app.Get("/auth/:provider/callback", controllers.GoogleRedirect)
