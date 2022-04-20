@@ -94,8 +94,8 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		}
 		return scoreRes, nil
 	} else {
-		IDENT := strings.Split(gameType, "-")
-		targetscore, err := strconv.Atoi(IDENT[1])
+		fullGameType := strings.Split(gameType, "-")
+		targetscore, err := strconv.Atoi(fullGameType[1])
 		if err != nil {
 			fmt.Println(err)
 			return scoreRes, err
