@@ -40,7 +40,7 @@ type GamesPaginationResponse struct {
 	PostPageLink  string         `json:"post_page_link"`
 }
 
-// swagger:parameters getGame editGame deleteGame
+// swagger:parameters getGame editGame deleteGame addScore
 type _ struct {
 
 	// in: path

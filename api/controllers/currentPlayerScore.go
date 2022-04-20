@@ -9,6 +9,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// swagger:route POST/games/{id}/score Scores addScore
+// Insert Score and Round in scores and rounds table
+// Responses:
+//  201: ResScore
+//  400: StatusCode
+//  500: StatusCode
+// InsertScore is insert score that post in score api by user
 func InsertScore(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
@@ -29,5 +36,5 @@ func InsertScore(ctx *fiber.Ctx) error {
 			Message:    "Internal Server Error",
 		})
 	}
-	return ctx.JSON(scoreRes)
+	return ctx.Status(201).JSON(scoreRes)
 }

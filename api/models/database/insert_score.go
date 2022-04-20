@@ -24,6 +24,14 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		fmt.Println(err)
 		return scoreRes, err
 	}
+	if activeRes.Round == 0 {
+		scoreRes := types.ResScore{
+			Score:       0,
+			TotalScore:  0,
+			FoundWinner: true,
+		}
+		return scoreRes, nil
+	}
 	verifyRoundTable := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", activejson.Round, gameId)
 	row := db.QueryRow(verifyRoundTable)
 	err = row.Scan(&roundId)
@@ -55,9 +63,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		fmt.Println(3, err)
 		return scoreRes, err
 	}
-	findTotalScore := fmt.Sprintf("SELECT IFNULL(sum(scores.score),0) FROM scores WHERE game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
-	row = db.QueryRow(findTotalScore)
-	err = row.Scan(&totalScore)
+	totalScore, err = FindTotalScore(db, gamePlayerId)
 	if err != nil {
 		fmt.Println(err)
 		return scoreRes, err
@@ -123,9 +129,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 				}
 				return scoreRes, nil
 			}
-			findTotalScore := fmt.Sprintf("SELECT sum(scores.score) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
-			row = db.QueryRow(findTotalScore)
-			err = row.Scan(&totalScore)
+			totalScore, err = FindTotalScore(db, gamePlayerId)
 			if err != nil {
 				fmt.Println(err)
 				return scoreRes, err
@@ -172,9 +176,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 					return scoreRes, err
 				}
 			}
-			findTotalScore := fmt.Sprintf("SELECT sum(scores.score) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
-			row = db.QueryRow(findTotalScore)
-			err = row.Scan(&totalScore)
+			totalScore, err = FindTotalScore(db, gamePlayerId)
 			if err != nil {
 				fmt.Println(err)
 				return scoreRes, err
@@ -187,4 +189,16 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 			return scoreRes, nil
 		}
 	}
+}
+
+func FindTotalScore(db *sql.DB, gamePlayerId int) (int, error) {
+	var totalScore int
+	findTotalScore := fmt.Sprintf("SELECT sum(scores.score) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
+	row := db.QueryRow(findTotalScore)
+	err := row.Scan(&totalScore)
+	if err != nil {
+		fmt.Println(err)
+		return totalScore, err
+	}
+	return totalScore, nil
 }
