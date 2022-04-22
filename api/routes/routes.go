@@ -14,7 +14,7 @@ func Setup(app *fiber.App) {
 	app.Get("/auth/:provider", controllers.Signinflow)
 	app.Get("/auth/:provider/callback", controllers.GoogleRedirect)
 	app.Get("/logout/:provider", controllers.Signout)
-	app.Get("api/v1/games/:id/current-turn-info", controllers.StartGame)
+	app.Get("api/v1/games/:id/current-game", controllers.StartGame)
 	group := app.Group("/", middleware.Validate())
 	group.Get("/", controllers.Endpoint)
 	group.Get("api/v1/users", controllers.GetUsers)
