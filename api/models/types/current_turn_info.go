@@ -30,7 +30,7 @@ type Scoreboard struct {
 type PlayerScore struct {
 	FirstName string   `json:"first_name"`
 	LastName  string   `json:"last_name"`
-	Round     []Rounds `json:"round "`
+	Rounds     []Rounds `json:"rounds"`
 	Total     int      `json:"total"`
 }
 
