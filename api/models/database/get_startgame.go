@@ -101,7 +101,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			if err != nil {
 				return Scoreboard, err
 			}
-			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d);", PerRound, id, PlayerId)
+			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d) AND s.is_valid = 'VALID';", PerRound, id, PlayerId)
 			rowsThrow, err := db.Query(dart)
 			for rowsThrow.Next() {
 				err = rowsThrow.Scan(&throwScore)
@@ -122,7 +122,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		PlayerRes := types.PlayerScore{
 			FirstName: PlayerFirstName,
 			LastName:  PlayerLastName,
-			Round:     RoundsRes,
+			Rounds:     RoundsRes,
 			Total:     PlayerTotal,
 		}
 		RoundsRes = nil
