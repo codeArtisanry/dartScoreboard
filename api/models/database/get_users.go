@@ -9,9 +9,9 @@ import (
 )
 
 // Get All User From Users Table
-func GetUsers(db *sql.DB, offset int, user types.User) ([]types.User, error) {
+func GetUsers(db *sql.DB, offset int, searchFisrtName string, searchLastName string, user types.User) ([]types.User, error) {
 	var users []types.User
-	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users ORDER BY first_name ASC LIMIT 5 OFFSET %d;", offset)
+	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE first_name LIKE '%s' AND last_name LIKE '%s' ORDER BY first_name ASC LIMIT 5 OFFSET %d;", searchFisrtName, searchLastName, offset)
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
