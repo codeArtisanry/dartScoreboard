@@ -21,7 +21,7 @@ func StartGame(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("gameid",err)
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",
@@ -31,7 +31,7 @@ func StartGame(ctx *fiber.Ctx) error {
 	fmt.Println("start")
 	startgameJson, err := models.GetStartGame(db, gameId, gameRes)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("startgamejson",err)
 		return ctx.Status(500).JSON(types.StatusCode{
 			StatusCode: 500,
 			Message:    "Internal Server Error",
