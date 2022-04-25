@@ -140,3 +140,22 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 	}
 	return Scoreboard, nil
 }
+
+func FoundWinner(db *sql.DB, id int) (types.Scoreboard, error) {
+	var (
+		Scoreboard types.Scoreboard
+		win        int
+	)
+	Winner := fmt.Sprintf("SELECT max_score.score as total from scores s left join (SELECT game_player_id, sum(scores.score) as score from scores GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id where s.round_id in (select round from rounds r where game_id=1) GROUP BY s.game_player_id,s.round_id  ORDER by s.score DESC;", PlayerId)
+	rowsPlayer := db.QueryRow(Winner)
+	err := rowsPlayer.Scan(&win)
+	if err != nil {
+		fmt.Println(300, err)
+		return Scoreboard, err
+	}
+	Winners := types.Scoreboard{
+		Winner: Winner,
+	}
+
+	return Scoreboard, nil
+}

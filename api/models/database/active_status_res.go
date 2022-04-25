@@ -18,6 +18,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		status        string
 		playerId      int
 	)
+	// count
 	queryofcount := fmt.Sprintf("SELECT COUNT(scores.id) from scores inner join game_players on game_players.id=scores.game_player_id WHERE game_players.game_id = %d;", id)
 	row := db.QueryRow(queryofcount)
 	err := row.Scan(&count)
@@ -25,6 +26,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		fmt.Println(err)
 		return activeResJson, err
 	}
+	// GameType
 	queryoftype := fmt.Sprintf("SELECT type, status from games WHERE id=%d", id)
 	rowoftype := db.QueryRow(queryoftype)
 	err = rowoftype.Scan(&typeOfGame, &status)
@@ -32,6 +34,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		fmt.Println()
 		return activeResJson, err
 	}
+	// USerArray
 	queryofuserid := fmt.Sprintf("SELECT user_id from game_players WHERE game_id = %d", id)
 	rows, err := db.Query(queryofuserid)
 	if err != nil {
@@ -46,7 +49,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		}
 		playersIds = append(playersIds, playerId)
 	}
-	if count == 0 {
+		if count == 0 {
 		insert, err := db.Prepare("UPDATE games set status='In Progress' WHERE id = ?")
 		if err != nil {
 			fmt.Println(err)
@@ -60,7 +63,7 @@ func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types
 		activeRes.Round = 1
 		activeRes.Throw = 1
 		activeRes.PlayerId = playersIds[0]
-
+		
 	} else {
 		query := fmt.Sprintf("SELECT rounds.round, game_players.user_id as player_id, scores.throw FROM scores INNER JOIN rounds ON scores.round_id = rounds.id INNER JOIN game_players ON scores.game_player_id = game_players.id WHERE rounds.game_id = %d ORDER BY scores.id DESC LIMIT 1 ;", id)
 		row = db.QueryRow(query)
