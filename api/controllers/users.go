@@ -39,8 +39,20 @@ func GetUsers(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
+	searchFirstName := ctx.Query("sfn")
+	searchLastName := ctx.Query("sln")
+	searchFirstName = (searchFirstName + "%")
+	searchLastName = (searchLastName + "%")
 	offset := (page - 1) * 5
-	users, err := models.GetUsers(db, offset, user)
+	if searchFirstName == "%"{
+		ctx.SendStatus(200)
+		return ctx.JSON(types.UsersPaginationResponse{
+			UserResponses: nil,
+			PrePageLink:   "cross limits",
+			PostPageLink:  "cross limits",
+		})
+	}
+	users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
 	if err != nil {
 		return ctx.JSON(types.StatusCode{
 			StatusCode: 500,
