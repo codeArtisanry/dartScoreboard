@@ -75,7 +75,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		RoundsRes       []types.Rounds
 		PlayersRes      []types.PlayerScore
 	)
-	game := fmt.Sprintf("SELECT user_id FROM game_players gp WHERE game_id = %d;", id)
+	game := fmt.Sprintf("SELECT user_id FROM game_players WHERE game_id = %d;", id)
 	rowsPlayersIds, err := db.Query(game)
 	if err != nil {
 		return Scoreboard, err
@@ -85,14 +85,15 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		total := fmt.Sprintf("select users.first_name,users.last_name, sum(s.score) from scores s left join game_players gp on gp.id = s.game_player_id left JOIN users on users.id = gp.user_id WHERE gp.user_id = %d AND gp.game_id = %d;", PlayerId, id)
+		total := fmt.Sprintf("select ifnull(users.first_name,'NULL'),ifnull(users.last_name,'NULL'), ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id left JOIN users on users.id = gp.user_id WHERE gp.game_id = %d AND users.id = %d;", id, PlayerId)
 		rowsPlayer := db.QueryRow(total)
 		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName, &PlayerTotal)
-		fmt.Println("========",PlayerFirstName, PlayerLastName, PlayerTotal)
+		fmt.Println("========", PlayerFirstName, PlayerLastName, PlayerTotal, "playerid", PlayerId)
 		if err != nil {
 			fmt.Println(300, err)
 			return Scoreboard, err
 		}
+		fmt.Println("locked")
 		Round := fmt.Sprintf("SELECT round, SUM(s2.score) from scores s2 left join rounds r on s2.round_id = r.id  where s2.game_player_id = (SElect id from game_players gp where gp.user_id= %d and gp.game_id=%d) group by s2.round_id;", PlayerId, id)
 		rowsRound, err := db.Query(Round)
 		fmt.Println(PerRound, RoundTotal)
@@ -122,7 +123,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		PlayerRes := types.PlayerScore{
 			FirstName: PlayerFirstName,
 			LastName:  PlayerLastName,
-			Rounds:     RoundsRes,
+			Rounds:    RoundsRes,
 			Total:     PlayerTotal,
 		}
 		RoundsRes = nil
