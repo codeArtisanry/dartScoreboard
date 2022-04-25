@@ -16,9 +16,7 @@
             rounded-pill
           "
           @click="creategame"
-        >
-          <b @click="fetch">Create Game</b>
-        </button>
+        ></button>
         <br />
       </div>
       <hr />
