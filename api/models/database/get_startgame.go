@@ -85,18 +85,20 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		total := fmt.Sprintf("select ifnull(users.first_name,'NULL'),ifnull(users.last_name,'NULL'), ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id left JOIN users on users.id = gp.user_id WHERE gp.game_id = %d AND users.id = %d;", id, PlayerId)
-		rowsPlayer := db.QueryRow(total)
-		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName, &PlayerTotal)
-		fmt.Println("========", PlayerFirstName, PlayerLastName, PlayerTotal, "playerid", PlayerId)
+		PlayerFullName := fmt.Sprintf("SELECT first_name,last_name  from users where id = %d;", PlayerId)
+		rowsPlayer := db.QueryRow(PlayerFullName)
+		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName)
 		if err != nil {
-			fmt.Println(300, err)
 			return Scoreboard, err
 		}
-		fmt.Println("locked")
+		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d;", id, PlayerId)
+		rowsPlayerTotal := db.QueryRow(Total)
+		err = rowsPlayerTotal.Scan(&PlayerTotal)
+		if err != nil {
+			return Scoreboard, err
+		}
 		Round := fmt.Sprintf("SELECT round, SUM(s2.score) from scores s2 left join rounds r on s2.round_id = r.id  where s2.game_player_id = (SElect id from game_players gp where gp.user_id= %d and gp.game_id=%d) group by s2.round_id;", PlayerId, id)
 		rowsRound, err := db.Query(Round)
-		fmt.Println(PerRound, RoundTotal)
 		for rowsRound.Next() {
 			err = rowsRound.Scan(&PerRound, &RoundTotal)
 			if err != nil {
@@ -116,7 +118,6 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 				ThrowsScore: Throws,
 				RoundTotal:  RoundTotal,
 			}
-			fmt.Println(RoundRes)
 			Throws = nil
 			RoundsRes = append(RoundsRes, RoundRes)
 		}
@@ -132,5 +133,25 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			PlayersScore: PlayersRes,
 		}
 	}
+	return Scoreboard, nil
+}
+
+func FoundWinner(db *sql.DB, id int) (types.Scoreboard, error) {
+	var (
+		Scoreboard types.Scoreboard
+		first_name string
+		last_name  string
+		win        int
+	)
+	Winner := fmt.Sprintf("SELECT u.first_name,u.last_name, max_score.score as total from scores s left join (SELECT game_player_id, sum(scores.score) as score from scores GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id LEFT JOIN game_players gp on gp.id = s.game_player_id left join users u on u.id = gp.user_id  where s.round_id in (select round from rounds r where game_id= %d) GROUP BY s.game_player_id,s.round_id  ORDER by s.score DESC;", id)
+	rowsPlayer := db.QueryRow(Winner)
+	err := rowsPlayer.Scan(&first_name, &last_name, &win)
+	if err != nil {
+		return Scoreboard, err
+	}
+	Scoreboard = types.Scoreboard{
+		Winner: first_name + last_name,
+	}
+
 	return Scoreboard, nil
 }
