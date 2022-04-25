@@ -89,20 +89,16 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		rowsPlayer := db.QueryRow(PlayerFullName)
 		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName)
 		if err != nil {
-			fmt.Println(300, err)
 			return Scoreboard, err
 		}
 		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d;", id, PlayerId)
 		rowsPlayerTotal := db.QueryRow(Total)
 		err = rowsPlayerTotal.Scan(&PlayerTotal)
 		if err != nil {
-			fmt.Println(300, err)
 			return Scoreboard, err
 		}
-		fmt.Println("locked")
 		Round := fmt.Sprintf("SELECT round, SUM(s2.score) from scores s2 left join rounds r on s2.round_id = r.id  where s2.game_player_id = (SElect id from game_players gp where gp.user_id= %d and gp.game_id=%d) group by s2.round_id;", PlayerId, id)
 		rowsRound, err := db.Query(Round)
-		fmt.Println(PerRound, RoundTotal)
 		for rowsRound.Next() {
 			err = rowsRound.Scan(&PerRound, &RoundTotal)
 			if err != nil {
@@ -122,7 +118,6 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 				ThrowsScore: Throws,
 				RoundTotal:  RoundTotal,
 			}
-			fmt.Println(RoundRes)
 			Throws = nil
 			RoundsRes = append(RoundsRes, RoundRes)
 		}
