@@ -21,8 +21,7 @@ var db = models.Database()
 // 1. Endpoint for i am logged in?
 func Endpoint(ctx *fiber.Ctx) error {
 	cookie := ctx.Cookies("user")
-	fmt.Println("this is cookie", cookie)
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
 		if err != nil {
 			return nil, err
@@ -33,19 +32,17 @@ func Endpoint(ctx *fiber.Ctx) error {
 		}
 		return key, nil
 	})
-	claims := token.Claims.(*jwt.StandardClaims)
-	fmt.Println("claims :", claims)
 	if err != nil {
 		fmt.Println("err  :", err)
-		// return ctx.Redirect("/auth/google")
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+		ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "User NOT Exist",
 		})
+		return ctx.Redirect("/auth/google")
 	} else {
-		// return ctx.Redirect("/home")
-		return ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
+		ctx.Status(fiber.StatusAccepted).JSON(fiber.Map{
 			"message": "User Exist",
 		})
+		return ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/"))
 	}
 	// If exist then return 2xx status code
 	// Else return 403 unauthorized

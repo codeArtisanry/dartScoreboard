@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +19,6 @@ func Validate(config ...fiber.Config) fiber.Handler {
 			return ctx.Redirect("/auth/google")
 		}
 		claims := jwt.MapClaims{}
-		fmt.Println("this is cookie", cookie)
 		token, err := jwt.ParseWithClaims(cookie, claims, func(token *jwt.Token) (interface{}, error) {
 			pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
 			if err != nil {
@@ -34,16 +34,16 @@ func Validate(config ...fiber.Config) fiber.Handler {
 		fmt.Println(token)
 		// ... error handling
 		if err != nil {
-			fmt.Println("err  :", err)
-			return ctx.Redirect("/auth/google")
+			fmt.Println("err",err)
+			return ctx.Redirect("auth/google")
 		} else {
-			ctx.Redirect("/home")
+			ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/"))
 			return ctx.Next()
 		}
 	}
 }
 
-// Google Public key 
+// Google Public key
 func getGooglePublicKey(keyID string) (string, error) {
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v1/certs")
 	if err != nil {

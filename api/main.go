@@ -4,9 +4,11 @@ import (
 	"dartscoreboard/routes"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/providers/google"
@@ -27,9 +29,18 @@ func main() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowCredentials: true,
-		AllowOrigins:     os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}"),
+		AllowOrigins: "*",
+		AllowMethods: strings.Join([]string{
+		fiber.MethodGet,
+		fiber.MethodPost,
+		fiber.MethodHead,
+		fiber.MethodPut,
+		fiber.MethodDelete,
+		fiber.MethodPatch,
+	}, ","),
 	}))
+
+	app.Use(logger.New())
 	routes.Setup(app)
 	// app.Group("/", middleware.Validate())
 	// app.Use(middleware.Validate())
