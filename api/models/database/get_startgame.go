@@ -91,7 +91,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d;", id, PlayerId)
+		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d  AND s.is_valid = 'VALID';", id, PlayerId)
 		rowsPlayerTotal := db.QueryRow(Total)
 		err = rowsPlayerTotal.Scan(&PlayerTotal)
 		if err != nil {
