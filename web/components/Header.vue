@@ -17,7 +17,6 @@
           "
           @click="creategame"
         > Create Game </button>
-        {{ cookie.state.auth}}
         <br />
       </div>
       <hr />
