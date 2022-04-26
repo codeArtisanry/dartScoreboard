@@ -125,9 +125,12 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		rowsLastRound := db.QueryRow(findLastRoundOfGame)
 		err = rowsLastRound.Scan(&lastRound)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				lastRound = 1
+			}
 			fmt.Println(err)
-			return Scoreboard, err
 		}
+		fmt.Println(lastRound)
 		for round := 1; round <= lastRound; round++ {
 			findRoundTotal := fmt.Sprintf("SELECT IFNULL(SUM(scores.score),0) FROM scores WHERE scores.is_valid = 'VALID' AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND game_player_id = (SELECT id FROM game_players WHERE user_id = %d AND game_id = %d);", round, id, PlayerId, id)
 			roundTotal := db.QueryRow(findRoundTotal)
