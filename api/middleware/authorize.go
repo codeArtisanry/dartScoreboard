@@ -35,7 +35,7 @@ func Validate(config ...fiber.Config) fiber.Handler {
 		// ... error handling
 		if err != nil {
 			fmt.Println("err",err)
-			return ctx.Redirect("auth/google")
+			return ctx.Redirect("/auth/google")
 		} else {
 			ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/"))
 			return ctx.Next()

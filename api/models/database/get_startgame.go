@@ -4,6 +4,8 @@ import (
 	"dartscoreboard/models/types"
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -63,7 +65,6 @@ func GetStartGame(db *sql.DB, id int, gameRes types.GameResponse) (types.Current
 
 func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 	var (
-		PerRound        int
 		PlayerId        int
 		throwScore      int
 		PlayerFirstName string
@@ -74,9 +75,31 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		Throws          []int
 		RoundsRes       []types.Rounds
 		PlayersRes      []types.PlayerScore
+		PlayerRes       types.PlayerScore
+		GameFullType    string
+		lastRound       int
+		targetScore     int
 	)
-	game := fmt.Sprintf("SELECT user_id FROM game_players WHERE game_id = %d;", id)
-	rowsPlayersIds, err := db.Query(game)
+	findGameType := fmt.Sprintf("SELECT type FROM games where id = %d;", id)
+	rowsPlayer := db.QueryRow(findGameType)
+	err := rowsPlayer.Scan(&GameFullType)
+	if err != nil {
+		fmt.Println(err)
+		return Scoreboard, err
+	}
+	GameType := strings.Split(GameFullType, "-")
+	if len(GameType) == 1 {
+		targetScore = 0
+	} else {
+		targetScore, err = strconv.Atoi(GameType[1])
+		if err != nil {
+			fmt.Println(err)
+			return Scoreboard, err
+		}
+	}
+	gameType := GameType[0]
+	gamePlayers := fmt.Sprintf("SELECT user_id FROM game_players WHERE game_id = %d;", id)
+	rowsPlayersIds, err := db.Query(gamePlayers)
 	if err != nil {
 		return Scoreboard, err
 	}
@@ -85,27 +108,43 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		PlayerFullName := fmt.Sprintf("SELECT first_name,last_name  from users where id = %d;", PlayerId)
+		PlayerFullName := fmt.Sprintf("SELECT first_name,last_name from users where id = %d;", PlayerId)
 		rowsPlayer := db.QueryRow(PlayerFullName)
-		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName)
+		err := rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName)
 		if err != nil {
+			fmt.Println(err)
 			return Scoreboard, err
 		}
-		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d  AND s.is_valid = 'VALID';", id, PlayerId)
+		Total := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE s.is_valid = 'VALID' AND gp.game_id = %d AND gp.user_id = %d;", id, PlayerId)
 		rowsPlayerTotal := db.QueryRow(Total)
 		err = rowsPlayerTotal.Scan(&PlayerTotal)
 		if err != nil {
 			return Scoreboard, err
 		}
-		Round := fmt.Sprintf("SELECT round, SUM(s2.score) from scores s2 left join rounds r on s2.round_id = r.id  where s2.game_player_id = (SElect id from game_players gp where gp.user_id= %d and gp.game_id=%d) group by s2.round_id;", PlayerId, id)
-		rowsRound, err := db.Query(Round)
-		for rowsRound.Next() {
-			err = rowsRound.Scan(&PerRound, &RoundTotal)
+		findLastRoundOfGame := fmt.Sprintf("SELECT round FROM rounds WHERE game_id = %d ORDER BY round DESC LIMIT 1", id)
+		rowsLastRound := db.QueryRow(findLastRoundOfGame)
+		err = rowsLastRound.Scan(&lastRound)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				lastRound = 1
+			}
+			fmt.Println(err)
+		}
+		fmt.Println(lastRound)
+		for round := 1; round <= lastRound; round++ {
+			findRoundTotal := fmt.Sprintf("SELECT IFNULL(SUM(scores.score),0) FROM scores WHERE scores.is_valid = 'VALID' AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND game_player_id = (SELECT id FROM game_players WHERE user_id = %d AND game_id = %d);", round, id, PlayerId, id)
+			roundTotal := db.QueryRow(findRoundTotal)
+			err = roundTotal.Scan(&RoundTotal)
 			if err != nil {
+				fmt.Println(err)
 				return Scoreboard, err
 			}
-			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d) AND s.is_valid = 'VALID';", PerRound, id, PlayerId)
+			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d);", round, id, PlayerId)
 			rowsThrow, err := db.Query(dart)
+			if err != nil {
+				fmt.Println(err)
+				return Scoreboard, err
+			}
 			for rowsThrow.Next() {
 				err = rowsThrow.Scan(&throwScore)
 				if err != nil {
@@ -114,25 +153,31 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 				Throws = append(Throws, throwScore)
 			}
 			RoundRes := types.Rounds{
-				Round:       PerRound,
+				Round:       round,
 				ThrowsScore: Throws,
-				RoundTotal:  RoundTotal,
-			}
-			Throws = nil
+				RoundTotal:  RoundTotal}
 			RoundsRes = append(RoundsRes, RoundRes)
+			Throws = nil
 		}
-		PlayerRes := types.PlayerScore{
-			FirstName: PlayerFirstName,
-			LastName:  PlayerLastName,
-			Rounds:    RoundsRes,
-			Total:     PlayerTotal,
+		if gameType == "Target Score" {
+			PlayerRes = types.PlayerScore{
+				FirstName: PlayerFirstName,
+				LastName:  PlayerLastName,
+				Rounds:    RoundsRes,
+				Total:     targetScore - PlayerTotal}
+		} else {
+			PlayerRes = types.PlayerScore{
+				FirstName: PlayerFirstName,
+				LastName:  PlayerLastName,
+				Rounds:    RoundsRes,
+				Total:     PlayerTotal}
 		}
-		RoundsRes = nil
 		PlayersRes = append(PlayersRes, PlayerRes)
-		Scoreboard = types.Scoreboard{
-			PlayersScore: PlayersRes,
-		}
+		RoundsRes = nil
 	}
+	Scoreboard = types.Scoreboard{
+		PlayersScore: PlayersRes}
+
 	return Scoreboard, nil
 }
 
