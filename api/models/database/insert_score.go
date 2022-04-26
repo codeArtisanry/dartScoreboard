@@ -151,8 +151,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 				fmt.Println(err)
 				return scoreRes, err
 			}
-			remainingThrow := (3 - activejson.Throw)
-			for throw := 1; throw <= remainingThrow; throw++ {
+			for throw := activejson.Throw + 1; throw <= 3; throw++ {
 				insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
 				if err != nil {
 					fmt.Println(err)
