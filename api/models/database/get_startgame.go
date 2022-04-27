@@ -154,7 +154,7 @@ func FoundWinner(db *sql.DB, id int) (string, error) {
 		last_name  string
 		winner     string
 	)
-	WinnerName := fmt.Sprintf("SELECT users.first_name, users.last_name from users left join game_players on game_players.user_id = users.id left join scores on game_players.id = scores.game_player_id WHERE game_players.game_id = %d GROUP BY scores.score ORDER by scores.score  DESC LIMIT 1;", id)
+	WinnerName := fmt.Sprintf("SELECT u.first_name,u.last_name from scores s left join (SELECT game_player_id, sum(scores.score) as score from scores GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id LEFT JOIN game_players gp on gp.id = s.game_player_id left join users u on u.id = gp.user_id  where s.round_id in (select round from rounds r) AND gp.game_id = %d AND s.is_valid='VALID' GROUP BY s.game_player_id,s.round_id  ORDER by max_score.score  DESC LIMIT 1;", id)
 	rowsPlayer := db.QueryRow(WinnerName)
 	err := rowsPlayer.Scan(&first_name, &last_name)
 	if err != nil {
