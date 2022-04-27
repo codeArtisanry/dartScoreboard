@@ -16,7 +16,9 @@
             rounded-pill
           "
           @click="creategame"
-        > Create Game </button>
+        >
+          Create Game
+        </button>
         <br />
       </div>
       <hr />

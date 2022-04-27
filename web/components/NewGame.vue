@@ -4,27 +4,25 @@
       <h1 class="font-weight-bolder">Welcome</h1>
       <p class="p-md-2">Let's create a new Game</p>
     </div>
-    <div class="">
+    <div class="ml-1">
+      <label class="text-muted">Enter Game Name:</label>
       <input
-        v-model="registerGame.gameName"
-        class="form-control ml-1"
+        v-model="game_responses.game_name"
+        class="form-control"
         type="text"
         placeholder="Game Name..."
       />
 
-      <div class="mt-5 mb-3 form-control ml-1">
-        <select v-model="registerGame.gameType" class="border-0 bg-white w-100" @change="onChange($event)">
-          <option value="0">--select--</option>
-          <option value="Highest Score Game">Highest Score Game</option>
-          <option id="101" value="Target Score Game-101">
-            Target Score Game
-          </option>
-          <option id="301" value="Target Score Game-301">
-            Target Score Game 301
-          </option>
-          <option id="501" value="Target Score Game-501">
-            Target Score Game 501
-          </option>
+      <div class="mt-5 mb-3">
+        <label class="text-muted">Select Game Type:</label>
+        <select
+          v-model="game_responses.game_type"
+          class="form-control bg-white w-100"
+        >
+          <option value="High Score">High Score</option>
+          <option value="Target Score-101">Target Score-101</option>
+          <option value="Target Score-301">Target Score-301</option>
+          <option value="Target Score-501">Target Score-501</option>
         </select>
       </div>
       <small class="form-text text-muted ml-4"
@@ -84,18 +82,46 @@
         </span>
       </small>
     </div>
-    <br>
-   <div>
-  <label class="typo__label">Select PlayersNames</label>
-  <multiselect v-model="value" :options="options" :custom-label="nameWithLang" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Pick some" label="firstname" track-by="firstname" :preselect-first="true">
-    <template slot="selection" slot-scope="{ values, isOpen }" ><span v-if="values.length &amp;&amp; !isOpen" class="multiselect__single" >{{ values.length }} options selected</span></template>
-  </multiselect>
-  <pre class="language-json"><code v-for="i in value" :key="i">{{ i.firstname }} {{i.lastname}}<br></code><br></pre><br>
-</div>
+    <br />
+
+    <div>
+      <label class="typo__label text-muted">Select PlayersNames:</label>
+      <multiselect
+        v-model="value"
+        :options="options"
+        :custom-label="nameWithLang"
+        :multiple="true"
+        :close-on-select="false"
+        :clear-on-select="false"
+        :preserve-search="true"
+        placeholder="Pick some"
+        label="first_name"
+        track-by="first_name"
+      >
+        <template slot="selection" slot-scope="{ values, isOpen }"
+          ><span
+            v-if="values.length &amp;&amp; !isOpen"
+            class="multiselect__single"
+            >{{ values.length }} options selected</span
+          ></template
+        >
+      </multiselect>
+      <pre
+        class="language-json"
+      ><code v-for="player in value" :key="player.email">{{ player.first_name }} {{player.last_name}}<br></code><br></pre>
+      <br />
+    </div>
 
     <div class="row">
       <div class="col text-center">
-        <button class="btn btn-secondary" @click="register">
+        <button
+          v-if="$route.params.gameid !== undefined"
+          class="btn btn-secondary"
+          @click="updatedata"
+        >
+          Update
+        </button>
+        <button v-else class="btn btn-secondary" @click="register">
           Register Game
         </button>
       </div>
@@ -104,110 +130,156 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect';
+import Multiselect from 'vue-multiselect'
 export default {
   components: { Multiselect },
   data() {
     return {
+      //  k:[],
       value: [],
       options: [
-        {firstname:'payal', lastname:'raviya', email:'payal@improwised.com' },
-        {firstname:'jeel', lastname:'rupapara', email:'jeel@improwised.com' },
-        {firstname:'vatsal', lastname:'chauhan', email:'vatsal@improwised.com' },
-        {firstname:'munir', lastname:'khakhi', email:'munir@improwised.com' },
-        {firstname:'tapan', lastname:'bavaliya', email:'tapan@improwised.com' },
-       {firstname:'rakshit', lastname:'menpara', email:'rakshit@improwised.com' },
+        {
+          id: 3,
+          first_name: 'jeel',
+          last_name: 'rupapara',
+          email: 'jeel@improwised.com',
+        },
+        {
+          id: 2,
+          first_name: 'vatsal',
+          last_name: 'chauhan',
+          email: 'vatsal@improwised.com',
+        },
+        {
+          id: 5,
+          first_name: 'munir',
+          last_name: 'khakhi',
+          email: 'munir@improwised.com',
+        },
+        {
+          id: 4,
+          first_name: 'tapan',
+          last_name: 'bavaliya',
+          email: 'tapan@improwised.com',
+        },
+        {
+          id: 1,
+          first_name: 'Payal',
+          last_name: 'Raviya',
+          email: 'payal@improwised.com',
+        },
       ],
       registerGames: '',
-      gameType: '',
-      gameName: '',
-      registerGame: {
-        gameName: '',
-        PlayersNames: [],
-        gameType: '',
-        gameTargetScore: 0,
-        gameStatus: 'not started',
+      game_responses: {
+        game_name: '',
+        game_type: '',
+        players: [],
       },
       newPlayer: '',
-      pname:[]
+      player: [],
     }
   },
   async created() {
-    if (this.$route.params.gameid !== undefined){
+    console.log(this.options)
+    if (this.$route.params.gameid !== undefined) {
       await this.getGameData()
+      this.playersnamechange()
     }
+    // this.game_responses.game_type = this.gameTypeChange()
+    // this.usertable()
+    // this.value=this.k
+    // console.log(this.value)
   },
-
   methods: {
-
-    nameWithLang ({ firstname,lastname, email }) {
-      return `${firstname} ${lastname} — [${email}]`
+    // eslint-disable-next-line camelcase
+    nameWithLang({ first_name, last_name, email }) {
+      // eslint-disable-next-line camelcase
+      return `${first_name} ${last_name} — [${email}]`
     },
-
     register() {
       this.gamenamefunc()
-      if (
-        this.value.length === 0 ||
-        this.value.length === 1
-      ) {
+      if (this.value.length === 0 || this.value.length === 1) {
         alert('please enter players name more then one')
       } else {
         this.$router.push('/')
-      console.log(this.value[0].firstname);
-      for(let i=0; i<=this.value.length-1;i++){
-        this.registerGame.PlayersNames.push(this.value[i].firstname)
-      }
-      console.log(this.registerGame.PlayersNames)
-     this.postgamedata()
+        console.log(this.value[0].id)
+        for (let i = 0; i <= this.value.length - 1; i++) {
+          this.game_responses.players.push(this.value[i].id)
         }
-      },
-
-    startgame() {
-      this.gamenamefunc()
-      this.postgamedata()
-      // this.getGameData()
-
-      if (
-        this.value.length === 0 ||
-        this.value.length === 1
-      ) {
-        alert('please enter players name more then one')
-      } else {
-        console.log(this.registerGame)
-        if (this.registerGame.gameType === 'Highest Score Game') {
-          this.$router.push('/start/highscoregame/')
-        } else {
-          this.$router.push('/start/highscoregame/')
-        }
+        console.log(this.game_responses.players)
+        this.postgamedata()
       }
     },
-    onChange(event) {
-      this.gameType = event.target.value
-      this.gameType = this.gameType.split('-')
-      this.registerGame.gameType = this.gameType[0]
-      this.registerGame.gameTargetScore = Number(this.gameType[1])
-    },
-
     gamenamefunc() {
-      if (this.gameName === '') {
-        this.registerGame.gameName = new Date().toLocaleString()
-      } else {
-        this.registerGame.gameName = this.gameName
+      if (this.game_responses.game_name === '') {
+        this.game_responses.game_name = new Date().toLocaleString()
       }
     },
-    async postGameData() {
-      await this.$axios.$post(
-        `${process.env.base_URL}/registerGame`,
-        this.registerGame
-      )
-      console.log(this.registerGame)
+    async postgamedata() {
+      await this.$axios.$post(`api/v1/games`, this.game_responses)
+      console.log(this.game_responses)
     },
     async getGameData() {
       const res = await this.$axios.$get(
-        `${process.env.base_URL}/registerGame/` + this.$route.params.gameid
+        `/api/v1/games/` + this.$route.params.gameid
       )
-      this.registerGame = res
+      this.game_responses = res
       console.log(res)
+    },
+    async updatedata() {
+      this.withupdate()
+      console.log(this.game_responses)
+      const res = await this.$axios.$put(
+        `/api/v1/games/` + this.$route.params.gameid,
+        this.game_responses
+      )
+      console.log(res)
+      this.$router.push('/')
+    },
+    // async usertable() {
+    //   const res = await this.$axios.$get(
+    //     `${process.env.USER_GET}`
+    //   )
+    //   this.options = res
+    // },
+    withupdate() {
+      this.game_responses.players = []
+      for (let j = 0; j <= this.value.length - 1; j++) {
+        console.log(this.value[j].id)
+        this.game_responses.players.push(this.value[j].id)
+        console.log(this.game_responses.players)
+      }
+    },
+    // this.game_responses.players_ids=this.registerGames.players
+    // this.game_responses=this.registerGames
+    //  gameTypeChange() {
+    //   const gameMainType = this.game_responses.game_type
+    //   if (gameMainType === 'Target Score Game') {
+    //     const gameSubType = this.registerGame.gameTargetScore
+    //     const gameType2 = gameMainType + '-' + gameSubType
+    //     return gameType2
+    //   }else{
+    //     return gameMainType
+    //   }
+    // },
+    playersnamechange() {
+      //  const res = await this.$axios.$get(
+      //     `${process.env.USER_GET}`
+      //   )
+      //   this.options = res
+      console.log(this.options)
+      this.player = this.game_responses.players
+      console.log(this.player)
+      for (let i = 0; i <= this.options.length - 1; i++) {
+        for (let j = 0; j <= this.player.length - 1; j++) {
+          if (this.options[i].id === this.player[j].id) {
+            console.log('hii')
+            this.value.push(this.options[i])
+          }
+        }
+      }
+      // this.value = this.k
+      // console.log(this.k)
     },
   },
 }

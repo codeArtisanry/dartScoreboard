@@ -3,18 +3,18 @@
     <center>
       <div class="text-center container mx-2">
         <p class="font-weight-bolder">Game Name:</p>
-        <p class="text text-muted">{{ registerGame.gameName }}</p>
+        <p class="text text-muted">{{ registerGame.game_name }}</p>
         <hr />
         <p class="font-weight-bolder">Game Type:</p>
-        <p class="text text-muted">{{ registerGame.gameType }}</p>
+        <p class="text text-muted">{{ registerGame.game_type }}</p>
         <hr />
         <p class="font-weight-bolder">Players Names:</p>
         <p
-          v-for="player in registerGame.PlayersNames"
-          :key="player"
+          v-for="player in registerGame.players"
+          :key="player.id"
           class="text-muted"
         >
-          {{ player }}
+          {{ player.first_name }}
         </p>
       </div>
 
@@ -23,14 +23,16 @@
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
         <div class="col col-4 text-center">
-          <button class="btn btn-danger">Delete</button>
+          <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
         </div>
         <div class="col col-4 text-left">
           <button class="btn btn-success" @click="startgame()">Start</button>
         </div>
       </div>
       <div class="text-center mt-5">
-        <button class="btn btn-secondary">back to home</button>
+        <button class="btn btn-secondary" @click="backToHome">
+          back to home
+        </button>
       </div>
     </center>
   </div>
@@ -48,24 +50,39 @@ export default {
   methods: {
     async getGameData() {
       const res = await this.$axios.$get(
-        `${process.env.base_URL}/registerGame/` + this.$route.params.gameid
+        `api/v1/games/` + this.$route.params.gameid
       )
       this.registerGame = res
+      console.log(this.registerGame)
     },
     updateGame() {
-      this.$router.push('/games/'+this.$route.params.gameid+'/update')
+      if (
+        this.registerGame.game_status === 'In Progress' ||
+        this.registerGame.game_status === 'Completed'
+      ) {
+        alert('not capable to update')
+      } else {
+        this.$router.push('/games/' + this.$route.params.gameid + '/update')
+      }
     },
-    startgame() {
-      this.$router.push(
-        'games/' +
-          this.$route.params.gameid +
-          '/round/' +
-          this.$route.params.roundid +
-          'player' +
-          this.$route.params.playerid +
-          'turn' +
-          this.$route.params.turnid
+    async startgame() {
+      const res = await this.$axios.$get(
+        `api/v1/games/` + this.$route.params.gameid + `/active-status`
       )
+      this.$router.push(
+        '/games/' + this.$route.params.gameid + '/player/' + res.player_id
+      )
+      console.log(res.player_id)
+    },
+    backToHome() {
+      this.$router.push('/')
+    },
+    async DeleteGame(id) {
+      const res = await this.$axios.$delete(
+        `api/v1/games` + '/' + this.$route.params.gameid
+      )
+      console.log(res)
+      this.$router.push('/')
     },
   },
 }
