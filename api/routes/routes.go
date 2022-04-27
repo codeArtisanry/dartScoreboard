@@ -17,6 +17,7 @@ func Setup(app *fiber.App) {
 	group.Get("api/v1/users", controllers.GetUsers)
 	group.Get("api/v1/games", controllers.GetGames)
 	group.Get("api/v1/games/:id", controllers.GetGame)
+	group.Get("api/v1/games/:id/scoreboard", controllers.GetScoreboard)
 	group.Get("api/v1/games/:id/active-status", controllers.GetActiveStatusRes)
 	group.Get("api/v1/games/:id/current-game", controllers.StartGame)
 	group.Post("api/v1/games/:id/score", controllers.InsertScore)

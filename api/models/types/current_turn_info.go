@@ -8,8 +8,8 @@ type CurrentTurnInfo struct {
 	Type             string            `json:"game_type"`
 	Round            int               `json:"round"`
 	Throw            int               `json:"throw"`
+	Score            int               `json:"score"`
 	ActivePlayerInfo *ActivePlayerInfo `json:"active_player_info"`
-	Scoreboard       Scoreboard        `json:"scoreboard"`
 }
 
 // swagger:response CurrentTurnInfo
@@ -30,7 +30,7 @@ type Scoreboard struct {
 type PlayerScore struct {
 	FirstName string   `json:"first_name"`
 	LastName  string   `json:"last_name"`
-	Rounds     []Rounds `json:"rounds"`
+	Rounds    []Rounds `json:"rounds"`
 	Total     int      `json:"total"`
 }
 
