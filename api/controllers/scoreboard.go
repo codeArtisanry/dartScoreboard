@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetWinner(ctx *fiber.Ctx) error {
+func GetScoreboard(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
@@ -19,14 +19,13 @@ func GetWinner(ctx *fiber.Ctx) error {
 			Message:    "Bad Request",
 		})
 	}
-	getwinnerjson, err := models.FoundWinner(db, gameId)
+	getScoreBoard, err := models.GetScoreboard(db, gameId)
 	if err != nil {
-		fmt.Println("getwinnerjson", err)
+		fmt.Println(err)
 		return ctx.Status(500).JSON(types.StatusCode{
 			StatusCode: 500,
 			Message:    "Internal Server Error",
 		})
 	}
-	fmt.Println("finised")
-	return ctx.Status(200).JSON(getwinnerjson)
+	return ctx.Status(200).JSON(getScoreBoard)
 }

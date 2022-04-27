@@ -17,7 +17,6 @@ import (
 //  500: StatusCode
 // StartGame are get that game which is you want to fetch
 func StartGame(ctx *fiber.Ctx) error {
-	fmt.Println("vatsal")
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
@@ -28,7 +27,6 @@ func StartGame(ctx *fiber.Ctx) error {
 		})
 	}
 	gameRes := types.GameResponse{}
-	fmt.Println("start")
 	startgameJson, err := models.GetStartGame(db, gameId, gameRes)
 	if err != nil {
 		fmt.Println("startgamejson",err)
@@ -37,6 +35,5 @@ func StartGame(ctx *fiber.Ctx) error {
 			Message:    "Internal Server Error",
 		})
 	}
-	fmt.Println("finised")
 	return ctx.Status(200).JSON(startgameJson)
 }
