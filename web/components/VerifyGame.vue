@@ -1,5 +1,6 @@
 <template>
   <div>
+    <CommonNavBar />
     <center>
       <div class="text-center container mx-2">
         <p class="font-weight-bolder">Game Name:</p>
@@ -38,6 +39,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable no-console */
 export default {
   data() {
     return {

@@ -1,6 +1,7 @@
 <template>
   <main class="container">
     <div class="text-center pt-5">
+      <CommonNavBar />
       <h1 class="font-weight-bolder">Welcome</h1>
       <p class="p-md-2">Let's create a new Game</p>
     </div>
@@ -140,15 +141,15 @@ export default {
       options: [
         {
           id: 3,
-          first_name: 'jeel',
-          last_name: 'rupapara',
+          first_name: 'Jeel',
+          last_name: 'Rupapara',
           email: 'jeel@improwised.com',
         },
         {
           id: 2,
-          first_name: 'vatsal',
-          last_name: 'chauhan',
-          email: 'vatsal@improwised.com',
+          first_name: 'Bhautik',
+          last_name: 'Chudasama',
+          email: 'bhautik@improwised.com',
         },
         {
           id: 5,
@@ -157,13 +158,13 @@ export default {
           email: 'munir@improwised.com',
         },
         {
-          id: 4,
-          first_name: 'tapan',
-          last_name: 'bavaliya',
-          email: 'tapan@improwised.com',
+          id: 1,
+          first_name: 'Vatsal',
+          last_name: 'Chauhan',
+          email: 'vatsal@improwised.com',
         },
         {
-          id: 1,
+          id: 4,
           first_name: 'Payal',
           last_name: 'Raviya',
           email: 'payal@improwised.com',

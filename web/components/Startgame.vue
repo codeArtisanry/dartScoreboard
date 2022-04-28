@@ -1,10 +1,10 @@
 <template>
   <div>
+    <CommonNavBar />
     <div class="container text-center mt-4">
       <div class="bg-white pb-4 px-5 rounded">
         <h5 class="heading">Welcome to</h5>
         <h4 class="font-weight-bolder">{{ currentgame.game_type }}</h4>
-        {{ rounddata }}
         <table class="table table-striped shadow mt-3">
           <tbody>
             <tr>
@@ -87,6 +87,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable no-console */
 export default {
   props: {
     gameType: Object,
@@ -149,7 +150,7 @@ export default {
     },
     async checkplayerid() {
       if (this.currentgame.round === 0) {
-        // this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
+        this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
         console.log('hii  ')
       } else {
         const res = await this.$axios.$get(

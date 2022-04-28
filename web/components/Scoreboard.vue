@@ -1,5 +1,6 @@
 <template>
   <div class="text-center mt-5">
+    <CommonNavBar />
     <div class="container text-center">
       <h3 class="text-center">{{ title }}</h3>
       <h4 class="text-center">{{ subtitle }}</h4>
@@ -16,13 +17,11 @@
         </thead>
         <tbody>
           <tr v-b-toggle.accordion-2 block variant="info">
-            <th scope="row">Tapan</th>
+            <th scope="row">{{ winner }}</th>
             <td>99</td>
           </tr>
         </tbody>
       </table>
-
-      <!-- Element to collapse -->
       <b-collapse
         id="accordion-2"
         visible
@@ -31,36 +30,30 @@
       >
         <b-card>
           <table class="table">
-            <tr>
-              <td>#</td>
-              <th>Round 1</th>
-              <th>Round 2</th>
-              <th>Round 3</th>
-            </tr>
-            <tr>
-              <th>throw 1</th>
-              <td>11</td>
-              <td>11</td>
-              <td>11</td>
-            </tr>
-            <tr>
-              <th>throw 2</th>
-              <td>11</td>
-              <td>11</td>
-              <td>11</td>
-            </tr>
-            <tr>
-              <th>throw 3</th>
-              <td>11</td>
-              <td>11</td>
-              <td>11</td>
-            </tr>
-            <tr>
-              <th>Total</th>
-              <td>33</td>
-              <td>33</td>
-              <td>33</td>
-            </tr>
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th
+                  v-for="throwscore in rounddata"
+                  :key="throwscore"
+                  scope="col"
+                >
+                  Round {{ throwscore.round }}
+                </th>
+                <th scope="col">total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="player in players" :key="player">
+                <th scope="row">
+                  {{ player.first_name + '  ' + player.last_name }}
+                </th>
+                <td v-for="p in player.rounds" :key="p">
+                  {{ p.throws_score }}
+                </td>
+                <td>{{ player.total }}</td>
+              </tr>
+            </tbody>
           </table>
         </b-card>
       </b-collapse>
@@ -69,7 +62,9 @@
     <br /><br />
 
     <div class="text-center">
-      <h4>Congratulations <b>Jeel</b></h4>
+      <h4>
+        Congratulations <b>{{ winner }}</b>
+      </h4>
       <h5>You Win This Game</h5>
       <br />
       <div class="d-grid gap-2 col-6 mx-auto">
@@ -88,7 +83,50 @@ export default {
     subtitle: String,
     score: String,
   },
+  data() {
+    return {
+      winner: ' ',
+    }
+  },
+  async created() {
+    await this.getCurrentGame()
+    if (
+      this.currentgame.game_type === 'Target Score-101' ||
+      this.currentgame.game_type === 'Target Score-301' ||
+      this.currentgame.game_type === 'Target Score-501'
+    ) {
+      this.gameScore = 'Remaining Score'
+    } else {
+      this.gameScore = 'Score'
+    }
+    this.players = this.scoreboardobj.players_score
+    this.rounddata = this.scoreboardobj.players_score[0].rounds
+    this.playername =
+      this.currentgame.active_player_info.first_name +
+      ' ' +
+      this.currentgame.active_player_info.last_name
+    this.winner = this.scoreboardobj.winner
+  },
   methods: {
+    async getCurrentGame() {
+      const res = await this.$axios.$get(
+        `/api/v1/games/` + this.$route.params.gameid + `/current-game`
+      )
+      this.currentgame = res
+      const res1 = await this.$axios.$get(
+        `/api/v1/games/` + this.$route.params.gameid + `/scoreboard`
+      )
+      this.scoreboardobj = res1
+      console.log(this.scoreboardobj)
+      for (let i = 0; i <= this.scoreboardobj.players_score.length - 1; i++) {
+        if (
+          this.currentgame.active_player_info.first_name ===
+          this.scoreboardobj.players_score[i].first_name
+        ) {
+          this.scoreofplayer = this.scoreboardobj.players_score[i].total
+        }
+      }
+    },
     homepage() {
       this.$router.push('/')
     },
