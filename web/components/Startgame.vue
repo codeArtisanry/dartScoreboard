@@ -40,7 +40,12 @@
               autofocus
             />
           </div>
-          <button type="button" class="btn btn-success" @click="postgamescore">
+          <button
+            type="button"
+            class="btn btn-success"
+            @click="postgamescore"
+            @keyup.enter="postgamescore"
+          >
             Submit
           </button>
         </form>
