@@ -12,13 +12,13 @@
         <thead>
           <tr>
             <th scope="col">Name</th>
-            <th scope="col">Total Score</th>
+            <th scope="col">Game Type</th>
           </tr>
         </thead>
         <tbody>
           <tr v-b-toggle.accordion-2 block variant="info">
-            <th scope="row">{{ winner }}</th>
-            <td>99</td>
+            <td scope="row">{{ winner }}</td>
+            <td>{{gametype}}</td>
           </tr>
         </tbody>
       </table>
@@ -86,6 +86,7 @@ export default {
   data() {
     return {
       winner: ' ',
+      gametype:' '
     }
   },
   async created() {
@@ -106,6 +107,7 @@ export default {
       ' ' +
       this.currentgame.active_player_info.last_name
     this.winner = this.scoreboardobj.winner
+    this.gametype = this.currentgame.game_type
   },
   methods: {
     async getCurrentGame() {
