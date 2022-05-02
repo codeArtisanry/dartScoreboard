@@ -26,7 +26,6 @@ func GetCurrentPlayerInfo(ctx *fiber.Ctx) error {
 		})
 	}
 	playerId, err := strconv.Atoi(ctx.Params("playerid"))
-	fmt.Println("this is a player is", playerId)
 	if err != nil {
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 400,
