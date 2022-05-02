@@ -8,60 +8,58 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func GetStartGame(db *sql.DB, id int, gameRes types.GameResponse) (types.CurrentTurnInfo, error) {
+// get current player info
+func GetCurrentPlayerInfo(db *sql.DB, gameId int, playerId int, gameRes types.GameResponse) (types.CurrentPlayerInfo, error) {
 	var (
-		GetStartGame     types.CurrentTurnInfo
-		activeRes        types.ActiveStatus
-		ActivePlayerInfo types.ActivePlayerInfo
-		Score            int
+		CurrentPlayerInfo types.CurrentPlayerInfo
+		activeRes         types.ActiveStatus
+		ActivePlayerInfo  types.ActivePlayerInfo
 	)
-	query := fmt.Sprintf("SELECT id, name, type FROM games WHERE id = %d;", id)
+	query := fmt.Sprintf("SELECT id, name, type, status FROM games WHERE id = %d;", gameId)
 	row := db.QueryRow(query)
-	err := row.Scan(&gameRes.Id, &gameRes.Name, &gameRes.Type)
+	err := row.Scan(&gameRes.Id, &gameRes.Name, &gameRes.Type, &gameRes.Status)
 	if err != nil {
-		return GetStartGame, err
+		return CurrentPlayerInfo, err
 	}
-	ActiveStatus, err := GetActiveStatusRes(db, id, activeRes)
+	ActiveStatus, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
 		fmt.Println(err)
-		return GetStartGame, err
+		return CurrentPlayerInfo, err
 	}
-	ActivePlayerTotal := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d  AND s.is_valid = 'VALID';", id, activeRes.PlayerId)
+	ActivePlayerTotal := fmt.Sprintf("select ifnull(sum(s.score),0) from scores s left join game_players gp on gp.id = s.game_player_id WHERE gp.game_id = %d AND gp.user_id = %d  AND s.is_valid = 'VALID';", gameId, playerId)
 	rowsPlayerTotal := db.QueryRow(ActivePlayerTotal)
-	err = rowsPlayerTotal.Scan(&Score)
+	err = rowsPlayerTotal.Scan(&ActivePlayerInfo.Score)
 	if err != nil {
-		return GetStartGame, err
+		return CurrentPlayerInfo, err
 	}
-	if ActiveStatus.Round == 0 {
-		GetStartGame = types.CurrentTurnInfo{
-			Id:               gameRes.Id,
-			Name:             gameRes.Name,
-			Type:             gameRes.Type,
-			Round:            ActiveStatus.Round,
-			Throw:            ActiveStatus.Throw,
-			Score:            Score,
-			ActivePlayerInfo: &ActivePlayerInfo,
-		}
-		return GetStartGame, nil
-	}
-	queryPlayer := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE id = %d", ActiveStatus.PlayerId)
+	queryPlayer := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE id = %d", playerId)
 	rowsPlayers := db.QueryRow(queryPlayer)
 	err = rowsPlayers.Scan(&ActivePlayerInfo.Id, &ActivePlayerInfo.FirstName, &ActivePlayerInfo.LastName, &ActivePlayerInfo.Email)
 	if err != nil {
-		return GetStartGame, err
+		return CurrentPlayerInfo, err
 	}
-	GetStartGame = types.CurrentTurnInfo{
+	if ActiveStatus.Round == 0 {
+		CurrentPlayerInfo = types.CurrentPlayerInfo{
+			Id:               gameRes.Id,
+			Name:             gameRes.Name,
+			Type:             gameRes.Type,
+			Status:           gameRes.Status,
+			ActivePlayerInfo: &ActivePlayerInfo,
+		}
+		return CurrentPlayerInfo, nil
+	}
+	CurrentPlayerInfo = types.CurrentPlayerInfo{
 		Id:               gameRes.Id,
 		Name:             gameRes.Name,
 		Type:             gameRes.Type,
 		Round:            ActiveStatus.Round,
 		Throw:            ActiveStatus.Throw,
-		Score:            Score,
 		ActivePlayerInfo: &ActivePlayerInfo,
 	}
-	return GetStartGame, nil
+	return CurrentPlayerInfo, nil
 }
 
+// get scoreboard
 func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 	var (
 		PerRound        int
