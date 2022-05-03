@@ -55,7 +55,6 @@
         <b-button v-b-toggle="'collapse-2'" class="m-1" @click="getCurrentGame"
           >To see ScoreBoard Click Here</b-button
         >
-
         <!-- Element to collapse -->
         <b-collapse id="collapse-2">
           <b-card>
@@ -71,6 +70,7 @@
                     Round {{ throwscore.round }}
                   </th>
                   <th scope="col">total</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -115,6 +115,7 @@ export default {
     }
   },
   async created() {
+    await this.checkplayerid()
     await this.getCurrentGame()
     if (
       this.currentgame.game_type === 'Target Score-101' ||
@@ -131,12 +132,11 @@ export default {
       this.currentgame.active_player_info.first_name +
       ' ' +
       this.currentgame.active_player_info.last_name
-    this.checkplayerid()
   },
   methods: {
     async getCurrentGame() {
       const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/current-game`
+        `api/v1/games/` + this.$route.params.gameid + `/players/` + this.$route.params.playerid + `/player-info`
       )
       this.currentgame = res
       const res1 = await this.$axios.$get(
@@ -154,8 +154,12 @@ export default {
       }
     },
     async checkplayerid() {
-      if (this.currentgame.round === 0) {
-        this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
+      const res = await this.$axios.$get(
+          `api/v1/games/` + this.$route.params.gameid + `/active-status`
+        )
+        this.checkplayer = res
+      if (res.player_id=== 0) {
+       this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
         console.log('hii  ')
       } else {
         const res = await this.$axios.$get(
@@ -177,6 +181,9 @@ export default {
     },
     async postgamescore() {
       this.dart.score = Number(this.throwscore)
+      if(this.dart.score<0 || this.dart.score> 60 || !Number.isInteger(this.dart.score)){
+        alert("please enter valid score")
+      }else{
       await this.$axios.$post(
         `api/v1/games/` + this.$route.params.gameid + `/score`,
         this.dart
@@ -188,6 +195,7 @@ export default {
           `/player/` +
           this.checkplayer.player_id
       )
+      }
     },
   },
 }
