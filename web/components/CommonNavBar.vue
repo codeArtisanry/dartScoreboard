@@ -1,6 +1,6 @@
 <template>
   <b-navbar toggleable type="light" variant="light">
-    <b-navbar-brand href="#">NavBar</b-navbar-brand>
+    <b-navbar-brand>NavBar</b-navbar-brand>
 
     <b-navbar-toggle target="navbar-toggle-collapse">
       <template #default="{ expanded }">

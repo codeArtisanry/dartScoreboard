@@ -95,9 +95,10 @@
         :close-on-select="false"
         :clear-on-select="false"
         :preserve-search="true"
+        :options-limit="5"
         placeholder="Pick some"
-        label="first_name"
-        track-by="first_name"
+        label="firstName"
+        track-by="firstName"
       >
         <template slot="selection" slot-scope="{ values, isOpen }"
           ><span
@@ -109,7 +110,7 @@
       </multiselect>
       <pre
         class="language-json"
-      ><code v-for="player in value" :key="player.email">{{ player.first_name }} {{player.last_name}}<br></code><br></pre>
+      ><code v-for="player in value" :key="player.email">{{ player.firstName }} {{player.lastName}}<br></code><br></pre>
       <br />
     </div>
 
@@ -138,38 +139,7 @@ export default {
     return {
       //  k:[],
       value: [],
-      options: [
-        {
-          id: 3,
-          first_name: 'Jeel',
-          last_name: 'Rupapara',
-          email: 'jeel@improwised.com',
-        },
-        {
-          id: 2,
-          first_name: 'Bhautik',
-          last_name: 'Chudasama',
-          email: 'bhautik@improwised.com',
-        },
-        {
-          id: 5,
-          first_name: 'munir',
-          last_name: 'khakhi',
-          email: 'munir@improwised.com',
-        },
-        {
-          id: 1,
-          first_name: 'Vatsal',
-          last_name: 'Chauhan',
-          email: 'vatsal@improwised.com',
-        },
-        {
-          id: 4,
-          first_name: 'Payal',
-          last_name: 'Raviya',
-          email: 'payal@improwised.com',
-        },
-      ],
+      options: [],
       registerGames: '',
       game_responses: {
         game_name: '',
@@ -181,21 +151,20 @@ export default {
     }
   },
   async created() {
-    console.log(this.options)
     if (this.$route.params.gameid !== undefined) {
       await this.getGameData()
       this.playersnamechange()
     }
     // this.game_responses.game_type = this.gameTypeChange()
-    // this.usertable()
+    this.usertable()
     // this.value=this.k
     // console.log(this.value)
   },
   methods: {
     // eslint-disable-next-line camelcase
-    nameWithLang({ first_name, last_name, email }) {
+    nameWithLang({ firstName, lastName, email }) {
       // eslint-disable-next-line camelcase
-      return `${first_name} ${last_name} — [${email}]`
+      return `${firstName} ${lastName} — [${email}]`
     },
     register() {
       this.gamenamefunc()
@@ -218,37 +187,29 @@ export default {
     },
     async postgamedata() {
       await this.$axios.$post(`api/v1/games`, this.game_responses)
-      console.log(this.game_responses)
     },
     async getGameData() {
       const res = await this.$axios.$get(
         `/api/v1/games/` + this.$route.params.gameid
       )
       this.game_responses = res
-      console.log(res)
     },
     async updatedata() {
       this.withupdate()
-      console.log(this.game_responses)
-      const res = await this.$axios.$put(
+      await this.$axios.$put(
         `/api/v1/games/` + this.$route.params.gameid,
         this.game_responses
       )
-      console.log(res)
       this.$router.push('/')
     },
-    // async usertable() {
-    //   const res = await this.$axios.$get(
-    //     `${process.env.USER_GET}`
-    //   )
-    //   this.options = res
-    // },
+    async usertable() {
+      const res = await this.$axios.$get(`api/v1/users`)
+      this.options = res.user_responses
+    },
     withupdate() {
       this.game_responses.players = []
       for (let j = 0; j <= this.value.length - 1; j++) {
-        console.log(this.value[j].id)
         this.game_responses.players.push(this.value[j].id)
-        console.log(this.game_responses.players)
       }
     },
     // this.game_responses.players_ids=this.registerGames.players
@@ -268,13 +229,10 @@ export default {
       //     `${process.env.USER_GET}`
       //   )
       //   this.options = res
-      console.log(this.options)
       this.player = this.game_responses.players
-      console.log(this.player)
       for (let i = 0; i <= this.options.length - 1; i++) {
         for (let j = 0; j <= this.player.length - 1; j++) {
           if (this.options[i].id === this.player[j].id) {
-            console.log('hii')
             this.value.push(this.options[i])
           }
         }

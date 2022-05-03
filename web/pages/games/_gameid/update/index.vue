@@ -3,6 +3,8 @@
 </template>
 <script>
 export default {
+  middleware: 'notauth',
+
   data() {
     return {
       gameDetails: '',

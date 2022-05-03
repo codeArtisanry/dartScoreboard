@@ -18,7 +18,7 @@
         <tbody>
           <tr v-b-toggle.accordion-2 block variant="info">
             <td scope="row">{{ winner }}</td>
-            <td>{{gametype}}</td>
+            <td>{{ gametype }}</td>
           </tr>
         </tbody>
       </table>
@@ -86,7 +86,7 @@ export default {
   data() {
     return {
       winner: ' ',
-      gametype:' '
+      gametype: ' ',
     }
   },
   async created() {

@@ -1,5 +1,7 @@
 <script>
 export default {
+  middleware: 'notauth',
+
   created() {
     this.checkplayerid()
   },

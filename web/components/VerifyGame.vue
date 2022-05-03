@@ -52,7 +52,7 @@ export default {
   methods: {
     async getGameData() {
       const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid
+        `/api/v1/games/` + this.$route.params.gameid
       )
       this.registerGame = res
       console.log(this.registerGame)
@@ -69,7 +69,7 @@ export default {
     },
     async startgame() {
       const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/active-status`
+        `/api/v1/games/` + this.$route.params.gameid + `/active-status`
       )
       this.$router.push(
         '/games/' + this.$route.params.gameid + '/player/' + res.player_id
@@ -81,7 +81,7 @@ export default {
     },
     async DeleteGame(id) {
       const res = await this.$axios.$delete(
-        `api/v1/games` + '/' + this.$route.params.gameid
+        `/api/v1/games` + '/' + this.$route.params.gameid
       )
       console.log(res)
       this.$router.push('/')

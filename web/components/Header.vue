@@ -27,19 +27,7 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie'
-import jwtDecode from 'jwt-decode'
 export default {
-  mounted() {
-    const auth = Cookies.get('user')
-    const token = jwtDecode(auth)
-    this.$store.dispatch('cookie/getAndSetCookie', { auth, token })
-  },
-  // updated() {
-  //   const auth = Cookies.get('user')
-  //   const token = jwtDecode(auth)
-  //   this.$store.dispatch('cookie/getAndSetCookie', { auth, token })
-  // },
   methods: {
     creategame() {
       this.$router.push('/games/new')

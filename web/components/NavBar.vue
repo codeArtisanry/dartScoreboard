@@ -14,7 +14,7 @@
           <a
             :href="logoutURL"
             type="button"
-            class="col-12 col-lg-6 shadow border border-light border-start-0 rounded-pill"
+            class="col-8 mr-2 shadow border border-light border-start-0 rounded-pill"
           >
             Log Out
           </a>

@@ -1,4 +1,7 @@
 export default {
+  ssr: true,
+  target: 'server',
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'web',
@@ -69,6 +72,8 @@ export default {
     '@nuxtjs/pwa',
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+    // https://go.nuxtjs.dev/
+    'cookie-universal-nuxt',
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -93,4 +98,9 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+
+  // middleware configuration: https://go.nuxtjs.dev/config-middleware
+  // router: {
+  //   middleware: 'auth',
+  // },
 }
