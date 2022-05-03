@@ -20,14 +20,14 @@
       </div>
 
       <div class="row">
-        <div class="col col-4 text-right">
+        <div v-if="registerGame.game_status=='Not Started'" class="col text-center">
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
-        <div class="col col-4 text-center">
+        <div class="col  text-center">
           <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
         </div>
-        <div class="col col-4 text-left">
-          <button class="btn btn-success" @click="startgame()">Start</button>
+        <div class="col text-center">
+          <button class="btn btn-success" @click="startgame()">{{button}}</button>
         </div>
       </div>
       <div class="text-center mt-5">
@@ -44,6 +44,7 @@ export default {
   data() {
     return {
       registerGame: '',
+      button:'',
     }
   },
   created() {
@@ -56,6 +57,15 @@ export default {
       )
       this.registerGame = res
       console.log(this.registerGame)
+      if(this.registerGame.game_status==='Not Started'){
+          this.button='Start'
+      }else if(this.registerGame.game_status==='In Progress'){
+          this.button='Resume'
+      }else{
+        this.button='Scoreboard'
+      }
+    
+      
     },
     updateGame() {
       if (

@@ -25,21 +25,22 @@
       <button
         v-if="registerGame.pre_page_link == 'cross limits'"
         variant="outline-primary"
-        disabled
+        class="btn btn-sm btn-secondary invisible"
         @click="prepage"
       >
         Back
       </button>
-      <button v-else variant="outline-primary" @click="prepage">Back</button>
+      <button v-else variant="outline-primary" class="btn btn-sm btn-secondary col my-2" @click="prepage">Back</button>
       <button
         v-if="registerGame.post_page_link == 'cross limits'"
         variant="outline-primary"
-        disabled
+        class="btn btn-sm btn-secondary invisible"
         @click="postpage"
       >
         Next
       </button>
-      <button v-else variant="outline-primary" @click="postpage">Next</button>
+     
+      <button v-else variant="outline-primary" class="btn btn-sm btn-secondary col" @click="postpage">Next</button>
     </div>
   </div>
 </template>
