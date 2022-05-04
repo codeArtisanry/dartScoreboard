@@ -13,7 +13,6 @@ func GetUsers(db *sql.DB, offset string, searchFisrtName string, searchLastName 
 	var users []types.User
 	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE first_name LIKE '%s' AND last_name LIKE '%s' ORDER BY first_name %s;", searchFisrtName, searchLastName, offset)
 	rows, err := db.Query(query)
-	fmt.Println("executed")
 	if err != nil {
 		fmt.Println(err)
 		return users, err
@@ -32,6 +31,5 @@ func GetUsers(db *sql.DB, offset string, searchFisrtName string, searchLastName 
 			Email:     user.Email}
 		users = append(users, userJson)
 	}
-	fmt.Println(users)
 	return users, nil
 }
