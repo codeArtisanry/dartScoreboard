@@ -33,7 +33,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		PlayerFullName := fmt.Sprintf("SELECT first_name,last_name  from users where id = %d;", PlayerId)
+		PlayerFullName := fmt.Sprintf("SELECT first_name,last_name FROM users where id = %d;", PlayerId)
 		rowsPlayer := db.QueryRow(PlayerFullName)
 		err = rowsPlayer.Scan(&PlayerFirstName, &PlayerLastName)
 		if err != nil {
@@ -97,16 +97,34 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 
 func FoundWinner(db *sql.DB, id int) (string, error) {
 	var (
-		first_name string
-		last_name  string
-		winner     string
+		first_name   string
+		last_name    string
+		winner       string
+		fullGameType string
 	)
-	WinnerName := fmt.Sprintf("SELECT u.first_name,u.last_name from scores s join (SELECT game_player_id, sum(scores.score) as score from scores join rounds r ON r.id = scores.round_id AND r.game_id=%d AND scores.is_valid='VALID' GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id JOIN game_players gp on gp.id = s.game_player_id join users u on u.id = gp.user_id where round_id in (select id from rounds r WHERE r.game_id=%d) AND s.is_valid='VALID' GROUP BY gp.id ,s.round_id ORDER by max_score.score DESC LIMIT 1;", id, id)
-	rowsPlayer := db.QueryRow(WinnerName)
-	err := rowsPlayer.Scan(&first_name, &last_name)
+	findGameType := fmt.Sprintf("SELECT type FROM games WHERE id = %d;", id)
+	rowGameType := db.QueryRow(findGameType)
+	err := rowGameType.Scan(&fullGameType)
 	if err != nil {
 		return winner, err
 	}
-	winner = first_name + last_name
-	return winner, nil
+	if fullGameType == "High Score" {
+		WinnerName := fmt.Sprintf("SELECT u.first_name,u.last_name from scores s join (SELECT game_player_id, sum(scores.score) as score from scores join rounds r ON r.id = scores.round_id AND r.game_id=%d AND scores.is_valid='VALID' GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id JOIN game_players gp on gp.id = s.game_player_id join users u on u.id = gp.user_id where round_id in (select id from rounds r WHERE r.game_id=%d) AND s.is_valid='VALID' GROUP BY gp.id ,s.round_id ORDER by max_score.score DESC LIMIT 1;", id, id)
+		rowsPlayer := db.QueryRow(WinnerName)
+		err = rowsPlayer.Scan(&first_name, &last_name)
+		if err != nil {
+			return winner, err
+		}
+		winner = first_name + last_name
+		return winner, nil
+	} else {
+		WinnerName := fmt.Sprintf("SELECT u.first_name,u.last_name from scores s join (SELECT game_player_id, sum(scores.score) as score from scores join rounds r ON r.id = scores.round_id AND r.game_id=%d AND scores.is_valid='VALID' GROUP BY game_player_id ) as max_score on max_score.game_player_id = s.game_player_id JOIN game_players gp on gp.id = s.game_player_id join users u on u.id = gp.user_id where round_id in (select id from rounds r WHERE r.game_id=%d) AND s.is_valid='VALID' GROUP BY gp.id ,s.round_id ORDER by max_score.score ASC LIMIT 1;", id, id)
+		rowsPlayer := db.QueryRow(WinnerName)
+		err = rowsPlayer.Scan(&first_name, &last_name)
+		if err != nil {
+			return winner, err
+		}
+		winner = first_name + last_name
+		return winner, nil
+	}
 }
