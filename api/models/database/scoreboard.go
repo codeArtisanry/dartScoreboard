@@ -27,6 +27,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		GameFullType    string
 		lastRound       int
 		targetScore     int
+		count           int
 	)
 	findGameType := fmt.Sprintf("SELECT type FROM games where id = %d;", id)
 	rowsPlayer := db.QueryRow(findGameType)
@@ -70,12 +71,23 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
-		findLastRoundOfGame := fmt.Sprintf("SELECT round FROM rounds WHERE game_id = %d ORDER BY round DESC LIMIT 1", id)
-		rowsLastRound := db.QueryRow(findLastRoundOfGame)
-		err = rowsLastRound.Scan(&lastRound)
+		findCount := fmt.Sprintf("SELECT COUNT(round) FROM rounds WHERE game_id = %d", id)
+		rowsLastRound := db.QueryRow(findCount)
+		err = rowsLastRound.Scan(&count)
 		if err != nil {
 			fmt.Println(err)
 			return Scoreboard, err
+		}
+		if count == 0 {
+			lastRound = 0
+		} else {
+			findLastRoundOfGame := fmt.Sprintf("SELECT round FROM rounds WHERE game_id = %d ORDER BY round DESC LIMIT 1", id)
+			rowsLastRound := db.QueryRow(findLastRoundOfGame)
+			err = rowsLastRound.Scan(&lastRound)
+			if err != nil {
+				fmt.Println(err)
+				return Scoreboard, err
+			}
 		}
 		for round := 1; round <= lastRound; round++ {
 			findRoundTotal := fmt.Sprintf("SELECT IFNULL(SUM(scores.score),0) FROM scores WHERE round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND game_player_id = (SELECT id FROM game_players WHERE user_id = %d AND game_id = %d);", round, id, PlayerId, id)
@@ -106,7 +118,6 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			RoundsRes = append(RoundsRes, RoundRes)
 			Throws = nil
 		}
-
 		if gameType == "Target Score" {
 			PlayerRes = types.PlayerScore{
 				FirstName: PlayerFirstName,
@@ -123,16 +134,21 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		PlayersRes = append(PlayersRes, PlayerRes)
 		RoundsRes = nil
 	}
-	Winner, err := FoundWinner(db, id)
-	if err != nil {
-		fmt.Println(err)
-		return Scoreboard, err
+	if count == 0 {
+		Scoreboard = types.Scoreboard{
+			PlayersScore: PlayersRes}
+		return Scoreboard, nil
+	} else {
+		Winner, err := FoundWinner(db, id)
+		if err != nil {
+			fmt.Println(err)
+			return Scoreboard, err
+		}
+		Scoreboard = types.Scoreboard{
+			PlayersScore: PlayersRes,
+			Winner:       Winner}
+		return Scoreboard, nil
 	}
-	Scoreboard = types.Scoreboard{
-		PlayersScore: PlayersRes,
-		Winner:       Winner}
-
-	return Scoreboard, nil
 }
 
 func FoundWinner(db *sql.DB, id int) (string, error) {
