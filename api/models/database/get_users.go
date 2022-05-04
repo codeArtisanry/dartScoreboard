@@ -9,10 +9,11 @@ import (
 )
 
 // Get All User From Users Table
-func GetUsers(db *sql.DB, offset int, searchFisrtName string, searchLastName string, user types.User) ([]types.User, error) {
+func GetUsers(db *sql.DB, offset string, searchFisrtName string, searchLastName string, user types.User) ([]types.User, error) {
 	var users []types.User
-	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE first_name LIKE '%s' AND last_name LIKE '%s' ORDER BY first_name ASC LIMIT 5 OFFSET %d;", searchFisrtName, searchLastName, offset)
+	query := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE first_name LIKE '%s' AND last_name LIKE '%s' ORDER BY first_name %s;", searchFisrtName, searchLastName, offset)
 	rows, err := db.Query(query)
+	fmt.Println("executed")
 	if err != nil {
 		fmt.Println(err)
 		return users, err
@@ -21,6 +22,7 @@ func GetUsers(db *sql.DB, offset int, searchFisrtName string, searchLastName str
 	for rows.Next() {
 		err = rows.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email)
 		if err != nil {
+			fmt.Println(err)
 			return users, err
 		}
 		userJson := types.User{
@@ -30,5 +32,6 @@ func GetUsers(db *sql.DB, offset int, searchFisrtName string, searchLastName str
 			Email:     user.Email}
 		users = append(users, userJson)
 	}
+	fmt.Println(users)
 	return users, nil
 }

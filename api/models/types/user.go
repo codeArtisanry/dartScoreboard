@@ -18,6 +18,6 @@ type User struct {
 type UsersPaginationResponse struct {
 	// in: body
 	UserResponses []User `json:"user_responses"`
-	PrePageLink   string `json:"pre_page_link"`
-	PostPageLink  string `json:"post_page_link"`
+	PrePageLink   string `json:"pre_page_link,omitempty"`
+	PostPageLink  string `json:"post_page_link,omitempty"`
 }

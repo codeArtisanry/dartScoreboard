@@ -38,9 +38,9 @@ func GetGame(db *sql.DB, id int, gameRes types.GameResponse, user types.User, ga
 }
 
 //Get All Games From Game Table
-func GetGames(db *sql.DB, loginUserId int, page int, offset int, gameRes types.GameResponse, user types.User, gamePlayerRes types.GamePlayerResponse) ([]types.GameResponse, error) {
+func GetGames(db *sql.DB, offset string, gameRes types.GameResponse, user types.User, gamePlayerRes types.GamePlayerResponse) ([]types.GameResponse, error) {
 	var gamesResJson []types.GameResponse
-	query := fmt.Sprintf("SELECT games.id, games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d ORDER BY games.created_at DESC LIMIT 10 OFFSET %d;", loginUserId, offset)
+	query := fmt.Sprintf("SELECT DISTINCT games.id, games.name, games.type, games.status, games.creater_user_id FROM games LEFT JOIN game_players ON games.id = game_players.game_id WHERE game_players.user_id = %d OR games.creater_user_id = %d ORDER BY games.id  %s;", user.Id, user.Id, offset)
 	rows, err := db.Query(query)
 	if err != nil {
 		fmt.Println(err)
