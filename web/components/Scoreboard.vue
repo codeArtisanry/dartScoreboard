@@ -1,69 +1,42 @@
 <template>
-  <div class="text-center mt-5">
-    <CommonNavBar />
+  <div class="text-center mt-5 mb-5">
     <div class="container text-center">
-      <h3 class="text-center">{{ title }}</h3>
-      <h4 class="text-center">{{ subtitle }}</h4>
+      <h3 class="text-center">{{ gameInfo.game_name }}</h3>
+      <h4 class="text-center">{{ gameInfo.game_type }}</h4>
       <h5 class="text-center">ScoreBoard</h5>
     </div>
+    <table class="table">
+      <thead>
+        <tr scope="row">
+          <th scope="col">Name</th>
+          <th v-for="playerRounds in rounds" :key="playerRounds">
+            Round {{ playerRounds.round }}
+          </th>
+          <th scope="col">{{ totalColHeader }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="playerInfo in scoreboard.players_score"
+          :key="playerInfo"
+          scope="row"
+        >
+          <th scope="col">
+            {{ playerInfo.first_name + ' ' + playerInfo.last_name }}
+          </th>
+          <td v-for="thows in playerInfo.rounds" :key="thows">
+            {{ thows.throws_score }}({{ thows.round_total }})
+          </td>
+          <th scope="col">
+            {{ playerInfo.total }}
+          </th>
+        </tr>
+      </tbody>
+    </table>
     <br /><br />
-    <div class="accordion">
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Game Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-b-toggle.accordion-2 block variant="info">
-            <td scope="row">{{ winner }}</td>
-            <td>{{ gametype }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <b-collapse
-        id="accordion-2"
-        visible
-        accordion="my-accordion"
-        role="tabpanel"
-      >
-        <b-card>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th
-                  v-for="throwscore in rounddata"
-                  :key="throwscore"
-                  scope="col"
-                >
-                  Round {{ throwscore.round }}
-                </th>
-                <th scope="col">total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="player in players" :key="player">
-                <th scope="row">
-                  {{ player.first_name + '  ' + player.last_name }}
-                </th>
-                <td v-for="p in player.rounds" :key="p">
-                  {{ p.throws_score }}
-                </td>
-                <td>{{ player.total }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </b-card>
-      </b-collapse>
-    </div>
-
-    <br /><br />
-
     <div class="text-center">
       <h4>
-        Congratulations <b>{{ winner }}</b>
+        Congratulations <b>{{ scoreboard.winner }}</b>
       </h4>
       <h5>You Win This Game</h5>
       <br />
@@ -78,55 +51,41 @@
 
 <script>
 export default {
-  props: {
-    title: String,
-    subtitle: String,
-    score: String,
-  },
   data() {
     return {
-      winner: ' ',
-      gametype: ' ',
+      gameInfo: '',
+      scoreboard: '',
+      rounds: '',
+      totalColHeader: '',
     }
   },
   async created() {
     await this.getCurrentGame()
-    if (
-      this.currentgame.game_type === 'Target Score-101' ||
-      this.currentgame.game_type === 'Target Score-301' ||
-      this.currentgame.game_type === 'Target Score-501'
-    ) {
-      this.gameScore = 'Remaining Score'
-    } else {
-      this.gameScore = 'Score'
-    }
-    this.players = this.scoreboardobj.players_score
-    this.rounddata = this.scoreboardobj.players_score[0].rounds
-    this.playername =
-      this.currentgame.active_player_info.first_name +
-      ' ' +
-      this.currentgame.active_player_info.last_name
-    this.winner = this.scoreboardobj.winner
-    this.gametype = this.currentgame.game_type
+    await this.getScoreboard()
   },
   methods: {
+    // call games api for game infomation
     async getCurrentGame() {
-      const res = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid + `/current-game`
+      const gameApiRes = await this.$axios.$get(
+        `/api/v1/games/` + this.$route.params.gameid
       )
-      this.currentgame = res
-      const res1 = await this.$axios.$get(
+      this.gameInfo = gameApiRes
+      this.chanageTotalColHeader()
+    },
+    // call scoreboard api for perticuler game for get all players scores, total and get winner
+    async getScoreboard() {
+      const scoreboardApiRes = await this.$axios.$get(
         `/api/v1/games/` + this.$route.params.gameid + `/scoreboard`
       )
-      this.scoreboardobj = res1
-      console.log(this.scoreboardobj)
-      for (let i = 0; i <= this.scoreboardobj.players_score.length - 1; i++) {
-        if (
-          this.currentgame.active_player_info.first_name ===
-          this.scoreboardobj.players_score[i].first_name
-        ) {
-          this.scoreofplayer = this.scoreboardobj.players_score[i].total
-        }
+      this.scoreboard = scoreboardApiRes
+      this.rounds = this.scoreboard.players_score[0].rounds
+    },
+    // change total column for perticuler game type
+    chanageTotalColHeader() {
+      if (this.gameInfo.game_type === 'High Score') {
+        this.totalColHeader = 'Total Score'
+      } else {
+        this.totalColHeader = 'Remaining Score'
       }
     },
     homepage() {
