@@ -69,8 +69,7 @@
                   >
                     Round {{ throwscore.round }}
                   </th>
-                  <th scope="col">total</th>
-
+                  <th scope="col">{{ gameScore }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,13 +93,9 @@
 <script>
 /* eslint-disable no-console */
 export default {
-  props: {
-    gameType: Object,
-    // registerGame: Object,
-  },
   data() {
     return {
-      scoreboardobj: '',
+      scoreboard: '',
       dart: {
         score: 0,
       },
@@ -126,8 +121,8 @@ export default {
     } else {
       this.gameScore = 'Score'
     }
-    this.players = this.scoreboardobj.players_score
-    this.rounddata = this.scoreboardobj.players_score[0].rounds
+    this.players = this.scoreboard.players_score
+    this.rounddata = this.scoreboard.players_score[0].rounds
     this.playername =
       this.currentgame.active_player_info.first_name +
       ' ' +
@@ -136,37 +131,38 @@ export default {
   methods: {
     async getCurrentGame() {
       const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/players/` + this.$route.params.playerid + `/player-info`
+        `api/v1/games/` +
+          this.$route.params.gameid +
+          `/players/` +
+          this.$route.params.playerid +
+          `/player-info`
       )
       this.currentgame = res
       const res1 = await this.$axios.$get(
         `api/v1/games/` + this.$route.params.gameid + `/scoreboard`
       )
-      this.scoreboardobj = res1
-      console.log(this.scoreboardobj)
-      for (let i = 0; i <= this.scoreboardobj.players_score.length - 1; i++) {
+      this.scoreboard = res1
+      for (let i = 0; i <= this.scoreboard.players_score.length - 1; i++) {
         if (
           this.currentgame.active_player_info.first_name ===
-          this.scoreboardobj.players_score[i].first_name
+          this.scoreboard.players_score[i].first_name
         ) {
-          this.scoreofplayer = this.scoreboardobj.players_score[i].total
+          this.scoreofplayer = this.scoreboard.players_score[i].total
         }
       }
     },
     async checkplayerid() {
       const res = await this.$axios.$get(
-          `api/v1/games/` + this.$route.params.gameid + `/active-status`
-        )
-        this.checkplayer = res
-      if (res.player_id=== 0) {
-       this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
-        console.log('hii  ')
+        `api/v1/games/` + this.$route.params.gameid + `/active-status`
+      )
+      this.checkplayer = res
+      if (res.player_id === 0) {
+        this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
       } else {
         const res = await this.$axios.$get(
           `api/v1/games/` + this.$route.params.gameid + `/active-status`
         )
         this.checkplayer = res
-        console.log(this.checkplayer)
         this.$router.push(
           `/games/` +
             res.game_id +
@@ -181,20 +177,24 @@ export default {
     },
     async postgamescore() {
       this.dart.score = Number(this.throwscore)
-      if(this.dart.score<0 || this.dart.score> 60 || !Number.isInteger(this.dart.score)){
-        alert("please enter valid score")
-      }else{
-      await this.$axios.$post(
-        `api/v1/games/` + this.$route.params.gameid + `/score`,
-        this.dart
-      )
-      console.log(this.dart, 'responce of post')
-      this.$router.push(
-        `/games/` +
-          this.checkplayer.game_id +
-          `/player/` +
-          this.checkplayer.player_id
-      )
+      if (
+        this.dart.score < 0 ||
+        this.dart.score > 60 ||
+        !Number.isInteger(this.dart.score)
+      ) {
+        alert('please enter valid score')
+      } else {
+        await this.$axios.$post(
+          `api/v1/games/` + this.$route.params.gameid + `/score`,
+          this.dart
+        )
+        console.log(this.dart, 'responce of post')
+        this.$router.push(
+          `/games/` +
+            this.checkplayer.game_id +
+            `/player/` +
+            this.checkplayer.player_id
+        )
       }
     },
   },
