@@ -27,7 +27,13 @@ func InsertScore(ctx *fiber.Ctx) error {
 		})
 	}
 	score := types.Score{}
-	ctx.BodyParser(&score)
+	err = ctx.BodyParser(&score)
+	if err != nil {
+		return ctx.Status(400).JSON(types.StatusCode{
+			StatusCode: 400,
+			Message:    "Invalid Score",
+		})
+	}
 	fmt.Println(score.Score)
 	if score.Score >= 0 && score.Score <= 60 {
 		scoreRes, err := models.InsertScore(db, gameId, score)
