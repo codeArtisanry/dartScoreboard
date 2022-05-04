@@ -28,6 +28,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 	if err != nil {
 		return Scoreboard, err
 	}
+	defer rowsPlayersIds.Close()
 	for rowsPlayersIds.Next() {
 		err = rowsPlayersIds.Scan(&PlayerId)
 		if err != nil {
@@ -50,6 +51,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		if err != nil {
 			return Scoreboard, err
 		}
+		defer rowsRound.Close()
 		for rowsRound.Next() {
 			err = rowsRound.Scan(&PerRound, &RoundTotal)
 			if err != nil {
@@ -60,6 +62,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			if err != nil {
 				return Scoreboard, err
 			}
+			defer rowsThrow.Close()
 			for rowsThrow.Next() {
 				err = rowsThrow.Scan(&throwScore)
 				if err != nil {
