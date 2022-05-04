@@ -34,10 +34,13 @@
             >
             <input
               id="enterThrow"
-              v-model="throwscore"
-              type="Number"
+              v-model.number="throwscore"
+              type="number"
               class="form-control"
+              min="0"
               autofocus
+              @keydown="noSpecialchar($event)"
+              @keypress="onlyNumber($event)"
             />
           </div>
           <button
@@ -173,6 +176,17 @@ export default {
             `/turns/` +
             res.throw
         )
+      }
+    },
+    onlyNumber($event) {
+      const keyCode = $event.keyCode ? $event.keyCode : $event.which
+      if (keyCode < 0 || keyCode > 60) {
+        $event.preventDefault()
+      }
+    },
+    noSpecialchar(e) {
+      if (/^\W$/.test(e.key)) {
+        e.preventDefault()
       }
     },
     async postgamescore() {
