@@ -78,8 +78,8 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			fmt.Println(err)
 			return Scoreboard, err
 		}
-		if count == 0 {
-			lastRound = 0
+		if count == 0 || count == 1 {
+			lastRound = 1
 		} else {
 			findLastRoundOfGame := fmt.Sprintf("SELECT round FROM rounds WHERE game_id = %d ORDER BY round DESC LIMIT 1", id)
 			rowsLastRound := db.QueryRow(findLastRoundOfGame)
@@ -134,7 +134,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		PlayersRes = append(PlayersRes, PlayerRes)
 		RoundsRes = nil
 	}
-	if count == 0 {
+	if count == 0 || count == 1 {
 		Scoreboard = types.Scoreboard{
 			PlayersScore: PlayersRes}
 		return Scoreboard, nil
