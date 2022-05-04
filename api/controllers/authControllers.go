@@ -80,7 +80,7 @@ func GoogleRedirect(ctx *fiber.Ctx) error {
 	cookie := new(fiber.Cookie)
 	cookie.Name = "user"
 	cookie.Value = user.IDToken
-	cookie.Expires = time.Now().Add(30 * time.Hour * 24)
+	cookie.Expires = time.Now().Add(1 * time.Hour)
 	cookie.HTTPOnly = false
 	cookie.SameSite = fiber.CookieSameSiteNoneMode
 	// Set cookie from JWT
