@@ -36,8 +36,8 @@ type GameResponse struct {
 type GamesPaginationResponse struct {
 	// in: body
 	GameResponses []GameResponse `json:"game_responses"`
-	PrePageLink   string         `json:"pre_page_link"`
-	PostPageLink  string         `json:"post_page_link"`
+	PrePageLink   string         `json:"pre_page_link,omitempty"`
+	PostPageLink  string         `json:"post_page_link,omitempty"`
 }
 
 // swagger:parameters getGame editGame deleteGame activeStatus addScore

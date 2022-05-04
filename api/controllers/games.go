@@ -223,7 +223,6 @@ func GetGame(ctx *fiber.Ctx) error {
 //  500: StatusCode
 // GetGames are get that games which participate and register by perticuler user
 func GetGames(ctx *fiber.Ctx) error {
-
 	LoginUser := ctx.Locals("claims")
 	if LoginUser == nil {
 		return ctx.JSON(types.StatusCode{
@@ -234,43 +233,68 @@ func GetGames(ctx *fiber.Ctx) error {
 	email := LoginUser.(string)
 	gamePlayer := types.GamePlayerResponse{}
 	game := types.GameResponse{}
-	user := types.User{}
-	user, err := models.SelectUserInfoByEmail(db, email, user)
+	loginUser := types.User{}
+	loginUser, err := models.SelectUserInfoByEmail(db, email, loginUser)
 	if err != nil {
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 400,
 			Message:    "Bad Request",
 		})
 	}
-	page, err := strconv.Atoi(ctx.Query("page"))
-	if err != nil {
-		return ctx.Status(400).JSON(types.StatusCode{
-			StatusCode: 400,
-			Message:    "Bad Request",
+	page := ctx.Query("page")
+	var offset string
+	if page == "" {
+		page = "0"
+		_, err = strconv.Atoi(page)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 400,
+				Message:    "Bad Request",
+			})
+		}
+		offset = "DESC"
+		games, err := models.GetGames(db, offset, game, loginUser, gamePlayer)
+		if err != nil {
+			fmt.Println(err)
+			return ctx.Status(500).JSON(types.StatusCode{
+				StatusCode: 500,
+				Message:    "Internal Server Error",
+			})
+		}
+		return ctx.Status(200).JSON(types.GamesPaginationResponse{
+			GameResponses: games,
+		})
+	} else {
+		pageInt, err := strconv.Atoi(page)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 400,
+				Message:    "Bad Request",
+			})
+		}
+		offset = fmt.Sprintf("DESC LIMIT 10 OFFSET %d", (pageInt-1)*10)
+		games, err := models.GetGames(db, offset, game, loginUser, gamePlayer)
+		if err != nil {
+			fmt.Println(err)
+			return ctx.Status(500).JSON(types.StatusCode{
+				StatusCode: 500,
+				Message:    "Internal Server Error",
+			})
+		}
+		prePage := pageInt - 1
+		postPage := pageInt + 1
+		prePageLink := fmt.Sprintf("/api/v1/games?page=%d", prePage)
+		postPageLink := fmt.Sprintf("/api/v1/games?page=%d", postPage)
+		if len(games) < 10 {
+			postPageLink = "cross limits"
+		}
+		if prePage == 0 {
+			prePageLink = "cross limits"
+		}
+		return ctx.Status(200).JSON(types.GamesPaginationResponse{
+			GameResponses: games,
+			PrePageLink:   prePageLink,
+			PostPageLink:  postPageLink,
 		})
 	}
-	offset := (page - 1) * 10
-	games, err := models.GetGames(db, user.Id, page, offset, game, user, gamePlayer)
-	if err != nil {
-		fmt.Println(err)
-		return ctx.Status(500).JSON(types.StatusCode{
-			StatusCode: 500,
-			Message:    "Internal Server Error",
-		})
-	}
-	prePage := page - 1
-	postPage := page + 1
-	prePageLink := fmt.Sprintf("/api/v1/games?page=%d", prePage)
-	postPageLink := fmt.Sprintf("/api/v1/games?page=%d", postPage)
-	if len(games) < 10 {
-		postPageLink = "cross limits"
-	}
-	if prePage == 0 {
-		prePageLink = "cross limits"
-	}
-	return ctx.Status(200).JSON(types.GamesPaginationResponse{
-		GameResponses: games,
-		PrePageLink:   prePageLink,
-		PostPageLink:  postPageLink,
-	})
 }

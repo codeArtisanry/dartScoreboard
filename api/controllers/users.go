@@ -32,47 +32,68 @@ import (
 // GetUsers are get all users that login in dart-scoreboard
 func GetUsers(ctx *fiber.Ctx) error {
 	user := types.User{}
-	page, err := strconv.Atoi(ctx.Query("page"))
-	if err != nil {
-		return ctx.JSON(types.StatusCode{
-			StatusCode: 400,
-			Message:    "Bad Request",
-		})
-	}
-	searchFirstName := ctx.Query("sfn")
-	searchLastName := ctx.Query("sln")
-	searchFirstName = (searchFirstName + "%")
-	searchLastName = (searchLastName + "%")
-	offset := (page - 1) * 5
-	if searchFirstName == "%"{
+	page := ctx.Query("page")
+	var offset string
+	if page == "" {
+		page = "0"
+		_, err := strconv.Atoi(page)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 400,
+				Message:    "Bad Request",
+			})
+		}
+		offset = "ASC"
+		searchFirstName := ctx.Query("sfn")
+		searchLastName := ctx.Query("sln")
+		searchFirstName = (searchFirstName + "%")
+		searchLastName = (searchLastName + "%")
+		users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 500,
+				Message:    "Internal Server Error",
+			})
+		}
 		ctx.SendStatus(200)
 		return ctx.JSON(types.UsersPaginationResponse{
-			UserResponses: nil,
-			PrePageLink:   "cross limits",
-			PostPageLink:  "cross limits",
+			UserResponses: users,
+		})
+	} else {
+		pageInt, err := strconv.Atoi(page)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 400,
+				Message:    "Bad Request",
+			})
+		}
+		offset = fmt.Sprintf("ASC LIMIT 5 OFFSET %d", (pageInt-1)*5)
+		searchFirstName := ctx.Query("sfn")
+		searchLastName := ctx.Query("sln")
+		searchFirstName = (searchFirstName + "%")
+		searchLastName = (searchLastName + "%")
+		users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
+		if err != nil {
+			return ctx.JSON(types.StatusCode{
+				StatusCode: 500,
+				Message:    "Internal Server Error",
+			})
+		}
+		prePage := pageInt - 1
+		postPage := pageInt + 1
+		prePageLink := fmt.Sprintf("/api/v1/users?page=%d", prePage)
+		postPageLink := fmt.Sprintf("/api/v1/users?page=%d", postPage)
+		if len(users) < 5 {
+			postPageLink = "cross limits"
+		}
+		if prePage == 0 {
+			prePageLink = "cross limits"
+		}
+		ctx.SendStatus(200)
+		return ctx.JSON(types.UsersPaginationResponse{
+			UserResponses: users,
+			PrePageLink:   prePageLink,
+			PostPageLink:  postPageLink,
 		})
 	}
-	users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
-	if err != nil {
-		return ctx.JSON(types.StatusCode{
-			StatusCode: 500,
-			Message:    "Internal Server Error",
-		})
-	}
-	prePage := page - 1
-	postPage := page + 1
-	prePageLink := fmt.Sprintf("/api/v1/users?page=%d", prePage)
-	postPageLink := fmt.Sprintf("/api/v1/users?page=%d", postPage)
-	if len(users) < 5 {
-		postPageLink = "cross limits"
-	}
-	if prePage == 0 {
-		prePageLink = "cross limits"
-	}
-	ctx.SendStatus(200)
-	return ctx.JSON(types.UsersPaginationResponse{
-		UserResponses: users,
-		PrePageLink:   prePageLink,
-		PostPageLink:  postPageLink,
-	})
 }
