@@ -33,7 +33,7 @@ func GetCurrentPlayerInfo(ctx *fiber.Ctx) error {
 	if playerId == 0 {
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 400,
-			Message:    "Invalid Score",
+			Message:    "Invalid Player",
 		})
 	}
 	gameRes := types.GameResponse{}
