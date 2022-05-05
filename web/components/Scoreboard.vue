@@ -25,7 +25,13 @@
             {{ playerInfo.first_name + ' ' + playerInfo.last_name }}
           </th>
           <td v-for="thows in playerInfo.rounds" :key="thows">
-            {{ thows.throws_score }}({{ thows.round_total }})
+            <mark
+              v-if="thows.check_round == 'INVALID'"
+              style="background-color: #ffcccb"
+            >
+              {{ thows.throws_score }}({{ thows.round_total }})
+            </mark>
+            <div v-else>{{ thows.throws_score }}({{ thows.round_total }})</div>
           </td>
           <th scope="col">
             {{ playerInfo.total }}
