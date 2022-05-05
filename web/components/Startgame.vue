@@ -203,12 +203,7 @@ export default {
           this.dart
         )
         console.log(this.dart, 'responce of post')
-        this.$router.push(
-          `/games/` +
-            this.checkplayer.game_id +
-            `/player/` +
-            this.checkplayer.player_id
-        )
+        this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`)
       }
     },
   },

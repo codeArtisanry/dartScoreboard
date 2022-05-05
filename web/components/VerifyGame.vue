@@ -20,14 +20,19 @@
       </div>
 
       <div class="row">
-        <div v-if="registerGame.game_status=='Not Started'" class="col text-center">
+        <div
+          v-if="registerGame.game_status == 'Not Started'"
+          class="col text-center"
+        >
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
-        <div class="col  text-center">
+        <div class="col text-center">
           <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
         </div>
         <div class="col text-center">
-          <button class="btn btn-success" @click="startgame()">{{button}}</button>
+          <button class="btn btn-success" @click="startgame()">
+            {{ button }}
+          </button>
         </div>
       </div>
       <div class="text-center mt-5">
@@ -44,7 +49,7 @@ export default {
   data() {
     return {
       registerGame: '',
-      button:'',
+      button: '',
     }
   },
   created() {
@@ -57,15 +62,13 @@ export default {
       )
       this.registerGame = res
       console.log(this.registerGame)
-      if(this.registerGame.game_status==='Not Started'){
-          this.button='Start'
-      }else if(this.registerGame.game_status==='In Progress'){
-          this.button='Resume'
-      }else{
-        this.button='Scoreboard'
+      if (this.registerGame.game_status === 'Not Started') {
+        this.button = 'Start'
+      } else if (this.registerGame.game_status === 'In Progress') {
+        this.button = 'Resume'
+      } else {
+        this.button = 'Scoreboard'
       }
-    
-      
     },
     updateGame() {
       if (
@@ -77,14 +80,8 @@ export default {
         this.$router.push('/games/' + this.$route.params.gameid + '/update')
       }
     },
-    async startgame() {
-      const res = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid + `/active-status`
-      )
-      this.$router.push(
-        '/games/' + this.$route.params.gameid + '/player/' + res.player_id
-      )
-      console.log(res.player_id)
+    startgame() {
+      this.$router.push('/games/' + this.$route.params.gameid + '/player/')
     },
     backToHome() {
       this.$router.push('/')
