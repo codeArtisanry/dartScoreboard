@@ -39,7 +39,8 @@ type PlayerScore struct {
 
 // swagger:response Rounds
 type Rounds struct {
-	Round       int   `json:"round"`
-	ThrowsScore []int `json:"throws_score"`
-	RoundTotal  int   `json:"round_total"`
+	Round       int    `json:"round"`
+	ThrowsScore []int  `json:"throws_score"`
+	CheckRound  string `json:"check_round"`
+	RoundTotal  int    `json:"round_total"`
 }

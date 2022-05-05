@@ -24,6 +24,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 		RoundsRes       []types.Rounds
 		PlayersRes      []types.PlayerScore
 		PlayerRes       types.PlayerScore
+		validateRound   string
 		GameFullType    string
 		lastRound       int
 		targetScore     int
@@ -97,6 +98,17 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 				fmt.Println(err)
 				return Scoreboard, err
 			}
+			checkRound := fmt.Sprintf("SELECT DISTINCT is_valid FROM scores WHERE game_player_id = (SELECT id FROM game_players WHERE user_id = %d AND game_id = %d) AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d);", PlayerId, id, round, id)
+			roundValidation := db.QueryRow(checkRound)
+			err = roundValidation.Scan(&validateRound)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					validateRound = "VALID"
+				} else {
+					fmt.Println(err)
+					return Scoreboard, err
+				}
+			}
 			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d);", round, id, PlayerId)
 			rowsThrow, err := db.Query(dart)
 			if err != nil {
@@ -114,6 +126,7 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			RoundRes := types.Rounds{
 				Round:       round,
 				ThrowsScore: Throws,
+				CheckRound:  validateRound,
 				RoundTotal:  RoundTotal}
 			RoundsRes = append(RoundsRes, RoundRes)
 			Throws = nil
