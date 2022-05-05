@@ -6,8 +6,8 @@ import "time"
 // swagger:model user
 type User struct {
 	Id        int        `json:"id"`
-	FirstName string     `json:"firstName"`
-	LastName  string     `json:"lastName"`
+	FirstName string     `json:"first_name"`
+	LastName  string     `json:"last_name"`
 	Email     string     `json:"email"`
 	AvatarURL string     `json:"avatarUrl,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
