@@ -102,8 +102,12 @@ func GetScoreboard(db *sql.DB, id int) (types.Scoreboard, error) {
 			roundValidation := db.QueryRow(checkRound)
 			err = roundValidation.Scan(&validateRound)
 			if err != nil {
-				fmt.Println(err)
-				return Scoreboard, err
+				if err == sql.ErrNoRows {
+					validateRound = "VALID"
+				} else {
+					fmt.Println(err)
+					return Scoreboard, err
+				}
 			}
 			dart := fmt.Sprintf("SELECT s.score from scores s join rounds r on s.round_id = r.id where r.round = %d AND game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id= %d);", round, id, PlayerId)
 			rowsThrow, err := db.Query(dart)
