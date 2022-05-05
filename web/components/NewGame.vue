@@ -97,8 +97,8 @@
         :preserve-search="true"
         :options-limit="5"
         placeholder="Pick some"
-        label="firstName"
-        track-by="firstName"
+        label="first_name"
+        track-by="first_name"
       >
         <template slot="selection" slot-scope="{ values, isOpen }"
           ><span
@@ -110,7 +110,7 @@
       </multiselect>
       <pre
         class="language-json"
-      ><code v-for="player in value" :key="player.email">{{ player.firstName }} {{player.lastName}}<br></code><br></pre>
+      ><code v-for="player in value" :key="player.email">{{ player.first_name }} {{player.last_name}}<br></code><br></pre>
       <br />
     </div>
 
@@ -137,7 +137,6 @@ export default {
   components: { Multiselect },
   data() {
     return {
-      //  k:[],
       value: [],
       options: [],
       registerGames: '',
@@ -154,29 +153,26 @@ export default {
     if (this.$route.params.gameid !== undefined) {
       await this.getGameData()
       this.playersnamechange()
+      this.withupdate()
     }
-    // this.game_responses.game_type = this.gameTypeChange()
     this.usertable()
-    // this.value=this.k
-    // console.log(this.value)
   },
   methods: {
     // eslint-disable-next-line camelcase
-    nameWithLang({ firstName, lastName, email }) {
+    nameWithLang({ first_name, last_name, email }) {
       // eslint-disable-next-line camelcase
-      return `${firstName} ${lastName} — [${email}]`
+      return `${first_name} ${last_name} — [${email}]`
     },
     register() {
       this.gamenamefunc()
-      if (this.value.length === 0 || this.value.length === 1) {
-        alert('please enter players name more then one')
+      if (this.value.length === 0 ) {
+        alert('please enter players name at list one')
       } else {
         this.$router.push('/')
         console.log(this.value[0].id)
         for (let i = 0; i <= this.value.length - 1; i++) {
           this.game_responses.players.push(this.value[i].id)
         }
-        console.log(this.game_responses.players)
         this.postgamedata()
       }
     },
@@ -195,7 +191,17 @@ export default {
       this.game_responses = res
     },
     async updatedata() {
-      this.withupdate()
+       const res = await this.$axios.$get(`api/v1/users`)
+      this.options = res.user_responses
+      this.game_responses.players=[]
+       for (let j = 0; j <= this.value.length - 1; j++) {
+        for(let k = 0; k <= this.options.length - 1; k++){
+          if(this.value[j].id===this.options[k].id){
+            this.game_responses.players.push(this.options[k].id)
+          }
+        }
+      }
+    console.log(this.game_responses.players)
       await this.$axios.$put(
         `/api/v1/games/` + this.$route.params.gameid,
         this.game_responses
@@ -206,29 +212,28 @@ export default {
       const res = await this.$axios.$get(`api/v1/users`)
       this.options = res.user_responses
     },
-    withupdate() {
-      this.game_responses.players = []
-      for (let j = 0; j <= this.value.length - 1; j++) {
-        this.game_responses.players.push(this.value[j].id)
+    async withupdate() {
+      const res = await this.$axios.$get(`api/v1/users`)
+      this.options = res.user_responses
+      for (let j = 0; j <= this.game_responses.players.length - 1; j++) {
+        for(let k = 0; k <= this.options.length - 1; k++){
+          if(this.game_responses.players[j].id===this.options[k].id){
+            this.value.push(this.options[k])
+            this.game_responses.players.push(this.options[k].id)
+          }
+        }
+      }
+
+      this.game_responses.players=[]
+       for (let j = 0; j <= this.value.length - 1; j++) {
+        for(let k = 0; k <= this.options.length - 1; k++){
+          if(this.value[j].id===this.options[k].id){
+            this.game_responses.players.push(this.options[k].id)
+          }
+        }
       }
     },
-    // this.game_responses.players_ids=this.registerGames.players
-    // this.game_responses=this.registerGames
-    //  gameTypeChange() {
-    //   const gameMainType = this.game_responses.game_type
-    //   if (gameMainType === 'Target Score Game') {
-    //     const gameSubType = this.registerGame.gameTargetScore
-    //     const gameType2 = gameMainType + '-' + gameSubType
-    //     return gameType2
-    //   }else{
-    //     return gameMainType
-    //   }
-    // },
     playersnamechange() {
-      //  const res = await this.$axios.$get(
-      //     `${process.env.USER_GET}`
-      //   )
-      //   this.options = res
       this.player = this.game_responses.players
       for (let i = 0; i <= this.options.length - 1; i++) {
         for (let j = 0; j <= this.player.length - 1; j++) {
@@ -237,8 +242,6 @@ export default {
           }
         }
       }
-      // this.value = this.k
-      // console.log(this.k)
     },
   },
 }
