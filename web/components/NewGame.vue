@@ -152,7 +152,6 @@ export default {
   async created() {
     if (this.$route.params.gameid !== undefined) {
       await this.getGameData()
-      this.playersnamechange()
       this.withupdate()
     }
     this.usertable()
@@ -229,16 +228,6 @@ export default {
         for(let k = 0; k <= this.options.length - 1; k++){
           if(this.value[j].id===this.options[k].id){
             this.game_responses.players.push(this.options[k].id)
-          }
-        }
-      }
-    },
-    playersnamechange() {
-      this.player = this.game_responses.players
-      for (let i = 0; i <= this.options.length - 1; i++) {
-        for (let j = 0; j <= this.player.length - 1; j++) {
-          if (this.options[i].id === this.player[j].id) {
-            this.value.push(this.options[i])
           }
         }
       }
