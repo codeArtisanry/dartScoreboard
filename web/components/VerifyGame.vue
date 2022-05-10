@@ -48,51 +48,49 @@
 export default {
   data() {
     return {
-      registerGame: '',
-      button: '',
-    }
+      registerGame: "",
+      button: "",
+    };
   },
   created() {
-    this.getGameData()
+    this.getGameData();
   },
   methods: {
     async getGameData() {
       const res = await this.$axios.$get(
         `/api/v1/games/` + this.$route.params.gameid
-      )
-      this.registerGame = res
-      console.log(this.registerGame)
-      if (this.registerGame.game_status === 'Not Started') {
-        this.button = 'Start'
-      } else if (this.registerGame.game_status === 'In Progress') {
-        this.button = 'Resume'
+      );
+      this.registerGame = res;
+      if (this.registerGame.game_status === "Not Started") {
+        this.button = "Start";
+      } else if (this.registerGame.game_status === "In Progress") {
+        this.button = "Resume";
       } else {
-        this.button = 'Scoreboard'
+        this.button = "Scoreboard";
       }
     },
     updateGame() {
       if (
-        this.registerGame.game_status === 'In Progress' ||
-        this.registerGame.game_status === 'Completed'
+        this.registerGame.game_status === "In Progress" ||
+        this.registerGame.game_status === "Completed"
       ) {
-        alert('not capable to update')
+        alert("not capable to update");
       } else {
-        this.$router.push('/games/' + this.$route.params.gameid + '/update')
+        this.$router.push("/games/" + this.$route.params.gameid + "/update");
       }
     },
     startgame() {
-      this.$router.push('/games/' + this.$route.params.gameid + '/player/')
+      this.$router.push("/games/" + this.$route.params.gameid + "/player/");
     },
     backToHome() {
-      this.$router.push('/')
+      this.$router.push("/");
     },
     async DeleteGame(id) {
-      const res = await this.$axios.$delete(
-        `/api/v1/games` + '/' + this.$route.params.gameid
-      )
-      console.log(res)
-      this.$router.push('/')
+      await this.$axios.$delete(
+        `/api/v1/games` + "/" + this.$route.params.gameid
+      );
+      this.$router.push("/");
     },
   },
-}
+};
 </script>

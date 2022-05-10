@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div>
     <div class="container my-5 mt-5 mb-3 text-center">
       <h2 class="font-weight-bolder">Game Info</h2>
       <table class="table table-hover">
@@ -11,11 +11,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="game in registerGame.game_responses"
-            :key="game.id"
-            @click="clicked(game.id)"
-          >
+          <tr v-for="game in gameData" :key="game.id" @click="clicked(game.id)">
             <td>{{ game.game_name }}</td>
             <td>{{ game.game_type }}</td>
             <td>{{ game.game_status }}</td>
@@ -30,7 +26,14 @@
       >
         Back
       </button>
-      <button v-else variant="outline-primary" class="btn btn-sm btn-secondary col my-2" @click="prepage">Back</button>
+      <button
+        v-else
+        variant="outline-primary"
+        class="btn btn-sm btn-secondary col my-2"
+        @click="prepage"
+      >
+        Back
+      </button>
       <button
         v-if="registerGame.post_page_link == 'cross limits'"
         variant="outline-primary"
@@ -39,8 +42,15 @@
       >
         Next
       </button>
-     
-      <button v-else variant="outline-primary" class="btn btn-sm btn-secondary col" @click="postpage">Next</button>
+
+      <button
+        v-else
+        variant="outline-primary"
+        class="btn btn-sm btn-secondary col"
+        @click="postpage"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>
@@ -49,31 +59,34 @@
 export default {
   data() {
     return {
-      registerGame: '',
-    }
+      registerGame: "",
+    };
+  },
+  computed: {
+    gameData() {
+      return this.$store.getters.getGamesData.game_responses;
+    },
   },
   created() {
-    this.getGameData()
+    this.getGameData();
   },
   methods: {
     clicked(id) {
-      this.$router.push('/games/' + id)
+      this.$router.push("/games/" + id);
     },
     async getGameData() {
-      const res = await this.$axios.$get(`/api/v1/games?page=1`)
-      this.registerGame = res
-      console.log(this.registerGame)
+      const res = await this.$axios.$get(`/api/v1/games?page=1`);
+      this.registerGame = res;
+      this.$store.commit("getGames", res);
     },
     async prepage() {
-      const res = await this.$axios.$get(this.registerGame.pre_page_link)
-      this.registerGame = res
-      console.log(this.registerGame)
+      const res = await this.$axios.$get(this.registerGame.pre_page_link);
+      this.registerGame = res;
     },
     async postpage() {
-      const res = await this.$axios.$get(this.registerGame.post_page_link)
-      this.registerGame = res
-      console.log(this.registerGame)
+      const res = await this.$axios.$get(this.registerGame.post_page_link);
+      this.registerGame = res;
     },
   },
-}
+};
 </script>

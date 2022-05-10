@@ -132,108 +132,106 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import Multiselect from "vue-multiselect";
 export default {
   components: { Multiselect },
   data() {
     return {
       value: [],
       options: [],
-      registerGames: '',
+      registerGames: "",
       game_responses: {
-        game_name: '',
-        game_type: '',
+        game_name: "",
+        game_type: "",
         players: [],
       },
-      newPlayer: '',
+      newPlayer: "",
       player: [],
-    }
+    };
   },
   async created() {
     if (this.$route.params.gameid !== undefined) {
-      await this.getGameData()
-      this.withupdate()
+      await this.getGameData();
+      this.withupdate();
     }
-    this.usertable()
+    this.usertable();
   },
   methods: {
     // eslint-disable-next-line camelcase
     nameWithLang({ first_name, last_name, email }) {
       // eslint-disable-next-line camelcase
-      return `${first_name} ${last_name} — [${email}]`
+      return `${first_name} ${last_name} — [${email}]`;
     },
     register() {
-      this.gamenamefunc()
-      if (this.value.length === 0 ) {
-        alert('please enter players name at list one')
+      this.gamenamefunc();
+      if (this.value.length === 0) {
+        alert("please enter players name at list one");
       } else {
-        this.$router.push('/')
-        console.log(this.value[0].id)
+        this.$router.push("/");
         for (let i = 0; i <= this.value.length - 1; i++) {
-          this.game_responses.players.push(this.value[i].id)
+          this.game_responses.players.push(this.value[i].id);
         }
-        this.postgamedata()
+        this.postgamedata();
       }
     },
     gamenamefunc() {
-      if (this.game_responses.game_name === '') {
-        this.game_responses.game_name = new Date().toLocaleString()
+      if (this.game_responses.game_name === "") {
+        this.game_responses.game_name = new Date().toLocaleString();
       }
     },
     async postgamedata() {
-      await this.$axios.$post(`api/v1/games`, this.game_responses)
+      await this.$axios.$post(`/api/v1/games`, this.game_responses);
     },
     async getGameData() {
       const res = await this.$axios.$get(
         `/api/v1/games/` + this.$route.params.gameid
-      )
-      this.game_responses = res
+      );
+      this.game_responses = res;
     },
     async updatedata() {
-       const res = await this.$axios.$get(`api/v1/users`)
-      this.options = res.user_responses
-      this.game_responses.players=[]
-       for (let j = 0; j <= this.value.length - 1; j++) {
-        for(let k = 0; k <= this.options.length - 1; k++){
-          if(this.value[j].id===this.options[k].id){
-            this.game_responses.players.push(this.options[k].id)
+      const res = await this.$axios.$get(`/api/v1/users`);
+      this.options = res.user_responses;
+      this.game_responses.players = [];
+      for (let j = 0; j <= this.value.length - 1; j++) {
+        for (let k = 0; k <= this.options.length - 1; k++) {
+          if (this.value[j].id === this.options[k].id) {
+            this.game_responses.players.push(this.options[k].id);
           }
         }
       }
-    console.log(this.game_responses.players)
       await this.$axios.$put(
         `/api/v1/games/` + this.$route.params.gameid,
         this.game_responses
-      )
-      this.$router.push('/')
+      );
+      this.$router.push("/");
     },
     async usertable() {
-      const res = await this.$axios.$get(`api/v1/users`)
-      this.options = res.user_responses
+      const res = await this.$axios.$get(`/api/v1/users`);
+      this.options = res.user_responses;
     },
     async withupdate() {
-      const res = await this.$axios.$get(`api/v1/users`)
-      this.options = res.user_responses
+      const res = await this.$axios.$get(`/api/v1/users`);
+      this.options = res.user_responses;
       for (let j = 0; j <= this.game_responses.players.length - 1; j++) {
-        for(let k = 0; k <= this.options.length - 1; k++){
-          if(this.game_responses.players[j].id===this.options[k].id){
-            this.value.push(this.options[k])
-            this.game_responses.players.push(this.options[k].id)
+        for (let k = 0; k <= this.options.length - 1; k++) {
+          if (this.game_responses.players[j].id === this.options[k].id) {
+            this.value.push(this.options[k]);
+            this.game_responses.players.push(this.options[k].id);
           }
         }
       }
 
-      this.game_responses.players=[]
-       for (let j = 0; j <= this.value.length - 1; j++) {
-        for(let k = 0; k <= this.options.length - 1; k++){
-          if(this.value[j].id===this.options[k].id){
-            this.game_responses.players.push(this.options[k].id)
+      this.game_responses.players = [];
+      for (let j = 0; j <= this.value.length - 1; j++) {
+        for (let k = 0; k <= this.options.length - 1; k++) {
+          if (this.value[j].id === this.options[k].id) {
+            this.game_responses.players.push(this.options[k].id);
           }
         }
       }
     },
   },
-}
+};
 </script>
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css">

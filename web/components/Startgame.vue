@@ -4,12 +4,12 @@
     <div class="container text-center mt-4">
       <div class="bg-white pb-4 px-5 rounded">
         <h5 class="heading">Welcome to</h5>
-        <h4 class="font-weight-bolder">{{ currentgame.game_type }}</h4>
+        <h4 class="font-weight-bolder">{{ getGame.game_type }}</h4>
         <table class="table table-striped shadow mt-3">
           <tbody>
             <tr>
               <th class="text-left" scope="row">Round</th>
-              <td scope="col">{{ currentgame.round }}</td>
+              <td scope="col">{{ getGame.round }}</td>
             </tr>
           </tbody>
           <tbody>
@@ -30,7 +30,7 @@
         <form class="pt-3">
           <div class="form-group">
             <label for="enterThrow" class="text-muted font-weight-bolder"
-              >Enter Points in Dart Throw :{{ currentgame.throw }}</label
+              >Enter Points in Dart Throw :{{ getGame.throw }}</label
             >
             <input
               id="enterThrow"
@@ -66,19 +66,19 @@
                 <tr>
                   <th scope="col">Name</th>
                   <th
-                    v-for="throwscore in rounddata"
-                    :key="throwscore"
+                    v-for="throwScore in getRound"
+                    :key="throwScore"
                     scope="col"
                   >
-                    Round {{ throwscore.round }}
+                    Round {{ throwScore.round }}
                   </th>
                   <th scope="col">{{ gameScore }}</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="player in players" :key="player">
+                <tr v-for="player in getPlayerScores" :key="player">
                   <th scope="row">
-                    {{ player.first_name + '  ' + player.last_name }}
+                    {{ player.first_name + "  " + player.last_name }}
                   </th>
                   <td v-for="p in player.rounds" :key="p">
                     <mark
@@ -106,38 +106,47 @@
 export default {
   data() {
     return {
-      scoreboard: '',
+      scoreboard: "",
       dart: {
         score: 0,
       },
-      throwscore: '',
-      checkplayer: '',
+      throwscore: "",
+      checkplayer: "",
       scoreofplayer: 0,
-      playername: '',
-      registerGame: '',
-      gameScore: '',
-      currentgame: '',
+      playername: "",
+      registerGame: "",
+      gameScore: "",
+      currentgame: "",
       players_score: [],
-    }
+    };
+  },
+  computed: {
+    getGame() {
+      return this.$store.getters.getCurrentGame;
+    },
+    getRound() {
+      return this.$store.getters.getRound;
+    },
+    getPlayerScores() {
+      return this.$store.getters.getPlayerScore;
+    },
   },
   async created() {
-    await this.checkplayerid()
-    await this.getCurrentGame()
+    await this.checkplayerid();
+    await this.getCurrentGame();
     if (
-      this.currentgame.game_type === 'Target Score-101' ||
-      this.currentgame.game_type === 'Target Score-301' ||
-      this.currentgame.game_type === 'Target Score-501'
+      this.currentgame.game_type === "Target Score-101" ||
+      this.currentgame.game_type === "Target Score-301" ||
+      this.currentgame.game_type === "Target Score-501"
     ) {
-      this.gameScore = 'Remaining Score'
+      this.gameScore = "Remaining Score";
     } else {
-      this.gameScore = 'Score'
+      this.gameScore = "Score";
     }
-    this.players = this.scoreboard.players_score
-    this.rounddata = this.scoreboard.players_score[0].rounds
     this.playername =
-      this.currentgame.active_player_info.first_name +
-      ' ' +
-      this.currentgame.active_player_info.last_name
+      this.getGame.active_player_info.first_name +
+      " " +
+      this.getGame.active_player_info.last_name;
   },
   methods: {
     async getCurrentGame() {
@@ -147,33 +156,37 @@ export default {
           `/players/` +
           this.$route.params.playerid +
           `/player-info`
-      )
-      this.currentgame = res
+      );
+      this.currentgame = res;
+      this.$store.commit("currentgame", res);
       const res1 = await this.$axios.$get(
         `api/v1/games/` + this.$route.params.gameid + `/scoreboard`
-      )
-      this.scoreboard = res1
+      );
+      this.scoreboard = res1;
+      this.$store.commit("getScoreboard", res1);
       for (let i = 0; i <= this.scoreboard.players_score.length - 1; i++) {
         if (
           this.currentgame.active_player_info.first_name ===
           this.scoreboard.players_score[i].first_name
         ) {
-          this.scoreofplayer = this.scoreboard.players_score[i].total
+          this.scoreofplayer = this.scoreboard.players_score[i].total;
         }
       }
     },
     async checkplayerid() {
       const res = await this.$axios.$get(
         `api/v1/games/` + this.$route.params.gameid + `/active-status`
-      )
-      this.checkplayer = res
+      );
+      this.checkplayer = res;
       if (res.player_id === 0) {
-        this.$router.push(`/games/` + this.$route.params.gameid + `/scoreboard`)
+        this.$router.push(
+          `/games/` + this.$route.params.gameid + `/scoreboard`
+        );
       } else {
         const res = await this.$axios.$get(
           `api/v1/games/` + this.$route.params.gameid + `/active-status`
-        )
-        this.checkplayer = res
+        );
+        this.checkplayer = res;
         this.$router.push(
           `/games/` +
             res.game_id +
@@ -183,37 +196,36 @@ export default {
             res.round +
             `/turns/` +
             res.throw
-        )
+        );
       }
     },
     onlyNumber($event) {
-      const keyCode = $event.keyCode ? $event.keyCode : $event.which
+      const keyCode = $event.keyCode ? $event.keyCode : $event.which;
       if (keyCode < 0 || keyCode > 60) {
-        $event.preventDefault()
+        $event.preventDefault();
       }
     },
     noSpecialchar(e) {
       if (/^\W$/.test(e.key)) {
-        e.preventDefault()
+        e.preventDefault();
       }
     },
     async postgamescore() {
-      this.dart.score = Number(this.throwscore)
+      this.dart.score = Number(this.throwscore);
       if (
         this.dart.score < 0 ||
         this.dart.score > 60 ||
         !Number.isInteger(this.dart.score)
       ) {
-        alert('please enter valid score')
+        alert("please enter valid score");
       } else {
         await this.$axios.$post(
           `api/v1/games/` + this.$route.params.gameid + `/score`,
           this.dart
-        )
-        console.log(this.dart, 'responce of post')
-        this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`)
+        );
+        this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
       }
     },
   },
-}
+};
 </script>
