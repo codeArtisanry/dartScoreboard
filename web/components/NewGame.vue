@@ -147,6 +147,8 @@ export default {
       },
       newPlayer: "",
       player: [],
+      nameofgame:[],
+      totalplayers:0
     };
   },
   async created() {
@@ -163,20 +165,19 @@ export default {
       return `${first_name} ${last_name} — [${email}]`;
     },
     register() {
-      this.gamenamefunc();
       if (this.value.length === 0) {
         alert("please enter players name at list one");
       } else {
         this.$router.push("/");
         for (let i = 0; i <= this.value.length - 1; i++) {
           this.game_responses.players.push(this.value[i].id);
+          this.nameofgame.push(this.value[i].first_name)
         }
+              if (this.game_responses.game_name === '') {
+                this.c=this.nameofgame.length-1
+                  this.game_responses.game_name= this.nameofgame[0] + ` +${this.totalplayers}  others`
+              }
         this.postgamedata();
-      }
-    },
-    gamenamefunc() {
-      if (this.game_responses.game_name === "") {
-        this.game_responses.game_name = new Date().toLocaleString();
       }
     },
     async postgamedata() {
