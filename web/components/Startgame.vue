@@ -1,20 +1,20 @@
 <template>
   <div>
-    <CommonNavBar />
-    <div class="container text-center mt-4">
-      <div class="bg-white pb-4 px-5 rounded">
-        <h5 class="heading">Welcome to</h5>
-        <h4 class="font-weight-bolder">{{ getGame.game_type }}</h4>
+    <script src="https://unpkg.com/dartboard/dist/dartboard.js"></script>
+    <div class="container text-center">
+      <div class="bg-white rounded">
+        <!-- dart-board -->
+        <div class="text-center">
+          <div
+            id="dartboard"
+            class="d-inline-block"
+            style="width: 22rem; height: 22rem"
+          ></div>
+        </div>
         <table class="table table-striped shadow mt-3">
           <tbody>
             <tr>
-              <th class="text-left" scope="row">Round</th>
-              <td scope="col">{{ getGame.round }}</td>
-            </tr>
-          </tbody>
-          <tbody>
-            <tr>
-              <th class="text-left" scope="row">Player Name</th>
+              <th class="text-center" scope="row">Player Name</th>
               <td scope="col">
                 {{ playername }}
               </td>
@@ -22,80 +22,74 @@
           </tbody>
           <tbody>
             <tr>
-              <th class="text-left" scope="row">{{ gameScore }}</th>
+              <th class="text-center" scope="row">Round, Turn</th>
+              <td scope="col">
+                {{ currentgame.round }}, {{ currentgame.throw }}
+              </td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <th class="text-center" scope="row">{{ gameScore }}</th>
               <td>{{ scoreofplayer }}</td>
             </tr>
           </tbody>
         </table>
-        <form class="pt-3">
-          <div class="form-group">
-            <label for="enterThrow" class="text-muted font-weight-bolder"
-              >Enter Points in Dart Throw :{{ getGame.throw }}</label
-            >
-            <input
-              id="enterThrow"
-              v-model.number="throwscore"
-              type="number"
-              class="form-control"
-              min="0"
-              autofocus
-              @keydown="noSpecialchar($event)"
-              @keypress="onlyNumber($event)"
-            />
-          </div>
-          <button
-            type="button"
-            class="btn btn-success"
-            @click="postgamescore"
-            @keyup.enter="postgamescore"
-          >
-            Submit
-          </button>
-        </form>
       </div>
       <div>
         <!-- Using value -->
-        <b-button v-b-toggle="'collapse-2'" class="m-1" @click="getCurrentGame"
-          >To see ScoreBoard Click Here</b-button
+        <b-button
+          v-b-toggle="'collapse-2'"
+          class="m-1 px-3"
+          @click="getCurrentGame"
+          ><div class="d-flex justify-content-around">
+            <div>
+              <img
+                height="20"
+                src="/scoreboard.svg"
+                alt="scoreboard-icon"
+                class="text-white mb-1"
+              />
+            </div>
+            <div class="ml-2">Scoreboard</div>
+          </div></b-button
         >
         <!-- Element to collapse -->
-        <b-collapse id="collapse-2">
-          <b-card>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">Name</th>
-                  <th
-                    v-for="throwScore in getRound"
-                    :key="throwScore"
-                    scope="col"
+        <b-collapse id="collapse-2" class="table-responsive">
+          <table class="table container-fluid wrap">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th
+                  v-for="throwscore in rounddata"
+                  :key="throwscore"
+                  scope="col"
+                >
+                  R-{{ throwscore.round }}
+                </th>
+                <th scope="col">{{ gameScore }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="player in players" :key="player">
+                <th scope="row">
+                  {{ player.first_name + "  " + player.last_name }}
+                </th>
+                <td v-for="p in player.rounds" :key="p">
+                  <mark
+                    v-if="p.check_round == 'INVALID'"
+                    style="background-color: #ffcccb"
                   >
-                    Round {{ throwScore.round }}
-                  </th>
-                  <th scope="col">{{ gameScore }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="player in getPlayerScores" :key="player">
-                  <th scope="row">
-                    {{ player.first_name + "  " + player.last_name }}
-                  </th>
-                  <td v-for="p in player.rounds" :key="p">
-                    <mark
-                      v-if="p.check_round == 'INVALID'"
-                      style="background-color: #ffcccb"
-                    >
-                      {{ p.throws_score }}
-                    </mark>
-                    <div v-else>
-                      {{ p.throws_score }}
-                    </div>
-                  </td>
-                  <td>{{ player.total }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </b-card>
+                    {{ p.throws_score }}
+                  </mark>
+                  <div v-else>
+                    {{ p.throws_score }}
+                  </div>
+                </td>
+                <td>{{ player.total }}</td>
+              </tr>
+            </tbody>
+          </table>
         </b-collapse>
       </div>
     </div>
@@ -106,11 +100,10 @@
 export default {
   data() {
     return {
+      rounddata: "",
+      players: "",
       scoreboard: "",
-      dart: {
-        score: 0,
-      },
-      throwscore: "",
+      Dartboard: "",
       checkplayer: "",
       scoreofplayer: 0,
       playername: "",
@@ -119,17 +112,6 @@ export default {
       currentgame: "",
       players_score: [],
     };
-  },
-  computed: {
-    getGame() {
-      return this.$store.getters.getCurrentGame;
-    },
-    getRound() {
-      return this.$store.getters.getRound;
-    },
-    getPlayerScores() {
-      return this.$store.getters.getPlayerScore;
-    },
   },
   async created() {
     await this.checkplayerid();
@@ -143,10 +125,24 @@ export default {
     } else {
       this.gameScore = "Score";
     }
+    this.players = this.scoreboard.players_score;
+    this.rounddata = this.scoreboard.players_score[0].rounds;
     this.playername =
-      this.getGame.active_player_info.first_name +
+      this.currentgame.active_player_info.first_name +
       " " +
-      this.getGame.active_player_info.last_name;
+      this.currentgame.active_player_info.last_name;
+  },
+  mounted() {
+    // eslint-disable-next-line no-undef
+    const dartboard = new Dartboard("#dartboard");
+    dartboard.render();
+    document.querySelector("#dartboard").addEventListener("throw", (d) => {
+      this.$axios.$post(
+        `/api/v1/games/` + this.$route.params.gameid + `/score`,
+        d.detail
+      );
+      this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
+    });
   },
   methods: {
     async getCurrentGame() {
@@ -158,12 +154,10 @@ export default {
           `/player-info`
       );
       this.currentgame = res;
-      this.$store.commit("currentgame", res);
       const res1 = await this.$axios.$get(
         `api/v1/games/` + this.$route.params.gameid + `/scoreboard`
       );
       this.scoreboard = res1;
-      this.$store.commit("getScoreboard", res1);
       for (let i = 0; i <= this.scoreboard.players_score.length - 1; i++) {
         if (
           this.currentgame.active_player_info.first_name ===
@@ -210,22 +204,15 @@ export default {
         e.preventDefault();
       }
     },
-    async postgamescore() {
-      this.dart.score = Number(this.throwscore);
-      if (
-        this.dart.score < 0 ||
-        this.dart.score > 60 ||
-        !Number.isInteger(this.dart.score)
-      ) {
-        alert("please enter valid score");
-      } else {
-        await this.$axios.$post(
-          `api/v1/games/` + this.$route.params.gameid + `/score`,
-          this.dart
-        );
-        this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
-      }
-    },
   },
 };
 </script>
+
+<style scoped>
+.wrap {
+  width: 110%;
+  max-width: 110%;
+  margin-bottom: 25px;
+  white-space: nowrap;
+}
+</style>
