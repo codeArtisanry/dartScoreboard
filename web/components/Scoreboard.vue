@@ -45,7 +45,7 @@
               <b-collapse :id="`${i}collapse`">
                 <tr>
                   <td>Round</td>
-                  <td>darts</td>
+                  <td>Darts</td>
                   <td>Total</td>
                 </tr>
                 <tr v-for="(round, j) in player.rounds" :key="j" scope="row">
