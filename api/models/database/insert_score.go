@@ -10,11 +10,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, error) {
+func InsertScore(db *sql.DB, gameId int, playerId int, round int, turnId int, score types.Score) (types.ResScore, error) {
 	var (
 		totalScore   int
 		roundId      int
 		gamePlayerId int
+		scoresId     int
 		gameType     string
 		scoreRes     types.ResScore
 	)
@@ -32,7 +33,7 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		}
 		return scoreRes, nil
 	}
-	verifyRoundTable := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", activejson.Round, gameId)
+	verifyRoundTable := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", round, gameId)
 	row := db.QueryRow(verifyRoundTable)
 	err = row.Scan(&roundId)
 	if err != nil {
@@ -42,21 +43,21 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 				fmt.Println(err)
 				return scoreRes, err
 			}
-			_, err = insert.Exec(activejson.Round, gameId)
+			_, err = insert.Exec(round, gameId)
 			if err != nil {
 				fmt.Println(err)
 				return scoreRes, err
 			}
 		}
 	}
-	findRoundId := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", activejson.Round, gameId)
+	findRoundId := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", round, gameId)
 	row = db.QueryRow(findRoundId)
 	err = row.Scan(&roundId)
 	if err != nil {
 		fmt.Println(err)
 		return scoreRes, err
 	}
-	findGamePlayerid := fmt.Sprintf("SELECT id FROM game_players WHERE user_id = %d AND game_id = %d;", activejson.PlayerId, gameId)
+	findGamePlayerid := fmt.Sprintf("SELECT id FROM game_players WHERE user_id = %d AND game_id = %d;", playerId, gameId)
 	row = db.QueryRow(findGamePlayerid)
 	err = row.Scan(&gamePlayerId)
 	if err != nil {
@@ -76,117 +77,133 @@ func InsertScore(db *sql.DB, gameId int, score types.Score) (types.ResScore, err
 		return scoreRes, err
 	}
 	totalScore = totalScore + score.Score
-	if gameType == "High Score" {
-		insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
-		if err != nil {
-			fmt.Println(err)
-			return scoreRes, err
-		}
-		_, err = insert.Exec(roundId, gamePlayerId, activejson.Throw, score.Score, "VALID")
-		if err != nil {
-			fmt.Println(err)
-			return scoreRes, err
-		}
-		scoreRes := types.ResScore{
-			Score:       score.Score,
-			TotalScore:  totalScore,
-			FoundWinner: false,
-		}
-		return scoreRes, nil
-	} else {
-		fullGameType := strings.Split(gameType, "-")
-		targetscore, err := strconv.Atoi(fullGameType[1])
-		if err != nil {
-			fmt.Println(err)
-			return scoreRes, err
-		}
-		if totalScore <= targetscore {
-			insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			_, err = insert.Exec(roundId, gamePlayerId, activejson.Throw, score.Score, "VALID")
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			if totalScore == targetscore {
-				query, err := db.Prepare("UPDATE games SET status = ? WHERE id = ?;")
-				if err != nil {
-					fmt.Println(err)
-					return scoreRes, err
-				}
-				_, err = query.Exec("Completed", gameId)
-				if err != nil {
-					fmt.Println(err)
-					return scoreRes, err
-				}
-				scoreRes := types.ResScore{
-					Score:       score.Score,
-					TotalScore:  targetscore - totalScore,
-					FoundWinner: true,
-				}
-				return scoreRes, nil
-			}
-			totalScore, err = FindTotalScore(db, gamePlayerId)
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			scoreRes := types.ResScore{
-				Score:       score.Score,
-				TotalScore:  targetscore - totalScore,
-				FoundWinner: false,
-			}
-			return scoreRes, nil
-		} else {
-			insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			_, err = insert.Exec(roundId, gamePlayerId, activejson.Throw, score.Score, "VALID")
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			for throw := activejson.Throw + 1; throw <= 3; throw++ {
+	validateScore := fmt.Sprintf("SELECT id FROM scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND throw = %d", gameId, playerId, round, gameId, turnId)
+	rowScore := db.QueryRow(validateScore)
+	err = rowScore.Scan(&scoresId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			if gameType == "High Score" {
 				insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
 				if err != nil {
 					fmt.Println(err)
 					return scoreRes, err
 				}
-				_, err = insert.Exec(roundId, gamePlayerId, throw, 0, "VALID")
+				_, err = insert.Exec(roundId, gamePlayerId, turnId, score.Score, "VALID")
 				if err != nil {
 					fmt.Println(err)
 					return scoreRes, err
 				}
-			}
-			for throw := 1; throw <= 3; throw++ {
-				query, err := db.Prepare("UPDATE scores SET is_valid = 'INVALID' WHERE round_id = ? AND game_player_id = ? AND throw = ?;")
+				scoreRes = types.ResScore{
+					Score:       score.Score,
+					TotalScore:  totalScore,
+					FoundWinner: false,
+				}
+				return scoreRes, nil
+			} else {
+				fullGameType := strings.Split(gameType, "-")
+				targetscore, err := strconv.Atoi(fullGameType[1])
 				if err != nil {
 					fmt.Println(err)
 					return scoreRes, err
 				}
-				_, err = query.Exec(roundId, gamePlayerId, throw)
-				if err != nil {
-					fmt.Println(err)
-					return scoreRes, err
+				if totalScore <= targetscore {
+					insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					_, err = insert.Exec(roundId, gamePlayerId, turnId, score.Score, "VALID")
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					if totalScore == targetscore {
+						query, err := db.Prepare("UPDATE games SET status = ? WHERE id = ?;")
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+						_, err = query.Exec("Completed", gameId)
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+						scoreRes = types.ResScore{
+							Score:       score.Score,
+							TotalScore:  targetscore - totalScore,
+							FoundWinner: true,
+						}
+						return scoreRes, nil
+					}
+					totalScore, err = FindTotalScore(db, gamePlayerId)
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					scoreRes = types.ResScore{
+						Score:       score.Score,
+						TotalScore:  targetscore - totalScore,
+						FoundWinner: false,
+					}
+					return scoreRes, nil
+				} else {
+					insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					_, err = insert.Exec(roundId, gamePlayerId, turnId, score.Score, "VALID")
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					for throw :=
+						+1; throw <= 3; throw++ {
+						insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+						_, err = insert.Exec(roundId, gamePlayerId, throw, 0, "VALID")
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+					}
+					for throw := 1; throw <= 3; throw++ {
+						query, err := db.Prepare("UPDATE scores SET is_valid = 'INVALID' WHERE round_id = ? AND game_player_id = ? AND throw = ?;")
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+						_, err = query.Exec(roundId, gamePlayerId, throw)
+						if err != nil {
+							fmt.Println(err)
+							return scoreRes, err
+						}
+					}
+					totalScore, err = FindTotalScore(db, gamePlayerId)
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					scoreRes = types.ResScore{
+						Score:       score.Score,
+						TotalScore:  targetscore - totalScore,
+						FoundWinner: false,
+					}
+					return scoreRes, nil
 				}
 			}
-			totalScore, err = FindTotalScore(db, gamePlayerId)
-			if err != nil {
-				fmt.Println(err)
-				return scoreRes, err
-			}
-			scoreRes = types.ResScore{
-				Score:       score.Score,
-				TotalScore:  targetscore - totalScore,
-				FoundWinner: false,
-			}
-			return scoreRes, nil
 		}
+		return scoreRes, err
+	} else {
+		scoreRes = types.ResScore{
+			Score:       61,
+			TotalScore:  0,
+			FoundWinner: false,
+		}
+		return scoreRes, nil
 	}
 }
 

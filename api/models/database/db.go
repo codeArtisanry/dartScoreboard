@@ -11,6 +11,7 @@ import (
 
 //Database Connection and Migration
 func Database() *sql.DB {
+	fmt.Println("Waiting For Migrations...")
 	migrations := &migrate.FileMigrationSource{
 		Dir: "models/migrations",
 	}
@@ -27,4 +28,3 @@ func Database() *sql.DB {
 	fmt.Printf("Applied %d migrations!\n", n)
 	return db
 }
-

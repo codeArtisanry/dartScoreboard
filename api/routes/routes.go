@@ -20,7 +20,7 @@ func Setup(app *fiber.App) {
 	group.Get("api/v1/games/:id/scoreboard", controllers.GetScoreboard)
 	group.Get("api/v1/games/:id/active-status", controllers.GetActiveStatusRes)
 	group.Get("api/v1/games/:id/players/:playerid/player-info", controllers.GetCurrentPlayerInfo)
-	group.Post("api/v1/games/:id/score", controllers.InsertScore)
+	group.Post("api/v1/games/:id/players/:playerid/rounds/:roundid/turns/:turnid/score", controllers.InsertScore)
 	group.Post("api/v1/games", controllers.InsertGame)
 	group.Put("api/v1/games/:id/", controllers.UpdateGame)
 	group.Delete("api/v1/games/:id", controllers.DeleteGame)
