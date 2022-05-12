@@ -176,7 +176,7 @@ export default {
           this.nameofgame.push(this.value[i].first_name);
         }
         if (this.game_responses.game_name === "") {
-          this.c = this.nameofgame.length - 1;
+          this.totalplayers = this.nameofgame.length - 1;
           this.game_responses.game_name =
             this.nameofgame[0] + ` +${this.totalplayers}  others`;
         }
