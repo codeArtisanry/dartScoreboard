@@ -13,7 +13,7 @@
         </svg>
       </b-button>
     </div>
-    <div class="col col-7 text-right">
+    <div class="col col-7 text-right mt-1">
       <img src="/dart-icon.png" height="35" alt="dart-icon" />
     </div>
     <b-sidebar
@@ -34,16 +34,31 @@
             {{ $store.state.auth.token.name }}
           </h6>
           <h6 class="text-muted">{{ $store.state.auth.token.email }}</h6>
-          <hr>
+          <hr />
           <b-nav vertical>
             <b-button
-              class="bg-light text-dark mt-3 border-0 hover font-weight-bolder text-dark"
+              class="
+                bg-light
+                text-dark
+                mt-3
+                border-0
+                hover
+                font-weight-bolder
+                text-dark
+              "
               @click="home"
               >Home</b-button
             >
             <b-link
               type="button"
-              class="btn btn-light btn-link mt-1 mb-4 border-0 font-weight-bolder text-dark text-decoration-none"
+              class="
+                btn btn-light btn-link
+                mt-1
+                mb-4
+                border-0
+                font-weight-bolder
+                text-dark text-decoration-none
+              "
               :href="logoutURL"
               @click="hide"
             >

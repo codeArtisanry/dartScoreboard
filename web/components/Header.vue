@@ -1,23 +1,23 @@
 <template>
   <div>
-    <div class="col float-right col-lg-4 mt-lg-5 mb-lg-3 my-md-2 text-center">
+    <div class="text-center">
       <div class="col pt-2 text-center">
-        <h1 class="text-muted">Welcome to</h1>
-        <h3 class="pt-2 pb-4 bold font-weight-bold">Dart Scoreboard</h3>
+        <h5 class="text-muted">Welcome to</h5>
+        <h4 class="pb-4 bold font-weight-bold">Dart Scoreboard</h4>
       </div>
       <div class="px-3">
         <button
           class="
-            col col-lg-12
             shadow
-            p-3
-            mb-3
+            px-5
+            py-3
+            font-weight-bolder
             border border-light border-start-0
-            rounded-pill
+            rounded
           "
           @click="creategame"
         >
-          Create Game
+          New Game
         </button>
         <br />
       </div>
@@ -30,8 +30,8 @@
 export default {
   methods: {
     creategame() {
-      this.$router.push('/games/new')
+      this.$router.push("/games/new");
     },
   },
-}
+};
 </script>
