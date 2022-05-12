@@ -157,8 +157,7 @@ func InsertScore(db *sql.DB, gameId int, playerId int, round int, turnId int, sc
 						fmt.Println(err)
 						return scoreRes, err
 					}
-					for throw :=
-						+1; throw <= 3; throw++ {
+					for throw := turnId + 1; throw <= 3; throw++ {
 						insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
 						if err != nil {
 							fmt.Println(err)
