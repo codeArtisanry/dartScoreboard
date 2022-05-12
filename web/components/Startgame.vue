@@ -104,7 +104,6 @@ export default {
       rounddata: "",
       players: "",
       scoreboard: "",
-      Dartboard: "",
       checkplayer: "",
       scoreofplayer: 0,
       playername: "",
@@ -117,7 +116,7 @@ export default {
   async created() {
     await this.checkplayerid();
     await this.getCurrentGame();
-    this.dartboard();
+
     if (
       this.currentgame.game_type === "Target Score-101" ||
       this.currentgame.game_type === "Target Score-301" ||
@@ -133,6 +132,27 @@ export default {
       this.currentgame.active_player_info.first_name +
       " " +
       this.currentgame.active_player_info.last_name;
+  },
+  mounted() {
+    // eslint-disable-next-line no-undef
+    const dartboard = new Dartboard("#dartboard");
+    console.log(dartboard, "Hello World");
+    dartboard.render();
+    document.querySelector("#dartboard").addEventListener("throw", (d) => {
+      this.$axios.$post(
+        `/api/v1/games/` +
+          this.$route.params.gameid +
+          `/players/` +
+          this.$route.params.playerid +
+          `/rounds/` +
+          this.$route.params.roundid +
+          `/turns/` +
+          this.$route.params.turnid +
+          `/score`,
+        d.detail
+      );
+      this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
+    });
   },
   methods: {
     async getCurrentGame() {
@@ -156,18 +176,6 @@ export default {
           this.scoreofplayer = this.scoreboard.players_score[i].total;
         }
       }
-    },
-    dartboard() {
-      // eslint-disable-next-line no-undef
-      const dartboard = new Dartboard("#dartboard");
-      dartboard.render();
-      document.querySelector("#dartboard").addEventListener("throw", (d) => {
-        this.$axios.$post(
-          `/api/v1/games/` + this.$route.params.gameid + `/score`,
-          d.detail
-        );
-        this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
-      });
     },
     async checkplayerid() {
       const res = await this.$axios.$get(

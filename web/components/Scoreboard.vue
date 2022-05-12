@@ -5,7 +5,7 @@
         <h4>
           Congratulations
           <b
-            ><u>{{ scoreboard.winner }}</u></b
+            ><u>{{ getWinner }}</u></b
           >
         </h4>
         <h5>You Win This Game</h5>
@@ -104,6 +104,9 @@ export default {
     };
   },
   computed: {
+    getWinner() {
+      return this.$store.getters.getWinnerName;
+    },
     players() {
       return this.$store.getters.getNameAndTotal;
     },
@@ -125,12 +128,10 @@ export default {
     },
     // call scoreboard api for perticuler game for get all players scores, total and get winner
     async getScoreboard() {
-      const scoreboardApiRes = await this.$axios.$get(
+      const scoreboard = await this.$axios.$get(
         `/api/v1/games/` + this.$route.params.gameid + `/scoreboard`
       );
-      this.scoreboard = scoreboardApiRes;
-      this.$store.commit("getScoreboard", this.scoreboard);
-      this.rounds = this.scoreboard.players_score[0].rounds;
+      this.$store.commit("getScoreboard", scoreboard);
     },
     // change total column for perticuler game type
     chanageTotalColHeader() {

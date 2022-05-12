@@ -176,6 +176,6 @@ func FoundWinner(db *sql.DB, id int) (string, error) {
 	if err != nil {
 		return winner, err
 	}
-	winner = first_name + last_name
+	winner = first_name + " " + " " + last_name
 	return winner, nil
 }

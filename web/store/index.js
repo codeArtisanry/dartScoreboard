@@ -42,6 +42,9 @@ export const actions = {
 };
 
 export const getters = {
+  getWinnerName: (state) => {
+    return state.scoreboard.winner;
+  },
   getCurrentGame: (state) => {
     return state.currentGame;
   },
@@ -65,6 +68,7 @@ export const getters = {
     if (players) {
       for (let gameDetails = 0; gameDetails < players.length; gameDetails++) {
         const gamedata = players[gameDetails];
+        console.log(gamedata);
       }
       return players;
     }

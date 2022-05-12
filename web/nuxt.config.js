@@ -1,33 +1,38 @@
 export default {
   ssr: true,
-  target: 'server',
+  target: "server",
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'web',
+    title: "web",
+    script: [
+      {
+        src: "https://unpkg.com/dartboard/dist/dartboard.js",
+      },
+    ],
     meta: [
       {
-        charset: 'utf-8',
+        charset: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        hid: 'description',
-        name: 'description',
-        content: '',
+        hid: "description",
+        name: "description",
+        content: "",
       },
       {
-        name: 'format-detection',
-        content: 'telephone=no',
+        name: "format-detection",
+        content: "telephone=no",
       },
     ],
     link: [
       {
-        rel: 'icon',
-        type: 'image/x-icon',
-        href: '/favicon.ico',
+        rel: "icon",
+        type: "image/x-icon",
+        href: "/favicon.ico",
       },
     ],
   },
@@ -44,12 +49,12 @@ export default {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/eslint
-    '@nuxtjs/eslint-module',
-    '@nuxtjs/fontawesome',
-    '@nuxtjs/dotenv',
+    "@nuxtjs/eslint-module",
+    "@nuxtjs/fontawesome",
+    "@nuxtjs/dotenv",
   ],
   fontawesome: {
-    component: 'fa',
+    component: "fa",
     icons: {
       solid: true,
       brands: true,
@@ -57,23 +62,23 @@ export default {
   },
   eslint: {
     /* module options */
-    extensions: ['js', 'vue'],
-    exclude: ['node_modules'],
+    extensions: ["js", "vue"],
+    exclude: ["node_modules"],
     fix: true,
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/bootstrap
-    'bootstrap-vue/nuxt',
+    "bootstrap-vue/nuxt",
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
+    "@nuxtjs/axios",
     // https://go.nuxtjs.dev/pwa
-    '@nuxtjs/pwa',
+    "@nuxtjs/pwa",
     // https://go.nuxtjs.dev/content
-    '@nuxt/content',
+    "@nuxt/content",
     // https://go.nuxtjs.dev/
-    'cookie-universal-nuxt',
+    "cookie-universal-nuxt",
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
@@ -83,13 +88,13 @@ export default {
     proxy: true,
   },
   proxy: {
-    '/api': `${process.env.BACKEND_URL}/`,
+    "/api": `${process.env.BACKEND_URL}/`,
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
     manifest: {
-      lang: 'en',
+      lang: "en",
     },
   },
 
@@ -103,4 +108,4 @@ export default {
   // router: {
   //   middleware: 'auth',
   // },
-}
+};
