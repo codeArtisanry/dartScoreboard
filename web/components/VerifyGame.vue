@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonNavBar />
+    <NavBar />
     <center>
       <div class="text-center container mx-2">
         <p class="font-weight-bolder">Game Name:</p>
