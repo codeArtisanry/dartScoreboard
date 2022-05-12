@@ -163,7 +163,15 @@ export default {
       dartboard.render();
       document.querySelector("#dartboard").addEventListener("throw", (d) => {
         this.$axios.$post(
-          `/api/v1/games/` + this.$route.params.gameid + `/score`,
+          `/api/v1/games/` +
+            this.$route.params.gameid +
+            `/players/` +
+            this.$route.params.playerid +
+            `/rounds/` +
+            this.$route.params.roundid +
+            `/turns/` +
+            this.$route.params.turnid +
+            `/score`,
           d.detail
         );
         this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
