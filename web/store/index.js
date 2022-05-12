@@ -57,4 +57,16 @@ export const getters = {
   getPlayerScore: (state) => {
     return state.scoreboard.players_score;
   },
+  getNameAndTotal: (state) => {
+    return state.scoreboard.players_score;
+  },
+  getgameDetails: (state) => {
+    const players = state.scoreboard.players_score;
+    if (players) {
+      for (let gameDetails = 0; gameDetails < players.length; gameDetails++) {
+        const gamedata = players[gameDetails];
+      }
+      return players;
+    }
+  },
 };
