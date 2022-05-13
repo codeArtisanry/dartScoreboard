@@ -30,7 +30,7 @@
           v-if="registerGame.creater_name == $store.state.auth.token.name"
           class="col text-center"
         >
-          <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
+          <button class="btn btn-danger" @click="DeleteGame()">Delete</button>
         </div>
         <div class="col text-center">
           <button class="btn btn-success" @click="startgame()">
@@ -97,3 +97,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+div {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <nav class="bg-light py-1 row">
+  <nav class="bg-light py-1 ml-0 row">
     <div class="col col-4">
       <b-button v-b-toggle.sidebar-no-header class="bg-light ml-4 border-0">
         <svg
@@ -37,28 +37,13 @@
           <hr />
           <b-nav vertical>
             <b-button
-              class="
-                bg-light
-                text-dark
-                mt-3
-                border-0
-                hover
-                font-weight-bolder
-                text-dark
-              "
+              class="bg-light text-dark mt-3 border-0 hover font-weight-bolder text-dark"
               @click="home"
               >Home</b-button
             >
             <b-link
               type="button"
-              class="
-                btn btn-light btn-link
-                mt-1
-                mb-4
-                border-0
-                font-weight-bolder
-                text-dark text-decoration-none
-              "
+              class="btn btn-light btn-link mt-1 mb-4 border-0 font-weight-bolder text-dark text-decoration-none"
               :href="logoutURL"
               @click="hide"
             >
@@ -85,3 +70,9 @@ export default {
   },
 };
 </script>
+<style scoped>
+nav {
+  width: 100%;
+  overflow-x: hidden;
+}
+</style>
