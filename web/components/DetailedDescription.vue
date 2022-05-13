@@ -11,7 +11,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="game in gameData" :key="game.id" @click="clicked(game.id)">
+          <tr
+            v-for="game in registerGame.game_responses"
+            :key="game.id"
+            @click="clicked(game.id)"
+          >
             <td>{{ game.game_name }}</td>
             <td>{{ game.game_type }}</td>
             <td>{{ game.game_status }}</td>
@@ -46,7 +50,7 @@
       <button
         v-else
         variant="outline-primary"
-        class="btn btn-sm btn-secondary col"
+        class="btn btn-sm btn-secondary col my-2"
         @click="postpage"
       >
         Next
@@ -62,13 +66,11 @@ export default {
       registerGame: "",
     };
   },
-  computed: {
-    gameData() {
-      return this.$store.getters.getGamesData.game_responses;
-    },
-  },
-  created() {
-    this.getGameData();
+  async created() {
+    await this.getGameData();
+    await this.postpage();
+    await this.prepage();
+    // console.log(this.gameData);
   },
   methods: {
     clicked(id) {
