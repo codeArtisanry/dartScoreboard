@@ -63,7 +63,7 @@
                 <th scope="col">Name</th>
                 <th
                   v-for="throwscore in rounddata"
-                  :key="throwscore"
+                  :key="throwscore.round"
                   scope="col"
                 >
                   R-{{ throwscore.round }}
@@ -72,11 +72,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="player in players" :key="player">
+              <tr v-for="player in players" :key="player.first_name">
                 <th scope="row">
                   {{ player.first_name + "  " + player.last_name }}
                 </th>
-                <td v-for="p in player.rounds" :key="p">
+                <td v-for="p in player.rounds" :key="p.total">
                   <mark
                     v-if="p.check_round == 'INVALID'"
                     style="background-color: #ffcccb"
@@ -136,7 +136,7 @@ export default {
   mounted() {
     // eslint-disable-next-line no-undef
     const dartboard = new Dartboard("#dartboard");
-    console.log(dartboard, "Hello World");
+
     dartboard.render();
     document.querySelector("#dartboard").addEventListener("throw", (d) => {
       this.$axios.$post(

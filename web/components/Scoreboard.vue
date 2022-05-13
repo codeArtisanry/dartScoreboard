@@ -1,96 +1,98 @@
 <template>
-  <div class="text-center mt-5 mb-5">
-    <div class="container text-center">
-      <div class="text-center">
-        <h4>
-          Congratulations
-          <b
-            ><u>{{ getWinner }}</u></b
-          >
-        </h4>
-        <h5>You Win This Game</h5>
-        <br />
-
-        <h3 class="text-center">{{ gameInfo.game_name }}</h3>
-        <h4 class="text-center">{{ gameInfo.game_type }}</h4>
-        <br />
-        <h5 class="text-center">ScoreBoard</h5>
-      </div>
-      <div class="text-center row">
-        <div class="table-responsive col-sm-12">
-          <table class="table-hover table showtable">
-            <tr>
-              <td colspan="2">
-                <b><u>Name</u></b>
-              </td>
-              <td>
-                <b
-                  ><u>{{ totalColHeader }}</u></b
-                >
-              </td>
-            </tr>
-
-            <tbody
-              v-for="(player, i) in players"
-              :key="i"
-              v-b-toggle="`${i}collapse`"
+  <client-only>
+    <div class="text-center mt-5 mb-5">
+      <div class="container text-center">
+        <div class="text-center">
+          <h4>
+            Congratulations
+            <b
+              ><u>{{ getWinner }}</u></b
             >
+          </h4>
+          <h5>You Win This Game</h5>
+          <br />
+
+          <h3 class="text-center">{{ gameInfo.game_name }}</h3>
+          <h4 class="text-center">{{ gameInfo.game_type }}</h4>
+          <br />
+          <h5 class="text-center">ScoreBoard</h5>
+        </div>
+        <div class="text-center row">
+          <div class="table-responsive col-sm-12">
+            <table class="table-hover table showtable">
               <tr>
                 <td colspan="2">
-                  {{ player.first_name + " " + player.last_name }}
+                  <b><u>Name</u></b>
                 </td>
-                <td>{{ player.total }}</td>
+                <td>
+                  <b
+                    ><u>{{ totalColHeader }}</u></b
+                  >
+                </td>
               </tr>
 
-              <b-collapse :id="`${i}collapse`">
+              <tbody
+                v-for="(player, i) in players"
+                :key="i"
+                v-b-toggle="`${i}collapse`"
+              >
                 <tr>
-                  <td>Round</td>
-                  <td>Darts</td>
-                  <td>Total</td>
+                  <td colspan="2">
+                    {{ player.first_name + " " + player.last_name }}
+                  </td>
+                  <td>{{ player.total }}</td>
                 </tr>
-                <tr v-for="(round, j) in player.rounds" :key="j" scope="row">
-                  <td scope="row">
-                    <mark
-                      v-if="round.check_round == 'INVALID'"
-                      style="background-color: #ffcccb"
-                    >
-                      {{ round.round }}
-                    </mark>
-                    <div v-else>{{ round.round }}</div>
-                  </td>
-                  <td>
-                    <mark
-                      v-if="round.check_round == 'INVALID'"
-                      style="background-color: #ffcccb"
-                      >{{ round.throws_score }}</mark
-                    >
-                    <div v-else>{{ round.throws_score }}</div>
-                  </td>
-                  <td>
-                    <mark
-                      v-if="round.check_round == 'INVALID'"
-                      style="background-color: #ffcccb"
-                      >{{ round.round_total }}</mark
-                    >
-                    <div v-else>{{ round.round_total }}</div>
-                  </td>
-                </tr>
-              </b-collapse>
-            </tbody>
-          </table>
-          <hr />
+
+                <b-collapse :id="`${i}collapse`">
+                  <tr>
+                    <td>Round</td>
+                    <td>Darts</td>
+                    <td>Total</td>
+                  </tr>
+                  <tr v-for="(round, j) in player.rounds" :key="j" scope="row">
+                    <td scope="row">
+                      <mark
+                        v-if="round.check_round == 'INVALID'"
+                        style="background-color: #ffcccb"
+                      >
+                        {{ round.round }}
+                      </mark>
+                      <div v-else>{{ round.round }}</div>
+                    </td>
+                    <td>
+                      <mark
+                        v-if="round.check_round == 'INVALID'"
+                        style="background-color: #ffcccb"
+                        >{{ round.throws_score }}</mark
+                      >
+                      <div v-else>{{ round.throws_score }}</div>
+                    </td>
+                    <td>
+                      <mark
+                        v-if="round.check_round == 'INVALID'"
+                        style="background-color: #ffcccb"
+                        >{{ round.round_total }}</mark
+                      >
+                      <div v-else>{{ round.round_total }}</div>
+                    </td>
+                  </tr>
+                </b-collapse>
+              </tbody>
+            </table>
+            <hr />
+          </div>
+        </div>
+
+        <div class="text-center"></div>
+        <br />
+        <div class="d-grid gap-2 col-6 mx-auto">
+          <button class="btn btn-secondary" type="button" @click="homepage">
+            Home Page
+          </button>
         </div>
       </div>
-
-      <div class="text-center"></div>
-      <br />
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-secondary" type="button" @click="homepage">
-          Home Page
-        </button>
-      </div>
     </div>
-  </div>
+  </client-only>
 </template>
 <script>
 export default {

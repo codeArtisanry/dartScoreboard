@@ -27,7 +27,7 @@
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
         <div class="col text-center">
-          <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
+          <button class="btn btn-danger" @click="DeleteGame()">Delete</button>
         </div>
         <div class="col text-center">
           <button class="btn btn-success" @click="startgame()">
@@ -85,7 +85,7 @@ export default {
     backToHome() {
       this.$router.push("/");
     },
-    async DeleteGame(id) {
+    async DeleteGame() {
       await this.$axios.$delete(
         `/api/v1/games` + "/" + this.$route.params.gameid
       );
