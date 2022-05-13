@@ -31,7 +31,7 @@ func GetGame(db *sql.DB, id int, gameRes types.GameResponse, user types.User, ga
 		Name:        gameRes.Name,
 		Type:        gameRes.Type,
 		Status:      gameRes.Status,
-		CreaterName: createrInfo.FirstName + createrInfo.LastName,
+		CreaterName: createrInfo.FirstName + " " + createrInfo.LastName,
 		Players:     PlayersInfo,
 	}
 	return gameResJson, nil
@@ -68,7 +68,7 @@ func GetGames(db *sql.DB, offset string, gameRes types.GameResponse, user types.
 			Name:        gameRes.Name,
 			Type:        gameRes.Type,
 			Status:      gameRes.Status,
-			CreaterName: createrInfo.FirstName + createrInfo.LastName,
+			CreaterName: createrInfo.FirstName + " " + createrInfo.LastName,
 			Players:     playersInfo}
 		gamesResJson = append(gamesResJson, gameResJson)
 	}

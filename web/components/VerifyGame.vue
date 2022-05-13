@@ -26,8 +26,11 @@
         >
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
-        <div class="col text-center">
-          <button class="btn btn-danger" @click="DeleteGame()">Delete</button>
+        <div
+          v-if="registerGame.creater_name == $store.state.auth.token.name"
+          class="col text-center"
+        >
+          <button class="btn btn-danger" @click="DeleteGame(id)">Delete</button>
         </div>
         <div class="col text-center">
           <button class="btn btn-success" @click="startgame()">
