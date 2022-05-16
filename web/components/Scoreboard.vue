@@ -37,7 +37,19 @@
                 v-b-toggle="`${i}collapse`"
               >
                 <tr>
-                  <td colspan="2">
+                  <td>
+                    <div class="d-flex justify-content-center">
+                      <div>
+                        <img
+                          height="10"
+                          src="/downarrow.svg"
+                          alt="click here"
+                          class="text-white mb-1 mr-2"
+                        />
+                      </div>
+                    </div>
+                  </td>
+                  <td colspan="1">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
                   <td>{{ player.total }}</td>
