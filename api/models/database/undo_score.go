@@ -54,7 +54,7 @@ func FindLastScoreId(db *sql.DB, id int, lastScoreDetails lastScoreDetails) (las
 	return lastScoreDetails, nil
 }
 
-// Delete Score'srow by Perticuler Score Id
+// Delete last Score by Particular Score Id
 func DeleteScore(db *sql.DB, scoreId int) error {
 	delete, err := db.Prepare("DELETE FROM scores WHERE id = ?;")
 	if err != nil {
