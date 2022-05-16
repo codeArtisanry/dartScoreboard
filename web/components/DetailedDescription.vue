@@ -68,9 +68,6 @@ export default {
   },
   async created() {
     await this.getGameData();
-    await this.postpage();
-    await this.prepage();
-    // console.log(this.gameData);
   },
   methods: {
     clicked(id) {
