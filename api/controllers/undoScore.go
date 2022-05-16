@@ -18,8 +18,8 @@ func UndoScore(ctx *fiber.Ctx) error {
 	}
 	err = models.UndoScore(db, gameId)
 	if err != nil {
-		return ctx.Status(400).JSON(types.StatusCode{
-			StatusCode: 400,
+		return ctx.Status(500).JSON(types.StatusCode{
+			StatusCode: 500,
 			Message:    "Internal Server Error",
 		})
 	}

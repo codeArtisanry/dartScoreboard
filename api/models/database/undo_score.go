@@ -14,7 +14,7 @@ type lastScoreDetails struct {
 	validate string
 }
 
-// Delete Games From Games Table By Game Id
+// Delete Last Inserted Score By GameId
 func UndoScore(db *sql.DB, id int) error {
 	for i := 1; i <= 3; i++ {
 		lastScoreDetails, err := FindLastScoreId(db, id, lastScoreDetails{})
