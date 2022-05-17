@@ -25,9 +25,7 @@
                   <b><u>Name</u></b>
                 </td>
                 <td>
-                  <b
-                    ><u>{{ totalColHeader }}</u></b
-                  >
+                  <b><u>Total Score</u></b>
                 </td>
               </tr>
 
@@ -52,7 +50,16 @@
                   <td colspan="1">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
-                  <td>{{ player.total }}</td>
+                  <td v-if="gameInfo.game_type == 'High Score'">
+                    {{ player.total }}
+                  </td>
+                  <td v-else-if="gameInfo.game_type == 'Target Score-101'">
+                    {{ 101 - player.total }}
+                  </td>
+                  <td v-else-if="gameInfo.game_type == 'Target Score-301'">
+                    {{ 301 - player.total }}
+                  </td>
+                  <td v-else>{{ 501 - player.total }}</td>
                 </tr>
 
                 <b-collapse :id="`${i}collapse`">
@@ -113,7 +120,6 @@ export default {
       gameInfo: "",
       scoreboard: "",
       rounds: "",
-      totalColHeader: "",
       count: 0,
     };
   },
@@ -138,7 +144,6 @@ export default {
         `/api/v1/games/` + this.$route.params.gameid
       );
       this.gameInfo = gameApiRes;
-      this.chanageTotalColHeader();
     },
     // call scoreboard api for perticuler game for get all players scores, total and get winner
     async getScoreboard() {
@@ -146,14 +151,6 @@ export default {
         `/api/v1/games/` + this.$route.params.gameid + `/scoreboard`
       );
       this.$store.commit("getScoreboard", scoreboard);
-    },
-    // change total column for perticuler game type
-    chanageTotalColHeader() {
-      if (this.gameInfo.game_type === "High Score") {
-        this.totalColHeader = "Total Score";
-      } else {
-        this.totalColHeader = "Remaining Score";
-      }
     },
     homepage() {
       this.$router.push("/");
