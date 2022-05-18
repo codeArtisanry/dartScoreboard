@@ -26,14 +26,14 @@ func FindGamePlayers(db *sql.DB, gameId int) ([]int, error) {
 	query := fmt.Sprintf("SELECT user_id FROM game_players WHERE game_id = %d;", gameId)
 	rows, err := db.Query(query)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return playersList, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		err = rows.Scan(&player)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 			return playersList, err
 		}
 		playersList = append(playersList, player)
