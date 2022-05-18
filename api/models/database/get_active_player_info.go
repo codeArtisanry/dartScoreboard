@@ -4,6 +4,8 @@ import (
 	"dartscoreboard/models/types"
 	"database/sql"
 	"fmt"
+	"strconv"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -31,6 +33,15 @@ func GetCurrentPlayerInfo(db *sql.DB, gameId int, playerId int, gameRes types.Ga
 	err = rowsPlayerTotal.Scan(&ActivePlayerInfo.Score)
 	if err != nil {
 		return CurrentPlayerInfo, err
+	}
+	GameType := strings.Split(gameRes.Type, "-")
+	if GameType[0] == "Target Score" {
+		TargetScore, err := strconv.Atoi(GameType[1])
+		if err != nil {
+			fmt.Println(err)
+			return CurrentPlayerInfo, err
+		}
+		ActivePlayerInfo.Score = TargetScore - ActivePlayerInfo.Score
 	}
 	queryPlayer := fmt.Sprintf("SELECT id, first_name, last_name, email FROM users WHERE id = %d", playerId)
 	rowsPlayers := db.QueryRow(queryPlayer)
