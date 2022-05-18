@@ -24,5 +24,5 @@ func Setup(app *fiber.App) {
 	group.Post("api/v1/games", controllers.InsertGame)
 	group.Put("api/v1/games/:id/", controllers.UpdateGame)
 	group.Delete("api/v1/games/:id", controllers.DeleteGame)
-	group.Delete("api/v1/games/:id/undo-score", controllers.UndoScore)
+	group.Delete("api/v1/games/:id/players/:playerid/rounds/:roundid/turns/:turnid/undo-score", controllers.UndoScore)
 }
