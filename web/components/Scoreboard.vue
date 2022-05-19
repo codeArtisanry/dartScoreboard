@@ -21,7 +21,7 @@
           <div class="table-responsive col-sm-12">
             <table class="table-hover table showtable">
               <tr>
-                <td colspan="2">
+                <td colspan="4">
                   <b><u>Name</u></b>
                 </td>
                 <td>
@@ -46,7 +46,7 @@
                       </div>
                     </div>
                   </td>
-                  <td colspan="1">
+                  <td colspan="3">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
                   <td v-if="getGame.game_type == 'High Score'">
@@ -63,7 +63,9 @@
                 <b-collapse :id="`${i}collapse`">
                   <tr>
                     <td>Round</td>
-                    <td>Darts</td>
+                    <td>D-1</td>
+                    <td>D-2</td>
+                    <td>D-3</td>
                     <td>Total</td>
                   </tr>
                   <tr v-for="(round, j) in player.rounds" :key="j" scope="row">
@@ -76,14 +78,22 @@
                       </mark>
                       <div v-else>{{ round.round }}</div>
                     </td>
-                    <td>
+                    <td
+                      v-for="(dart, index) in round.throws_score"
+                      :key="index"
+                    >
                       <mark
                         v-if="round.check_round == 'INVALID'"
                         style="background-color: #ffcccb"
-                        >{{ round.throws_score }}</mark
+                        >{{ dart }}</mark
                       >
-                      <div v-else>{{ round.throws_score }}</div>
+                      <div v-else>{{ dart }}</div>
                     </td>
+                    <td v-if="round.throws_score == null" colspan="3">-</td>
+                    <td v-else-if="round.throws_score.length == 1" colspan="2">
+                      -
+                    </td>
+                    <td v-else-if="round.throws_score.length == 2">-</td>
                     <td>
                       <mark
                         v-if="round.check_round == 'INVALID'"

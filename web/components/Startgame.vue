@@ -76,15 +76,23 @@
                   {{ player.first_name + "  " + player.last_name }}
                 </th>
                 <td v-for="p in player.rounds" :key="p.total">
-                  <mark
-                    v-if="p.check_round == 'INVALID'"
-                    style="background-color: #ffcccb"
-                  >
-                    {{ p.throws_score }}
-                  </mark>
-                  <div v-else>
-                    {{ p.throws_score }}
-                  </div>
+                  <ul class="list-inline">
+                    <li
+                      v-for="(dart, index) in p.throws_score"
+                      :key="index"
+                      class="list-inline-item"
+                    >
+                      <mark
+                        v-if="p.check_round == 'INVALID'"
+                        style="background-color: #ffcccb"
+                      >
+                        {{ dart }}
+                      </mark>
+                      <div v-else>
+                        {{ dart }}
+                      </div>
+                    </li>
+                  </ul>
                 </td>
                 <td>{{ player.total }}</td>
               </tr>
