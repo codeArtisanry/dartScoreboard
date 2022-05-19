@@ -40,7 +40,7 @@ func UndoScore(ctx *fiber.Ctx) error {
 	activeRes := types.ActiveStatus{}
 	currentStateOfGame, err := models.GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
-		return ctx.Status(400).JSON(types.StatusCode{
+		return ctx.Status(500).JSON(types.StatusCode{
 			StatusCode: 500,
 			Message:    "Internal Server Error",
 		})
