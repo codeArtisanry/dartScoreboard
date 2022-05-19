@@ -124,6 +124,28 @@ func UndoScore(db *sql.DB, gameId int, round int, playerId int, turn int) error 
 				return err
 			}
 			log.Println("Successfully Deleted", lastScoreDetails.scoreId, "ScoreId")
+			// Find Previous Turns of that player in that particular round
+			var count int
+			countRemainingScore := fmt.Sprintf("SELECT count(score) from scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE game_id = %d AND round = %d);", gameId, previousTurn.playerId, gameId, previousTurn.round)
+			RemainingScore := db.QueryRow(countRemainingScore)
+			err := RemainingScore.Scan(&count)
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+			if count != 0 {
+				// Update Previous Turns Validation Score for Particular Round and Player to Valid
+				invalidToValid, err := db.Prepare("UPDATE scores SET is_valid = ? WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = ? AND user_id = ?) AND round_id = (SELECT id FROM rounds WHERE game_id = ? AND round = ?);")
+				if err != nil {
+					log.Println(err)
+					return err
+				}
+				_, err = invalidToValid.Exec("VALID", gameId, previousTurn.playerId, gameId, previousTurn.round)
+				if err != nil {
+					log.Println(err)
+					return err
+				}
+			}
 			break
 		}
 		previousTurn = FindPreviousTurn(previousTurn.round, previousTurn.playerId, previousTurn.turn, gamePlayerList)
