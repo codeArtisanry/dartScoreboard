@@ -1,34 +1,35 @@
 <template>
   <div></div>
 </template>
-
 <script>
 export default {
-  middleware: 'notauth',
-
+  computed: {
+    getTurn() {
+      return this.$store.state.game.currentTurn;
+    },
+  },
   async created() {
-    await this.checkPlayerTurn()
+    await this.currentTurnApi();
   },
   methods: {
-    async checkPlayerTurn() {
-      const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/active-status`
-      )
-      if (res.player_id === 0) {
-        this.$router.push(`/games/` + res.game_id + `/scoreboard`)
+    async currentTurnApi() {
+      await this.$store.dispatch(
+        "game/getCurrentTurn",
+        this.$route.params.gameid
+      );
+      this.scoreboard();
+    },
+    scoreboard() {
+      if (this.getTurn.round === 0) {
+        this.$router.push(
+          "/games/" + this.$route.params.gameid + "/scoreboard"
+        );
       } else {
         this.$router.push(
-          `/games/` +
-            res.game_id +
-            `/player/` +
-            res.player_id +
-            `/round/` +
-            res.round +
-            `/turns/` +
-            res.throw
-        )
+          `/games/${this.$route.params.gameid}/player/${this.getTurn.player_id}/round/${this.getTurn.round}/turns/${this.getTurn.throw}`
+        );
       }
     },
   },
-}
+};
 </script>

@@ -6,14 +6,14 @@
           <h4>
             Congratulations
             <b
-              ><u>{{ getWinner }}</u></b
+              ><u>{{ getScoreboardStore.winner }}</u></b
             >
           </h4>
           <h5>You Win This Game</h5>
           <br />
 
-          <h3 class="text-center">{{ gameInfo.game_name }}</h3>
-          <h4 class="text-center">{{ gameInfo.game_type }}</h4>
+          <h3 class="text-center">{{ getGame.game_name }}</h3>
+          <h4 class="text-center">{{ getGame.game_type }}</h4>
           <br />
           <h5 class="text-center">ScoreBoard</h5>
         </div>
@@ -28,9 +28,8 @@
                   <b><u>Total Score</u></b>
                 </td>
               </tr>
-
               <tbody
-                v-for="(player, i) in players"
+                v-for="(player, i) in getScoreboardStore.players_score"
                 :key="i"
                 v-b-toggle="`${i}collapse`"
               >
@@ -50,18 +49,17 @@
                   <td colspan="1">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
-                  <td v-if="gameInfo.game_type == 'High Score'">
+                  <td v-if="getGame.game_type == 'High Score'">
                     {{ player.total }}
                   </td>
-                  <td v-else-if="gameInfo.game_type == 'Target Score-101'">
+                  <td v-else-if="getGame.game_type == 'Target Score-101'">
                     {{ 101 - player.total }}
                   </td>
-                  <td v-else-if="gameInfo.game_type == 'Target Score-301'">
+                  <td v-else-if="getGame.game_type == 'Target Score-301'">
                     {{ 301 - player.total }}
                   </td>
                   <td v-else>{{ 501 - player.total }}</td>
                 </tr>
-
                 <b-collapse :id="`${i}collapse`">
                   <tr>
                     <td>Round</td>
@@ -101,7 +99,6 @@
             <hr />
           </div>
         </div>
-
         <div class="text-center"></div>
         <br />
         <div class="d-grid gap-2 col-6 mx-auto">
@@ -115,45 +112,30 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      gameInfo: "",
-      scoreboard: "",
-      rounds: "",
-      count: 0,
-    };
-  },
   computed: {
-    getWinner() {
-      return this.$store.getters.getWinnerName;
+    getGame() {
+      return this.$store.state.game.game;
     },
-    players() {
-      return this.$store.getters.getNameAndTotal;
-    },
-    getDetails() {
-      return this.$store.getters.getgameDetails;
+    getScoreboardStore() {
+      return this.$store.state.game.scoreboard;
     },
   },
   async created() {
-    await this.getCurrentGame();
-    await this.getScoreboard();
+    await this.gameApi();
+    await this.scoreboardApi();
   },
   methods: {
-    async getCurrentGame() {
-      const gameApiRes = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid
-      );
-      this.gameInfo = gameApiRes;
-    },
-    // call scoreboard api for perticuler game for get all players scores, total and get winner
-    async getScoreboard() {
-      const scoreboard = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid + `/scoreboard`
-      );
-      this.$store.commit("getScoreboard", scoreboard);
-    },
     homepage() {
       this.$router.push("/");
+    },
+    async gameApi() {
+      await this.$store.dispatch("game/getGame", this.$route.params.gameid);
+    },
+    async scoreboardApi() {
+      await this.$store.dispatch(
+        "game/getScoreboard",
+        this.$route.params.gameid
+      );
     },
   },
 };

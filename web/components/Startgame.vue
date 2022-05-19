@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavBar />
     <script src="https://unpkg.com/dartboard/dist/dartboard.js"></script>
     <div class="container text-center">
       <div class="bg-white rounded">
@@ -17,7 +16,7 @@
             <tr>
               <th class="text-center" scope="row">Player Name</th>
               <td scope="col">
-                {{ playername }}
+                {{ playerName }}
               </td>
             </tr>
           </tbody>
@@ -25,24 +24,21 @@
             <tr>
               <th class="text-center" scope="row">Round, Turn</th>
               <td scope="col">
-                {{ currentgame.round }}, {{ currentgame.throw }}
+                {{ getPlayerInfo.round }}, {{ getPlayerInfo.throw }}
               </td>
             </tr>
           </tbody>
           <tbody>
             <tr>
               <th class="text-center" scope="row">{{ gameScore }}</th>
-              <td>{{ scoreofplayer }}</td>
+              <td>{{ playerScore }}</td>
             </tr>
           </tbody>
         </table>
       </div>
       <div>
         <!-- Using value -->
-        <b-button
-          v-b-toggle="'collapse-2'"
-          class="m-1 px-3"
-          @click="getCurrentGame"
+        <b-button v-b-toggle="'collapse-2'" class="m-1 px-3"
           ><div class="d-flex justify-content-around">
             <div>
               <img
@@ -62,17 +58,20 @@
               <tr>
                 <th scope="col">Name</th>
                 <th
-                  v-for="throwscore in rounddata"
-                  :key="throwscore.round"
+                  v-for="roundInfo in totalRounds"
+                  :key="roundInfo.round"
                   scope="col"
                 >
-                  R-{{ throwscore.round }}
+                  R-{{ roundInfo.round }}
                 </th>
                 <th scope="col">{{ gameScore }}</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="player in players" :key="player.first_name">
+              <tr
+                v-for="player in getScoreboard.players_score"
+                :key="player.first_name"
+              >
                 <th scope="row">
                   {{ player.first_name + "  " + player.last_name }}
                 </th>
@@ -101,117 +100,74 @@
 export default {
   data() {
     return {
-      rounddata: "",
-      players: "",
-      scoreboard: "",
-      checkplayer: "",
-      scoreofplayer: 0,
-      playername: "",
-      registerGame: "",
+      playerName: "",
+      playerScore: "",
       gameScore: "",
-      currentgame: "",
-      players_score: [],
+      totalRounds: "",
     };
   },
+  computed: {
+    getPlayerInfo() {
+      return this.$store.state.game.playerInfo;
+    },
+    getScoreboard() {
+      return this.$store.state.game.scoreboard;
+    },
+  },
   async created() {
-    await this.checkplayerid();
-    await this.getCurrentGame();
-
-    if (
-      this.currentgame.game_type === "Target Score-101" ||
-      this.currentgame.game_type === "Target Score-301" ||
-      this.currentgame.game_type === "Target Score-501"
-    ) {
-      this.gameScore = "Remaining Score";
-    } else {
-      this.gameScore = "Score";
-    }
-    this.players = this.scoreboard.players_score;
-    this.rounddata = this.scoreboard.players_score[0].rounds;
-    this.playername =
-      this.currentgame.active_player_info.first_name +
-      " " +
-      this.currentgame.active_player_info.last_name;
+    await this.playerInfoApi();
+    await this.scoreboardApi();
+    this.changeScoreColHeader();
+    this.fetchUpdatedData();
   },
   mounted() {
     // eslint-disable-next-line no-undef
     const dartboard = new Dartboard("#dartboard");
-
     dartboard.render();
-    document.querySelector("#dartboard").addEventListener("throw", (d) => {
-      this.$axios.$post(
-        `/api/v1/games/` +
-          this.$route.params.gameid +
-          `/players/` +
-          this.$route.params.playerid +
-          `/rounds/` +
-          this.$route.params.roundid +
-          `/turns/` +
-          this.$route.params.turnid +
-          `/score`,
-        d.detail
-      );
-      this.$router.push(`/games/` + this.checkplayer.game_id + `/player/`);
-    });
+    document
+      .querySelector("#dartboard")
+      .addEventListener("throw", async (d) => {
+        await this.postScoreApi(d.detail);
+        this.$router.push(`/games/${this.$route.params.gameid}/player`);
+      });
   },
   methods: {
-    async getCurrentGame() {
-      const res = await this.$axios.$get(
-        `api/v1/games/` +
-          this.$route.params.gameid +
-          `/players/` +
-          this.$route.params.playerid +
-          `/player-info`
-      );
-      this.currentgame = res;
-      const res1 = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/scoreboard`
-      );
-      this.scoreboard = res1;
-      for (let i = 0; i <= this.scoreboard.players_score.length - 1; i++) {
-        if (
-          this.currentgame.active_player_info.first_name ===
-          this.scoreboard.players_score[i].first_name
-        ) {
-          this.scoreofplayer = this.scoreboard.players_score[i].total;
-        }
-      }
+    async postScoreApi(dartScore) {
+      await this.$store.dispatch("game/postScore", {
+        gameId: this.$route.params.gameid,
+        playerId: this.$route.params.playerid,
+        roundId: this.$route.params.roundid,
+        turnId: this.$route.params.turnid,
+        score: dartScore,
+      });
     },
-    async checkplayerid() {
-      const res = await this.$axios.$get(
-        `api/v1/games/` + this.$route.params.gameid + `/active-status`
+    async playerInfoApi() {
+      await this.$store.dispatch("game/getGamePlayerInfo", {
+        gameId: this.$route.params.gameid,
+        playerId: this.$route.params.playerid,
+      });
+    },
+    async scoreboardApi() {
+      await this.$store.dispatch(
+        "game/getScoreboard",
+        this.$route.params.gameid
       );
-      this.checkplayer = res;
-      if (res.player_id === 0) {
-        this.$router.push(
-          `/games/` + this.$route.params.gameid + `/scoreboard`
-        );
+    },
+    fetchUpdatedData() {
+      this.playerName =
+        this.$store.state.game.playerInfo.active_player_info.first_name +
+        " " +
+        this.$store.state.game.playerInfo.active_player_info.last_name;
+      this.playerScore =
+        this.$store.state.game.playerInfo.active_player_info.score;
+      this.totalRounds =
+        this.$store.state.game.scoreboard.players_score[0].rounds;
+    },
+    changeScoreColHeader() {
+      if (this.getPlayerInfo.game_type === "High Score") {
+        this.gameScore = "Total Score";
       } else {
-        const res = await this.$axios.$get(
-          `api/v1/games/` + this.$route.params.gameid + `/active-status`
-        );
-        this.checkplayer = res;
-        this.$router.push(
-          `/games/` +
-            res.game_id +
-            `/player/` +
-            res.player_id +
-            `/round/` +
-            res.round +
-            `/turns/` +
-            res.throw
-        );
-      }
-    },
-    onlyNumber($event) {
-      const keyCode = $event.keyCode ? $event.keyCode : $event.which;
-      if (keyCode < 0 || keyCode > 60) {
-        $event.preventDefault();
-      }
-    },
-    noSpecialchar(e) {
-      if (/^\W$/.test(e.key)) {
-        e.preventDefault();
+        this.gameScore = "Remaining Score";
       }
     },
   },

@@ -153,18 +153,30 @@ export default {
       totalplayers: 0,
     };
   },
+  computed: {
+    getGame() {
+      return this.$store.state.game.game;
+    },
+    getUsers() {
+      return this.$store.state.game.users;
+    },
+  },
   async created() {
+    await this.users();
     if (this.$route.params.gameid !== undefined) {
-      await this.getGameData();
-      this.withupdate();
+      await this.game();
+      this.withUpdate();
     }
-    this.usertable();
   },
   methods: {
     // eslint-disable-next-line camelcase
     nameWithLang({ first_name, last_name, email }) {
       // eslint-disable-next-line camelcase
       return `${first_name} ${last_name} — [${email}]`;
+    },
+    async users() {
+      await this.$store.dispatch("game/getUsers");
+      this.options = this.getUsers.user_responses;
     },
     register() {
       if (this.value.length === 0) {
@@ -180,21 +192,18 @@ export default {
           this.game_responses.game_name =
             this.nameofgame[0] + ` +${this.totalplayers}  others`;
         }
-        this.postgamedata();
+        this.postGame();
       }
     },
-    async postgamedata() {
-      await this.$axios.$post(`/api/v1/games`, this.game_responses);
+    async postGame() {
+      await this.$store.dispatch("game/postGame", this.game_responses);
     },
-    async getGameData() {
-      const res = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid
-      );
-      this.game_responses = res;
+    async game() {
+      await this.$store.dispatch("game/getGame", this.$route.params.gameid);
+      this.game_responses = this.getGame;
     },
     async updatedata() {
-      const res = await this.$axios.$get(`/api/v1/users`);
-      this.options = res.user_responses;
+      this.options = this.getUsers.user_responses;
       this.game_responses.players = [];
       for (let j = 0; j <= this.value.length - 1; j++) {
         for (let k = 0; k <= this.options.length - 1; k++) {
@@ -203,36 +212,14 @@ export default {
           }
         }
       }
-      await this.$axios.$put(
-        `/api/v1/games/` + this.$route.params.gameid,
-        this.game_responses
-      );
+      await this.$store.dispatch("game/updateGame", {
+        gameId: this.$route.params.gameid,
+        update: this.game_responses,
+      });
       this.$router.push("/");
     },
-    async usertable() {
-      const res = await this.$axios.$get(`/api/v1/users`);
-      this.options = res.user_responses;
-    },
-    async withupdate() {
-      const res = await this.$axios.$get(`/api/v1/users`);
-      this.options = res.user_responses;
-      for (let j = 0; j <= this.game_responses.players.length - 1; j++) {
-        for (let k = 0; k <= this.options.length - 1; k++) {
-          if (this.game_responses.players[j].id === this.options[k].id) {
-            this.value.push(this.options[k]);
-            this.game_responses.players.push(this.options[k].id);
-          }
-        }
-      }
-
-      this.game_responses.players = [];
-      for (let j = 0; j <= this.value.length - 1; j++) {
-        for (let k = 0; k <= this.options.length - 1; k++) {
-          if (this.value[j].id === this.options[k].id) {
-            this.game_responses.players.push(this.options[k].id);
-          }
-        }
-      }
+    withUpdate() {
+      this.value = this.getGame.players;
     },
   },
 };

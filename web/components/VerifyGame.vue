@@ -4,33 +4,40 @@
     <center>
       <div class="text-center container mx-2">
         <p class="font-weight-bolder">Game Name:</p>
-        <p class="text text-muted">{{ registerGame.game_name }}</p>
+        <p class="text text-muted">{{ getGame.game_name }}</p>
         <hr />
         <p class="font-weight-bolder">Game Type:</p>
-        <p class="text text-muted">{{ registerGame.game_type }}</p>
+        <p class="text text-muted">{{ getGame.game_type }}</p>
+        <hr />
+        <p class="font-weight-bolder">Creater Name:</p>
+        <p class="text text-muted">{{ getGame.creater_name }}</p>
         <hr />
         <p class="font-weight-bolder">Players Names:</p>
         <p
-          v-for="player in registerGame.players"
+          v-for="player in getGame.players"
           :key="player.id"
           class="text-muted"
         >
           {{ player.first_name }}
         </p>
       </div>
-
       <div class="row">
         <div
-          v-if="registerGame.game_status == 'Not Started'"
+          v-if="
+            getGame.game_status == 'Not Started' &&
+            getGame.creater_name == $store.state.auth.token.name
+          "
           class="col text-center"
         >
           <button class="btn btn-info" @click="updateGame">Update</button>
         </div>
         <div
-          v-if="registerGame.creater_name == $store.state.auth.token.name"
+          v-if="getGame.creater_name == $store.state.auth.token.name"
           class="col text-center"
         >
-          <button class="btn btn-danger" @click="DeleteGame()">Delete</button>
+          <button class="btn btn-danger" @click="DeleteGame(getGame.id)">
+            Delete
+          </button>
         </div>
         <div class="col text-center">
           <button class="btn btn-success" @click="startgame()">
@@ -51,22 +58,26 @@
 export default {
   data() {
     return {
-      registerGame: "",
       button: "",
     };
   },
-  created() {
-    this.getGameData();
+  computed: {
+    getGame() {
+      return this.$store.state.game.game;
+    },
+  },
+  async created() {
+    await this.gameApi();
+    this.changeButton();
   },
   methods: {
-    async getGameData() {
-      const res = await this.$axios.$get(
-        `/api/v1/games/` + this.$route.params.gameid
-      );
-      this.registerGame = res;
-      if (this.registerGame.game_status === "Not Started") {
+    async gameApi() {
+      await this.$store.dispatch("game/getGame", this.$route.params.gameid);
+    },
+    changeButton() {
+      if (this.getGame.game_status === "Not Started") {
         this.button = "Start";
-      } else if (this.registerGame.game_status === "In Progress") {
+      } else if (this.getGame.game_status === "In Progress") {
         this.button = "Resume";
       } else {
         this.button = "Scoreboard";
@@ -74,8 +85,8 @@ export default {
     },
     updateGame() {
       if (
-        this.registerGame.game_status === "In Progress" ||
-        this.registerGame.game_status === "Completed"
+        this.getGame.game_status === "In Progress" ||
+        this.getGame.game_status === "Completed"
       ) {
         alert("not capable to update");
       } else {
@@ -83,15 +94,19 @@ export default {
       }
     },
     startgame() {
-      this.$router.push("/games/" + this.$route.params.gameid + "/player/");
+      if (this.getGame.game_status === "Completed") {
+        this.$router.push(
+          "/games/" + this.$route.params.gameid + "/scoreboard/"
+        );
+      } else {
+        this.$router.push("/games/" + this.$route.params.gameid + "/player/");
+      }
     },
     backToHome() {
       this.$router.push("/");
     },
-    async DeleteGame() {
-      await this.$axios.$delete(
-        `/api/v1/games` + "/" + this.$route.params.gameid
-      );
+    DeleteGame(id) {
+      this.$store.dispatch("game/deleteGame", id);
       this.$router.push("/");
     },
   },
