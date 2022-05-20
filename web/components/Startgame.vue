@@ -11,6 +11,25 @@
             style="width: 22rem; height: 22rem"
           ></div>
         </div>
+        <br />
+        <div class="form-text text-muted ml-4">
+          Rules for Use Dartboard
+          <span>
+            <a v-b-modal.modalPopover class="bg-white text-primary border-0"
+              >Read...</a
+            >
+            <b-modal id="modalPopover" title="Rules for Use Dartboard" ok-only>
+              <div class="col sm-12">
+                <img
+                  class="img-responsive"
+                  width="100%"
+                  src="/scoreboard.png"
+                  alt="scoreboard-icon"
+                />
+              </div>
+            </b-modal>
+          </span>
+        </div>
         <table class="table table-striped shadow mt-3">
           <tbody>
             <tr>
