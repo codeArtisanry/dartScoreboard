@@ -140,9 +140,13 @@ export default {
     getScoreboard() {
       return this.$store.state.game.scoreboard;
     },
+    getTurn() {
+      return this.$store.state.game.currentTurn;
+    },
   },
   async created() {
-    await this.playerInfoApi();
+    await this.currentTurnApi();
+    await this.loadPlayerInfoApi();
     await this.scoreboardApi();
     this.changeScoreColHeader();
     this.fetchUpdatedData();
@@ -155,10 +159,19 @@ export default {
       .querySelector("#dartboard")
       .addEventListener("throw", async (d) => {
         await this.postScoreApi(d.detail);
-        this.$router.push(`/games/${this.$route.params.gameid}/player`);
+        await this.currentTurnApi();
+        await this.playerInfoApi();
+        await this.scoreboardApi();
+        this.fetchUpdatedData();
       });
   },
   methods: {
+    async loadPlayerInfoApi() {
+      await this.$store.dispatch("game/getGamePlayerInfo", {
+        gameId: this.$route.params.gameid,
+        playerId: this.getTurn.player_id,
+      });
+    },
     async postScoreApi(dartScore) {
       await this.$store.dispatch("game/postScore", {
         gameId: this.$route.params.gameid,
@@ -179,6 +192,24 @@ export default {
         "game/getScoreboard",
         this.$route.params.gameid
       );
+    },
+    async currentTurnApi() {
+      await this.$store.dispatch(
+        "game/getCurrentTurn",
+        this.$route.params.gameid
+      );
+      this.scoreboard();
+    },
+    scoreboard() {
+      if (this.getTurn.round === 0) {
+        this.$router.push(
+          "/games/" + this.$route.params.gameid + "/scoreboard"
+        );
+      } else {
+        this.$router.push(
+          `/games/${this.$route.params.gameid}/player/${this.getTurn.player_id}/round/${this.getTurn.round}/turns/${this.getTurn.throw}`
+        );
+      }
     },
     fetchUpdatedData() {
       this.playerName =
