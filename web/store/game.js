@@ -74,6 +74,18 @@ const actions = {
         }
       });
   },
+
+  async undoScore({ commit }, params) {
+    await this.$axios
+      .$delete(
+        `/api/v1/games/${params.gameId}/players/${params.playerId}/rounds/${params.roundId}/turns/${params.turnId}/undo-score`
+      )
+      .catch((error) => {
+        if (error.response.status === 500) {
+          alert("Already Undo This Score");
+        }
+      });
+  },
 };
 
 const mutations = {

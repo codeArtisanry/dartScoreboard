@@ -30,6 +30,10 @@
             </b-modal>
           </span>
         </div>
+        <br /><br />
+        <div class="text-center">
+          <button class="btn btn-secondary" @click="undoLastScore">Undo</button>
+        </div>
         <table class="table table-striped shadow mt-3">
           <tbody>
             <tr>
@@ -227,6 +231,16 @@ export default {
       } else {
         this.gameScore = "Remaining Score";
       }
+    },
+    async undoLastScore() {
+      await this.$store.dispatch("game/undoScore", {
+        gameId: this.$route.params.gameid,
+        playerId: this.$route.params.playerid,
+        roundId: this.$route.params.roundid,
+        turnId: this.$route.params.turnid,
+      });
+      // confirm("Are You Sure You want To Undo");
+      this.$router.push(`/games/` + this.$route.params.gameid + `/player`);
     },
   },
 };
