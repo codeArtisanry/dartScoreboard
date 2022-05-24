@@ -19,7 +19,7 @@ var cache ttlcache.SimpleCache = ttlcache.NewCache()
 // Get Public Key into the Cache Memory and Validate Token With that Public Key
 func Validate(Vaconfig ...fiber.Config) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var publicKey string
+		var publicKey string = "publicKey"
 		cookie := ctx.Cookies("user")
 		if cookie == "" {
 			return ctx.Redirect("/auth/google")
@@ -59,7 +59,7 @@ func Validate(Vaconfig ...fiber.Config) fiber.Handler {
 
 // Google Public key
 func getGooglePublicKey(keyID string) (string, error) {
-	var publicKey string
+	var publicKey string = "publicKey"
 	cache.SetTTL(time.Duration(24 * time.Hour))
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v1/certs")
 	if err != nil {
