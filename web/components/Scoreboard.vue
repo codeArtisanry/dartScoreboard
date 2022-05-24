@@ -134,6 +134,12 @@ export default {
     await this.gameApi();
     await this.scoreboardApi();
   },
+  mounted() {
+    const SpeakWinnerName = new SpeechSynthesisUtterance(
+      "Congratulations " + this.getScoreboardStore.winner + "You Win This Game"
+    );
+    window.speechSynthesis.speak(SpeakWinnerName);
+  },
   methods: {
     homepage() {
       this.$router.push("/");

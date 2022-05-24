@@ -148,14 +148,17 @@ export default {
       return this.$store.state.game.currentTurn;
     },
   },
-  async created() {
+  async mounted() {
     await this.currentTurnApi();
     await this.playerInfoApi();
+    const scoreSpeak = new SpeechSynthesisUtterance(
+      "welcome to " + this.getPlayerInfo.game_type + " game"
+    );
+    window.speechSynthesis.speak(scoreSpeak);
+    this.speakPlayerName();
     await this.scoreboardApi();
     this.changeScoreColHeader();
     this.fetchUpdatedData();
-  },
-  mounted() {
     // eslint-disable-next-line no-undef
     const dartboard = new Dartboard("#dartboard");
     dartboard.render();
@@ -163,9 +166,14 @@ export default {
       .querySelector("#dartboard")
       .addEventListener("throw", async (d) => {
         await this.postScoreApi(d.detail);
+        const scoreSpeak = new SpeechSynthesisUtterance(d.detail.score);
+        window.speechSynthesis.speak(scoreSpeak);
         await this.currentTurnApi();
         await this.playerInfoApi();
         await this.scoreboardApi();
+        if (this.getTurn.throw === 1) {
+          this.speakPlayerName();
+        }
         this.fetchUpdatedData();
       });
   },
@@ -235,6 +243,12 @@ export default {
       });
       // confirm("Are You Sure You want To Undo");
       this.$router.push(`/games/` + this.$route.params.gameid + `/player`);
+    },
+    speakPlayerName() {
+      const playerNameSpeak = new SpeechSynthesisUtterance(
+        "Now " + this.getPlayerInfo.active_player_info.first_name + "'s Turn"
+      );
+      window.speechSynthesis.speak(playerNameSpeak);
     },
   },
 };
