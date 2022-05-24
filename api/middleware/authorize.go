@@ -7,26 +7,40 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
+	"github.com/jellydator/ttlcache/v2"
 )
 
-func Validate(config ...fiber.Config) fiber.Handler {
+var cache ttlcache.SimpleCache = ttlcache.NewCache()
+
+// Get Public Key into the Cache Memory and Validate Token With that Public Key
+func Validate(Vaconfig ...fiber.Config) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
+		var publicKey string
 		cookie := ctx.Cookies("user")
 		if cookie == "" {
 			return ctx.Redirect("/auth/google")
 		}
 		claims := jwt.MapClaims{}
 		token, err := jwt.ParseWithClaims(cookie, claims, func(token *jwt.Token) (interface{}, error) {
-			pem, err := getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
+			// Get Public key from cache memory
+			pem, err := cache.Get(publicKey)
 			if err != nil {
-				return nil, err
+				pem, err = getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
+				if err != nil {
+					return nil, err
+				}
 			}
-			key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(pem))
+			key, err := jwt.ParseRSAPublicKeyFromPEM([]byte(pem.(string)))
 			if err != nil {
-				return nil, err
+				// If get error to fetch a public key than set again public key in cache memory
+				pem, err = getGooglePublicKey(fmt.Sprintf("%s", token.Header["kid"]))
+				if err != nil {
+					return nil, err
+				}
 			}
 			return key, nil
 		})
@@ -34,7 +48,7 @@ func Validate(config ...fiber.Config) fiber.Handler {
 		fmt.Println(token)
 		// ... error handling
 		if err != nil {
-			fmt.Println("err",err)
+			fmt.Println("err", err)
 			return ctx.Redirect("/auth/google")
 		} else {
 			ctx.Redirect(os.ExpandEnv("${PROTOCOL}://${HOST}:${FRONTENDPORT}/"))
@@ -45,6 +59,8 @@ func Validate(config ...fiber.Config) fiber.Handler {
 
 // Google Public key
 func getGooglePublicKey(keyID string) (string, error) {
+	var publicKey string
+	cache.SetTTL(time.Duration(24 * time.Hour))
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v1/certs")
 	if err != nil {
 		return "", err
@@ -63,5 +79,8 @@ func getGooglePublicKey(keyID string) (string, error) {
 	if !ok {
 		return "", errors.New("key not found")
 	}
+	publicKeyValue := key
+	// Set public key in cache memory
+	cache.Set(publicKey, publicKeyValue)
 	return key, nil
 }

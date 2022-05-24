@@ -23,6 +23,7 @@ require (
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/rubenv/sql-migrate v1.1.1
 )
@@ -37,5 +38,6 @@ require (
 	github.com/gorilla/sessions v1.1.1 // indirect
 	github.com/lib/pq v1.10.3 // indirect
 	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914 // indirect
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	google.golang.org/protobuf v1.26.0 // indirect
 )
