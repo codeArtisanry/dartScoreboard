@@ -150,7 +150,7 @@ export default {
   },
   async created() {
     await this.currentTurnApi();
-    await this.loadPlayerInfoApi();
+    await this.playerInfoApi();
     await this.scoreboardApi();
     this.changeScoreColHeader();
     this.fetchUpdatedData();
@@ -170,7 +170,7 @@ export default {
       });
   },
   methods: {
-    async loadPlayerInfoApi() {
+    async playerInfoApi() {
       await this.$store.dispatch("game/getGamePlayerInfo", {
         gameId: this.$route.params.gameid,
         playerId: this.getTurn.player_id,
@@ -183,12 +183,6 @@ export default {
         roundId: this.$route.params.roundid,
         turnId: this.$route.params.turnid,
         score: dartScore,
-      });
-    },
-    async playerInfoApi() {
-      await this.$store.dispatch("game/getGamePlayerInfo", {
-        gameId: this.$route.params.gameid,
-        playerId: this.$route.params.playerid,
       });
     },
     async scoreboardApi() {
