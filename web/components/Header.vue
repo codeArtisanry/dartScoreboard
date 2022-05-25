@@ -7,16 +7,10 @@
       </div>
       <div class="px-3">
         <button
-          class="
-            shadow
-            px-5
-            py-3
-            font-weight-bolder
-            border border-light border-start-0
-            rounded
-          "
+          class="shadow px-5 py-3 font-weight-bolder border border-light border-start-0 rounded"
           @click="creategame"
         >
+          <i class="px-2 font-weight-bolder"><fa icon="plus" /></i>
           New Game
         </button>
         <br />

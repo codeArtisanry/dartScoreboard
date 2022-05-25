@@ -6,6 +6,13 @@
         <h1 class="font-weight-bolder">Welcome</h1>
         <p class="p-md-2">Let's create a new Game</p>
       </div>
+      <div>
+        <small
+          style="color: red; position: absolute; top: 180px; right: 20px"
+          class="pl-5"
+          >Note : * Indicates mandatory field.</small
+        >
+      </div>
       <div class="ml-1">
         <label class="text-muted">Enter Game Name:</label>
         <input
@@ -16,18 +23,17 @@
         />
 
         <div class="mt-5 mb-3">
-          <label class="text-muted">Select Game Type:</label>
-          <select
-            v-model="game_responses.game_type"
-            class="form-control bg-white w-100"
+          <label class="text-muted"
+            >Select Game Type<span style="color: red"> *</span></label
           >
+          <select v-model="game_responses.game_type" class="form-control w-100">
             <option value="High Score">High Score</option>
             <option value="Target Score-101">Target Score-101</option>
             <option value="Target Score-301">Target Score-301</option>
             <option value="Target Score-501">Target Score-501</option>
           </select>
         </div>
-        <small class="form-text text-muted ml-4"
+        <small class="form-text text-muted"
           >Rules of the Game
           <span>
             <a v-b-modal.modalPopover class="bg-white text-primary border-0"
@@ -87,17 +93,18 @@
       <br />
 
       <div>
-        <label class="typo__label text-muted">Select PlayersNames:</label>
+        <label class="typo__label text-muted mt-3"
+          >Select PlayersNames<span style="color: red"> *</span></label
+        >
         <multiselect
           v-model="value"
           :options="options"
           :custom-label="nameWithLang"
           :multiple="true"
           :close-on-select="false"
-          :clear-on-select="false"
+          :clear-on-select="true"
           :preserve-search="true"
-          :options-limit="5"
-          placeholder="Pick some"
+          placeholder="Search Player Name"
           label="first_name"
           track-by="first_name"
         >
@@ -144,7 +151,7 @@ export default {
       registerGames: "",
       game_responses: {
         game_name: "",
-        game_type: "",
+        game_type: "High Score",
         players: [],
       },
       newPlayer: "",
@@ -190,7 +197,7 @@ export default {
         if (this.game_responses.game_name === "") {
           this.totalplayers = this.nameofgame.length - 1;
           this.game_responses.game_name =
-            this.nameofgame[0] + ` +${this.totalplayers}  others`;
+            this.nameofgame[0] + ` (+${this.totalplayers}  others)`;
         }
         this.postGame();
       }
@@ -225,4 +232,4 @@ export default {
 };
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.min.css">
+<style src="vue-multiselect/dist/vue-multiselect.min.css" />

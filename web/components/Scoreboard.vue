@@ -18,7 +18,7 @@
           <h5 class="text-center">ScoreBoard</h5>
         </div>
         <div class="text-center row">
-          <div class="table-responsive col-sm-12">
+          <div class="table-responsive ml-4">
             <table class="table-hover table showtable">
               <tr>
                 <td colspan="4">
@@ -33,20 +33,19 @@
                 :key="i"
                 v-b-toggle="`${i}collapse`"
               >
+                <!-- @click="toggleDetails(player)"   @click="toggle(i)"-->
                 <tr>
-                  <td>
-                    <div class="d-flex justify-content-center">
-                      <div>
-                        <img
-                          height="10"
-                          src="/downarrow.svg"
-                          alt="click here"
-                          class="text-white mb-1 mr-2"
-                        />
-                      </div>
+                  <td colspan="2">
+                    <div class="justify-content-center">
+                      <img
+                        height="10"
+                        src="/downarrow.svg"
+                        alt="click here"
+                        class="text-white mb-1 mr-2"
+                      />
                     </div>
                   </td>
-                  <td colspan="3">
+                  <td colspan="2">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
                   <td v-if="getGame.game_type == 'High Score'">
@@ -60,53 +59,60 @@
                   </td>
                   <td v-else>{{ 501 - player.total }}</td>
                 </tr>
-                <b-collapse :id="`${i}collapse`">
-                  <tr>
-                    <td>Round</td>
-                    <td>D-1</td>
-                    <td>D-2</td>
-                    <td>D-3</td>
-                    <td>Total</td>
-                  </tr>
-                  <tr v-for="(round, j) in player.rounds" :key="j" scope="row">
-                    <td scope="row">
-                      <mark
-                        v-if="round.check_round == 'INVALID'"
-                        style="background-color: #ffcccb"
-                      >
-                        {{ round.round }}
-                      </mark>
-                      <div v-else>{{ round.round }}</div>
-                    </td>
-                    <td
-                      v-for="(dart, index) in round.throws_score"
-                      :key="index"
-                    >
-                      <mark
-                        v-if="round.check_round == 'INVALID'"
-                        style="background-color: #ffcccb"
-                        >{{ dart }}</mark
-                      >
-                      <div v-else>{{ dart }}</div>
-                    </td>
-                    <td v-if="round.throws_score == null" colspan="3">-</td>
-                    <td v-else-if="round.throws_score.length == 1" colspan="2">
-                      -
-                    </td>
-                    <td v-else-if="round.throws_score.length == 2">-</td>
-                    <td>
-                      <mark
-                        v-if="round.check_round == 'INVALID'"
-                        style="background-color: #ffcccb"
-                        >{{ round.round_total }}</mark
-                      >
-                      <div v-else>{{ round.round_total }}</div>
-                    </td>
-                  </tr>
-                </b-collapse>
+
+                <td colspan="6" style="padding: inherit">
+                  <b-collapse :id="`${i}collapse`">
+                    <table class="table">
+                      <tr>
+                        <td>Round</td>
+                        <td>D-1</td>
+                        <td>D-2</td>
+                        <td>D-3</td>
+                        <td>Total</td>
+                      </tr>
+                      <tr v-for="(round, j) in player.rounds" :key="j">
+                        <td>
+                          <mark
+                            v-if="round.check_round == 'INVALID'"
+                            style="background-color: #ffcccb"
+                          >
+                            {{ round.round }}
+                          </mark>
+                          <div v-else>{{ round.round }}</div>
+                        </td>
+                        <td
+                          v-for="(dart, index) in round.throws_score"
+                          :key="index"
+                        >
+                          <mark
+                            v-if="round.check_round == 'INVALID'"
+                            style="background-color: #ffcccb"
+                            >{{ dart }}</mark
+                          >
+                          <div v-else>{{ dart }}</div>
+                        </td>
+                        <td v-if="round.throws_score == null" colspan="3">-</td>
+                        <td
+                          v-else-if="round.throws_score.length == 1"
+                          colspan="2"
+                        >
+                          -
+                        </td>
+                        <td v-else-if="round.throws_score.length == 2">-</td>
+                        <td>
+                          <mark
+                            v-if="round.check_round == 'INVALID'"
+                            style="background-color: #ffcccb"
+                            >{{ round.round_total }}</mark
+                          >
+                          <div v-else>{{ round.round_total }}</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </b-collapse>
+                </td>
               </tbody>
             </table>
-            <hr />
           </div>
         </div>
         <div class="text-center"></div>
@@ -158,7 +164,7 @@ export default {
 </script>
 
 <style scoped>
-.showtable .show {
+.showtable {
   display: contents !important;
 }
 </style>

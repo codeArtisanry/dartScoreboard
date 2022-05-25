@@ -1,7 +1,11 @@
 <template>
   <div>
+    <br />
+    <div class="alert alert-danger">
+      * You want to score 0 touch on outer ring
+    </div>
     <script src="https://unpkg.com/dartboard/dist/dartboard.js"></script>
-    <div class="container text-center">
+    <div class="container text-center mt-4">
       <div class="bg-white rounded">
         <!-- dart-board -->
         <div class="text-center">
@@ -11,12 +15,14 @@
             style="width: 22rem; height: 22rem"
           ></div>
         </div>
-        <br />
+        <!-- /*  class="video-btn vidbtn"-->
         <div class="form-text text-muted ml-4">
-          Rules for Use Dartboard
           <span>
-            <a v-b-modal.modalPopover class="bg-white text-primary border-0"
-              >Read...</a
+            <a
+              v-b-modal.modalPopover
+              class="bg-white text-dark border-0 button mt-4 mb-4"
+            >
+              Rules for Use Dartboard</a
             >
             <b-modal id="modalPopover" title="Rules for Use Dartboard" ok-only>
               <div class="col sm-12">
@@ -30,8 +36,7 @@
             </b-modal>
           </span>
         </div>
-        <br /><br />
-        <div class="text-center">
+        <div v-if="hideUndo == true">
           <button class="btn btn-secondary" @click="undoLastScore">Undo</button>
         </div>
         <table class="table table-striped shadow mt-3">
@@ -135,6 +140,7 @@ export default {
       playerScore: "",
       gameScore: "",
       totalRounds: "",
+      hideUndo: Boolean,
     };
   },
   computed: {
@@ -175,6 +181,7 @@ export default {
           this.speakPlayerName();
         }
         this.fetchUpdatedData();
+        this.hideUndo = true;
       });
   },
   methods: {
@@ -241,8 +248,10 @@ export default {
         roundId: this.$route.params.roundid,
         turnId: this.$route.params.turnid,
       });
-      // confirm("Are You Sure You want To Undo");
-      this.$router.push(`/games/` + this.$route.params.gameid + `/player`);
+      await this.currentTurnApi();
+      await this.playerInfoApi();
+      await this.scoreboardApi();
+      this.fetchUpdatedData();
     },
     speakPlayerName() {
       const playerNameSpeak = new SpeechSynthesisUtterance(
@@ -260,5 +269,35 @@ export default {
   max-width: 110%;
   margin-bottom: 25px;
   white-space: nowrap;
+}
+.button {
+  background-color: #1c87c9;
+  -webkit-border-radius: 60px;
+  border-radius: 60px;
+  border: none;
+  color: #eeeeee;
+  cursor: pointer;
+  display: inline-block;
+  font-family: sans-serif;
+  padding: 5px 15px;
+  text-align: center;
+  text-decoration: none;
+}
+@keyframes glowing {
+  0% {
+    background-color: #2ba805;
+    box-shadow: 0 0 5px #2ba805;
+  }
+  50% {
+    background-color: #49e819;
+    box-shadow: 0 0 20px #49e819;
+  }
+  100% {
+    background-color: #2ba805;
+    box-shadow: 0 0 5px #2ba805;
+  }
+}
+.button {
+  animation: glowing 1300ms infinite;
 }
 </style>

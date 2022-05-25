@@ -81,8 +81,10 @@ const actions = {
         `/api/v1/games/${params.gameId}/players/${params.playerId}/rounds/${params.roundId}/turns/${params.turnId}/undo-score`
       )
       .catch((error) => {
-        if (error.response.status === 500) {
+        if (error.response.status === 400) {
           alert("Already Undo This Score");
+        } else if (error.response.status === 500) {
+          alert("Not Enough Score");
         }
       });
   },
