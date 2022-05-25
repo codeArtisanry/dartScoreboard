@@ -16,25 +16,23 @@
           ></div>
         </div>
         <!-- /*  class="video-btn vidbtn"-->
-        <div class="form-text text-muted ml-4">
-          <span>
-            <a
-              v-b-modal.modalPopover
-              class="bg-white text-dark border-0 button mt-4 mb-4"
-            >
-              Rules for Use Dartboard</a
-            >
-            <b-modal id="modalPopover" title="Rules for Use Dartboard" ok-only>
-              <div class="col sm-12">
-                <img
-                  class="img-responsive"
-                  width="100%"
-                  src="/scoreboard.png"
-                  alt="scoreboard-icon"
-                />
-              </div>
-            </b-modal>
-          </span>
+        <div
+          class="form-text text-muted ml-4 my-4 text-uppercase font-weight-bold"
+        >
+          <ins>Rules for Use Dartboard</ins>
+          <a v-b-modal.modalPopover class="bg-white border-0 mt-4 mb-4"
+            ><ins> Read...</ins>
+          </a>
+          <b-modal id="modalPopover" title="Rules for Use Dartboard" ok-only>
+            <div class="col sm-12">
+              <img
+                class="img-responsive"
+                width="100%"
+                src="/scoreboard.png"
+                alt="scoreboard-icon"
+              />
+            </div>
+          </b-modal>
         </div>
         <div v-if="hideUndo == true">
           <button class="btn btn-secondary" @click="undoLastScore">Undo</button>
@@ -269,35 +267,5 @@ export default {
   max-width: 110%;
   margin-bottom: 25px;
   white-space: nowrap;
-}
-.button {
-  background-color: #1c87c9;
-  -webkit-border-radius: 60px;
-  border-radius: 60px;
-  border: none;
-  color: #eeeeee;
-  cursor: pointer;
-  display: inline-block;
-  font-family: sans-serif;
-  padding: 5px 15px;
-  text-align: center;
-  text-decoration: none;
-}
-@keyframes glowing {
-  0% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
-  }
-  50% {
-    background-color: #49e819;
-    box-shadow: 0 0 20px #49e819;
-  }
-  100% {
-    background-color: #2ba805;
-    box-shadow: 0 0 5px #2ba805;
-  }
-}
-.button {
-  animation: glowing 1300ms infinite;
 }
 </style>
