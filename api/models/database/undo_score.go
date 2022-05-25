@@ -14,9 +14,9 @@ type lastScoreDetails struct {
 	validate string
 }
 type PreviousTurn struct {
-	round    int
-	playerId int
-	turn     int
+	Round    int
+	PlayerId int
+	Turn     int
 }
 
 // Find players of particular game by gameId
@@ -62,16 +62,16 @@ func FindPreviousTurn(round int, playerId int, turn int, playersId []int) Previo
 		}
 	}
 	previousTurn := PreviousTurn{
-		round:    round,
-		playerId: playerId,
-		turn:     turn,
+		Round:    round,
+		PlayerId: playerId,
+		Turn:     turn,
 	}
 	return previousTurn
 }
 
 // Find Last Inserted Scoreid
 func FindLastScoreId(db *sql.DB, gameId int, lastScoreDetails lastScoreDetails, previosTurn PreviousTurn) (lastScoreDetails, error) {
-	findLastScoreId := fmt.Sprintf("SELECT id,score,is_valid FROM scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND throw = %d", gameId, previosTurn.playerId, previosTurn.round, gameId, previosTurn.turn)
+	findLastScoreId := fmt.Sprintf("SELECT id,score,is_valid FROM scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND throw = %d", gameId, previosTurn.PlayerId, previosTurn.Round, gameId, previosTurn.Turn)
 	lastScoreId := db.QueryRow(findLastScoreId)
 	err := lastScoreId.Scan(&lastScoreDetails.scoreId, &lastScoreDetails.score, &lastScoreDetails.validate)
 	if err != nil {
@@ -126,7 +126,7 @@ func UndoScore(db *sql.DB, gameId int, round int, playerId int, turn int) error 
 			log.Println("Successfully Deleted", lastScoreDetails.scoreId, "ScoreId")
 			// Find Previous Turns of that player in that particular round
 			var count int
-			countRemainingScore := fmt.Sprintf("SELECT count(score) from scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE game_id = %d AND round = %d);", gameId, previousTurn.playerId, gameId, previousTurn.round)
+			countRemainingScore := fmt.Sprintf("SELECT count(score) from scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE game_id = %d AND round = %d);", gameId, previousTurn.PlayerId, gameId, previousTurn.Round)
 			RemainingScore := db.QueryRow(countRemainingScore)
 			err := RemainingScore.Scan(&count)
 			if err != nil {
@@ -140,7 +140,7 @@ func UndoScore(db *sql.DB, gameId int, round int, playerId int, turn int) error 
 					log.Println(err)
 					return err
 				}
-				_, err = invalidToValid.Exec("VALID", gameId, previousTurn.playerId, gameId, previousTurn.round)
+				_, err = invalidToValid.Exec("VALID", gameId, previousTurn.PlayerId, gameId, previousTurn.Round)
 				if err != nil {
 					log.Println(err)
 					return err
@@ -148,7 +148,7 @@ func UndoScore(db *sql.DB, gameId int, round int, playerId int, turn int) error 
 			}
 			break
 		}
-		previousTurn = FindPreviousTurn(previousTurn.round, previousTurn.playerId, previousTurn.turn, gamePlayerList)
+		previousTurn = FindPreviousTurn(previousTurn.Round, previousTurn.PlayerId, previousTurn.Turn, gamePlayerList)
 	}
 	return nil
 }
