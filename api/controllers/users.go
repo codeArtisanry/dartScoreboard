@@ -30,7 +30,7 @@ import (
 //	400: StatusCode
 //  500: StatusCode
 // GetUsers are get all users that login in dart-scoreboard
-func GetUsers(ctx *fiber.Ctx) error {
+func GetUsersAPI(ctx *fiber.Ctx) error {
 	user := types.User{}
 	page := ctx.Query("page")
 	var offset string
@@ -48,7 +48,7 @@ func GetUsers(ctx *fiber.Ctx) error {
 		searchLastName := ctx.Query("sln")
 		searchFirstName = (searchFirstName + "%")
 		searchLastName = (searchLastName + "%")
-		users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
+		users, err := GetUsers(offset, searchFirstName, searchLastName, user)
 		if err != nil {
 			return ctx.JSON(types.StatusCode{
 				StatusCode: 500,
@@ -72,7 +72,7 @@ func GetUsers(ctx *fiber.Ctx) error {
 		searchLastName := ctx.Query("sln")
 		searchFirstName = (searchFirstName + "%")
 		searchLastName = (searchLastName + "%")
-		users, err := models.GetUsers(db, offset, searchFirstName, searchLastName, user)
+		users, err := GetUsers(offset, searchFirstName, searchLastName, user)
 		if err != nil {
 			return ctx.JSON(types.StatusCode{
 				StatusCode: 500,
@@ -96,4 +96,26 @@ func GetUsers(ctx *fiber.Ctx) error {
 			PostPageLink:  postPageLink,
 		})
 	}
+}
+
+// Get All User From Users Table
+func GetUsers(offset string, searchFisrtName string, searchLastName string, user types.User) ([]types.User, error) {
+	var users []types.User
+	dbcon := models.DataBase{Db: db}
+	rows := dbcon.UsersQuery(offset, searchFisrtName, searchLastName)
+	defer rows.Close()
+	for rows.Next() {
+		err := rows.Scan(&user.Id, &user.FirstName, &user.LastName, &user.Email)
+		if err != nil {
+			fmt.Println(err)
+			return users, err
+		}
+		userJson := types.User{
+			Id:        user.Id,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email}
+		users = append(users, userJson)
+	}
+	return users, nil
 }

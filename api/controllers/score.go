@@ -3,8 +3,10 @@ package controllers
 import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
+	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,7 +18,7 @@ import (
 //  400: StatusCode
 //  500: StatusCode
 // InsertScore is insert score that post in score api by user
-func InsertScore(ctx *fiber.Ctx) error {
+func InsertScoreAPI(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
@@ -60,7 +62,7 @@ func InsertScore(ctx *fiber.Ctx) error {
 	}
 	fmt.Println(score.Score)
 	activeRes := types.ActiveStatus{}
-	currentStateOfGame, err := models.GetActiveStatusRes(db, gameId, activeRes)
+	currentStateOfGame, err := GetActiveStatusRes(gameId, activeRes)
 	if err != nil {
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 500,
@@ -69,7 +71,21 @@ func InsertScore(ctx *fiber.Ctx) error {
 	}
 	if playerId == currentStateOfGame.PlayerId && round == currentStateOfGame.Round && turn == currentStateOfGame.Throw {
 		if score.Score >= 0 && score.Score <= 60 {
-			scoreRes, err := models.InsertScore(db, gameId, playerId, round, turn, score)
+			activeRes := types.ActiveStatus{}
+			activejson, err := GetActiveStatusRes(gameId, activeRes)
+			if err != nil {
+				fmt.Println(err)
+
+			}
+			if activejson.Round == 0 {
+				scoreRes := types.ResScore{
+					Score:       0,
+					TotalScore:  0,
+					FoundWinner: true,
+				}
+				fmt.Println(scoreRes)
+			}
+			scoreRes, err := InsertScore(gameId, playerId, round, turn, score)
 			if err != nil {
 				fmt.Println(err)
 				return ctx.Status(500).JSON(types.StatusCode{
@@ -95,5 +111,103 @@ func InsertScore(ctx *fiber.Ctx) error {
 			StatusCode: 400,
 			Message:    "Turn is Not Matched",
 		})
+	}
+}
+
+func InsertScore(gameId int, playerId int, round int, turnId int, score types.Score) (types.ResScore, error) {
+	var (
+		totalScore   int
+		roundId      int
+		gamePlayerId int
+		scoresId     int
+		gameType     string
+		scoreRes     types.ResScore
+	)
+
+	dbcon := models.DataBase{Db: db}
+	dbcon.VerifyRoundTableQuery(gameId, round, roundId)
+	gamePlayerId, roundId = dbcon.RoundGamePlayerIdQuery(gameId, playerId, round)
+	totalScore, err := dbcon.FindTotalScore(gamePlayerId)
+	if err != nil {
+		fmt.Println(err)
+		return scoreRes, err
+	}
+	gameType = dbcon.FindGameTypeQuery(gameId)
+	totalScore = totalScore + score.Score
+	rowScore := dbcon.ValidateScoreQuery(gameId, playerId, round, turnId)
+	err = rowScore.Scan(&scoresId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			if gameType == "High Score" {
+				dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+				scoreRes = types.ResScore{
+					Score:       score.Score,
+					TotalScore:  totalScore,
+					FoundWinner: false,
+				}
+				return scoreRes, nil
+			} else {
+				fullGameType := strings.Split(gameType, "-")
+				targetscore, err := strconv.Atoi(fullGameType[1])
+				if err != nil {
+					fmt.Println(err)
+					return scoreRes, err
+				}
+				if totalScore <= targetscore {
+					dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+					if totalScore == targetscore {
+						status := "Completed"
+						err = dbcon.UpdateStatus(gameId, status)
+						if err != nil {
+							fmt.Println(err)
+						}
+						scoreRes = types.ResScore{
+							Score:       score.Score,
+							TotalScore:  targetscore - totalScore,
+							FoundWinner: true,
+						}
+						return scoreRes, nil
+					}
+					totalScore, err = dbcon.FindTotalScore(gamePlayerId)
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					scoreRes = types.ResScore{
+						Score:       score.Score,
+						TotalScore:  targetscore - totalScore,
+						FoundWinner: false,
+					}
+					return scoreRes, nil
+				} else {
+					dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+					for throw := turnId + 1; throw <= 3; throw++ {
+						dbcon.RemoveMultipleEntryInScore(roundId, gamePlayerId, throw)
+					}
+					for throw := 1; throw <= 3; throw++ {
+						dbcon.QueryForUpdateIsValid(roundId, gamePlayerId, throw)
+					}
+					totalScore, err = dbcon.FindTotalScore(gamePlayerId)
+					if err != nil {
+						fmt.Println(err)
+						return scoreRes, err
+					}
+					scoreRes = types.ResScore{
+						Score:       score.Score,
+						TotalScore:  targetscore - totalScore,
+						FoundWinner: false,
+					}
+					return scoreRes, nil
+				}
+			}
+		}
+		return scoreRes, err
+	} else {
+		scoreRes = types.ResScore{
+			Score:       61,
+			TotalScore:  0,
+			FoundWinner: false,
+		}
+		return scoreRes, nil
 	}
 }
