@@ -2,7 +2,7 @@
   <div>
     <NavBar />
     <Header />
-    <DetailedDescription />
+    <GamesList />
   </div>
 </template>
 <script>

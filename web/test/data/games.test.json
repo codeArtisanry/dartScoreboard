@@ -1,0 +1,27 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "name": "Game-Name",
+            "type": "Target Score-101",
+            "status": "Not Started",
+            "creater_name": "Vatsal Chauhan",
+            "players": [
+                {
+                    "id": 4,
+                    "first_name": "Payal",
+                    "last_name": "Raviya",
+                    "email": "payal@improwised.com"
+                },
+                {
+                    "id": 3,
+                    "first_name": "Jeel",
+                    "last_name": "Rupapara",
+                    "email": "jeel@improwised.com"
+                }
+            ]
+        }
+    ],
+    "previous": "null",
+    "next": "/api/v1/games?page=2"
+}

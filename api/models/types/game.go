@@ -8,9 +8,9 @@ import "time"
 // swagger:model game
 type Game struct {
 	Id               int        `json:"id"`
-	Name             string     `json:"game_name"`
-	Type             string     `json:"game_type,omitempty"`
-	Status           string     `json:"game_status"`
+	Name             string     `json:"name"`
+	Type             string     `json:"type,omitempty"`
+	Status           string     `json:"status"`
 	PlayersIds       []int      `json:"players"`
 	CreaterUserEmail string     `json:"creater_user_email"`
 	CreatedAt        *time.Time `json:"created_at,omitempty"`
@@ -21,23 +21,21 @@ type Game struct {
 type GameResponse struct {
 	// in: body
 	Id            int    `json:"id"`
-	Name          string `json:"game_name"`
-	Type          string `json:"game_type"`
-	Status        string `json:"game_status"`
+	Name          string `json:"name"`
+	Type          string `json:"type"`
+	Status        string `json:"status"`
 	CreaterUserId int    `json:"creater_user_id,omitempty"`
 	CreaterName   string `json:"creater_name"`
 	// in: body
 	Players      []GamePlayerResponse `json:"players"`
-	PreviousPage string               `json:"previous_page,omitempty"`
-	NextPage     string               `json:"next_page,omitempty"`
 }
 
 // swagger:response GamesPaginationResponse
 type GamesPaginationResponse struct {
 	// in: body
-	GameResponses []GameResponse `json:"game_responses"`
-	PrePageLink   string         `json:"pre_page_link,omitempty"`
-	PostPageLink  string         `json:"post_page_link,omitempty"`
+	GameResponses []GameResponse `json:"list"`
+	PrePageLink   string         `json:"previous,omitempty"`
+	PostPageLink  string         `json:"next,omitempty"`
 }
 
 // swagger:parameters getGame editGame deleteGame activeStatus addScore

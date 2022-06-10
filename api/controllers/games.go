@@ -286,10 +286,10 @@ func GetGames(ctx *fiber.Ctx) error {
 		prePageLink := fmt.Sprintf("/api/v1/games?page=%d", prePage)
 		postPageLink := fmt.Sprintf("/api/v1/games?page=%d", postPage)
 		if len(games) < 10 {
-			postPageLink = "cross limits"
+			postPageLink = "null"
 		}
 		if prePage == 0 {
-			prePageLink = "cross limits"
+			prePageLink = "null"
 		}
 		return ctx.Status(200).JSON(types.GamesPaginationResponse{
 			GameResponses: games,

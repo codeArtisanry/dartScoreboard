@@ -4,7 +4,6 @@
     <div class="alert alert-danger">
       * You want to score 0 touch on outer ring
     </div>
-    <script src="https://unpkg.com/dartboard/dist/dartboard.js"></script>
     <div class="container text-center mt-4">
       <div class="bg-white rounded">
         <!-- dart-board -->

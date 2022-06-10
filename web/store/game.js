@@ -1,7 +1,6 @@
 const state = () => {
   return {
     game: "",
-    games: "",
     users: "",
     playerInfo: "",
     scoreboard: "",
@@ -16,18 +15,6 @@ const actions = {
   async getUsers({ commit }) {
     const usersRes = await this.$axios.$get(`/api/v1/users`);
     commit("GET_USERS", usersRes);
-  },
-  async getPrePage({ commit }, prePageLink) {
-    const prePageRes = await this.$axios.$get(`${prePageLink}`);
-    commit("GET_PREVIOUS_GAMES", prePageRes);
-  },
-  async getPostPage({ commit }, postPageLink) {
-    const postPageRes = await this.$axios.$get(`${postPageLink}`);
-    commit("GET_NEXT_GAMES", postPageRes);
-  },
-  async getGames({ commit }) {
-    const gamesRes = await this.$axios.$get(`/api/v1/games?page=1`);
-    commit("GET_GAMES", gamesRes);
   },
   async getGame({ commit }, gameId) {
     const gameRes = await this.$axios.$get(`/api/v1/games/${gameId}`);
@@ -97,20 +84,11 @@ const mutations = {
   POST_GAME(state, game) {
     state.game = game;
   },
-  GET_GAMES(state, games) {
-    state.games = games;
-  },
   UPDATE_GAME(state, game) {
     state.game = game;
   },
   GET_USERS(state, users) {
     state.users = users;
-  },
-  GET_NEXT_GAMES(state, games) {
-    state.games = games;
-  },
-  GET_PREVIOUS_GAMES(state, games) {
-    state.games = games;
   },
   GET_SCOREBOARD(state, scoreboard) {
     state.scoreboard = scoreboard;
