@@ -17,8 +17,6 @@ export const $router = {
     push: jest.fn()
 };
 
-export const actions = {
-    games: {
-        getGames: jest.fn(),
-    }
+export const $config = {
+    logoutURL: "http://localhost:8080/logout/google"
 }

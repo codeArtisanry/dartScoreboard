@@ -29,22 +29,42 @@
             class="rounded-circle my-4"
             height="50"
             alt="Profile Pic"
+            data-test="profile-pic"
           />
-          <h6 class="text-muted font-weight-bolder">
+          <h6 class="text-muted font-weight-bolder" data-test="user-name">
             {{ $store.state.auth.token.name }}
           </h6>
-          <h6 class="text-muted">{{ $store.state.auth.token.email }}</h6>
+          <h6 class="text-muted" data-test="user-email">
+            {{ $store.state.auth.token.email }}
+          </h6>
           <hr />
           <b-nav vertical>
             <b-button
-              class="bg-light text-dark mt-3 border-0 hover font-weight-bolder text-dark"
+              class="
+                bg-light
+                text-dark
+                mt-3
+                border-0
+                hover
+                font-weight-bolder
+                text-dark
+              "
+              data-test="home-button"
               @click="home"
               >Home</b-button
             >
             <b-link
               type="button"
-              class="btn btn-light btn-link mt-1 mb-4 border-0 font-weight-bolder text-dark text-decoration-none"
-              :href="logoutURL"
+              class="
+                btn btn-light btn-link
+                mt-1
+                mb-4
+                border-0
+                font-weight-bolder
+                text-dark text-decoration-none
+              "
+              :href="$config.logoutURL"
+              data-test="logout-button"
               @click="hide"
             >
               Sign Out
@@ -58,11 +78,6 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      logoutURL: process.env.LOGOUT_URL,
-    };
-  },
   methods: {
     home() {
       this.$router.push("/");
