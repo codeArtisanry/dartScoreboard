@@ -62,7 +62,7 @@ func InsertScoreAPI(ctx *fiber.Ctx) error {
 	}
 	fmt.Println(score.Score)
 	activeRes := types.ActiveStatus{}
-	currentStateOfGame, err := GetActiveStatusRes(gameId, activeRes)
+	currentStateOfGame, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
 		return ctx.Status(400).JSON(types.StatusCode{
 			StatusCode: 500,
@@ -72,7 +72,7 @@ func InsertScoreAPI(ctx *fiber.Ctx) error {
 	if playerId == currentStateOfGame.PlayerId && round == currentStateOfGame.Round && turn == currentStateOfGame.Throw {
 		if score.Score >= 0 && score.Score <= 60 {
 			activeRes := types.ActiveStatus{}
-			activejson, err := GetActiveStatusRes(gameId, activeRes)
+			activejson, err := GetActiveStatusRes(db, gameId, activeRes)
 			if err != nil {
 				fmt.Println(err)
 
@@ -157,7 +157,7 @@ func InsertScore(gameId int, playerId int, round int, turnId int, score types.Sc
 					dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
 					if totalScore == targetscore {
 						status := "Completed"
-						err = dbcon.UpdateStatus(gameId, status)
+						err = models.UpdateStatus(db, gameId, status)
 						if err != nil {
 							fmt.Println(err)
 						}

@@ -4,6 +4,7 @@ import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
 	services "dartscoreboard/services"
+	"database/sql"
 	"fmt"
 	"strconv"
 
@@ -20,6 +21,7 @@ import (
 // GetActiveStatus are get that res which is you want to fetch
 func GetActiveStatusResAPI(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
+	db := models.Database("dart.db")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
@@ -29,7 +31,7 @@ func GetActiveStatusResAPI(ctx *fiber.Ctx) error {
 		})
 	}
 	activeRes := types.ActiveStatus{}
-	activejson, err := GetActiveStatusRes(gameId, activeRes)
+	activejson, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
 		fmt.Println(err)
 		return ctx.Status(404).JSON(types.StatusCode{
@@ -40,13 +42,11 @@ func GetActiveStatusResAPI(ctx *fiber.Ctx) error {
 	return ctx.Status(200).JSON(activejson)
 }
 
-func GetActiveStatusRes(id int, activeRes types.ActiveStatus) (types.ActiveStatus, error) {
-	dbcon := models.DataBase{Db: db}
-	numOfRowsPerGame, typeOfGame, status, playersIds := dbcon.Query(id, activeRes)
-
+func GetActiveStatusRes(db *sql.DB, id int, activeRes types.ActiveStatus) (types.ActiveStatus, error) {
+	numOfRowsPerGame, typeOfGame, status, playersIds := models.Query(db, id, activeRes)
 	if numOfRowsPerGame == 0 {
 		status := "In Progress"
-		err := dbcon.UpdateStatus(id, status)
+		err := models.UpdateStatus(db, id, status)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -54,14 +54,14 @@ func GetActiveStatusRes(id int, activeRes types.ActiveStatus) (types.ActiveStatu
 		activeRes.Throw = 1
 		activeRes.PlayerId = playersIds[0]
 	} else {
-		activeRes.Round, activeRes.PlayerId, activeRes.Throw = dbcon.Find(id, activeRes)
+		activeRes.Round, activeRes.PlayerId, activeRes.Throw = models.Find(db, id, activeRes)
 
 		if typeOfGame == "High Score" && numOfRowsPerGame%(9*len(playersIds)) == 0 {
 			activeRes.Round = 0
 			activeRes.PlayerId = 0
 			activeRes.Throw = 0
 			status := "Completed"
-			err := dbcon.UpdateStatus(id, status)
+			err := models.UpdateStatus(db, id, status)
 			if err != nil {
 				fmt.Println(err)
 			}

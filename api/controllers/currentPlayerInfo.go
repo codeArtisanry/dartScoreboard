@@ -4,6 +4,7 @@ import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
 	services "dartscoreboard/services"
+	"database/sql"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -39,7 +40,7 @@ func GetCurrentPlayerInfoAPI(ctx *fiber.Ctx) error {
 		})
 	}
 	gameRes := types.GameResponse{}
-	activePlayerInfo, err := GetCurrentPlayerInfo(gameId, playerId, gameRes)
+	activePlayerInfo, err := GetCurrentPlayerInfo(db, gameId, playerId, gameRes)
 	if err != nil {
 		return ctx.Status(500).JSON(types.StatusCode{
 			StatusCode: 500,
@@ -49,22 +50,22 @@ func GetCurrentPlayerInfoAPI(ctx *fiber.Ctx) error {
 	return ctx.Status(200).JSON(activePlayerInfo)
 }
 
-func GetCurrentPlayerInfo(gameId int, playerId int, gameRes types.GameResponse) (types.CurrentPlayerInfo, error) {
+func GetCurrentPlayerInfo(db *sql.DB, gameId int, playerId int, gameRes types.GameResponse) (types.CurrentPlayerInfo, error) {
 	var (
 		CurrentPlayerInfo types.CurrentPlayerInfo
 		activeRes         types.ActiveStatus
 		ActivePlayerInfo  types.ActivePlayerInfo
 	)
-	dbcon := models.DataBase{Db: db}
-	gameRes.Id, gameRes.Name, gameRes.Type, gameRes.Status = dbcon.GameResQuery(gameId, gameRes)
-	ActiveStatus, err := GetActiveStatusRes(gameId, activeRes)
+	//dbcon := models.DataBase{Db: db}
+	gameRes.Id, gameRes.Name, gameRes.Type, gameRes.Status = models.GameResQuery(db, gameId, gameRes)
+	ActiveStatus, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
 
 		return CurrentPlayerInfo, err
 	}
-	ActivePlayerInfo.Score = dbcon.ActivePlayerTotal(gameId, playerId)
+	ActivePlayerInfo.Score = models.ActivePlayerTotal(db, gameId, playerId)
 	ActivePlayerInfo.Score = services.RemainScore(gameRes.Type, ActivePlayerInfo.Score)
-	ActivePlayerInfo.Id, ActivePlayerInfo.FirstName, ActivePlayerInfo.LastName, ActivePlayerInfo.Email = dbcon.QueryForPlayer(playerId)
+	ActivePlayerInfo.Id, ActivePlayerInfo.FirstName, ActivePlayerInfo.LastName, ActivePlayerInfo.Email = models.QueryForPlayer(db, playerId)
 	if ActiveStatus.Round == 0 {
 		CurrentPlayerInfo = types.CurrentPlayerInfo{
 			Id:               gameRes.Id,

@@ -16,9 +16,10 @@ import (
 	gf "github.com/shareed2k/goth_fiber"
 )
 
-var db = models.Database()
+var (
+	db = models.Database("dart.db")
+)
 
-// 1. Endpoint for i am logged in?
 func Endpoint(ctx *fiber.Ctx) error {
 	cookie := ctx.Cookies("user")
 	_, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {

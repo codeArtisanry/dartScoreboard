@@ -8,24 +8,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type modelQuerys interface {
-	Query(id int, activeRes types.ActiveStatus) (numOfRowsPerGame int, typeOfGame string, status string, playersIds []int)
-	UpdateStatus(id int, status string) error
-	Find(id int, activeRes types.ActiveStatus) (Round int, PlayerId int, Throw int)
-}
-
 type DataBase struct {
 	Db *sql.DB
 }
 
-var (
-	DATABASE modelQuerys = DataBase{}
-)
-
-func (DATABASE DataBase) Query(id int, activeRes types.ActiveStatus) (numOfRowsPerGame int, typeOfGame string, status string, playersIds []int) {
+func Query(db *sql.DB, id int, activeRes types.ActiveStatus) (numOfRowsPerGame int, typeOfGame string, status string, playersIds []int) {
 	var playerId int
-	db := DATABASE.Db
-	//	id := DATABASE.id
 	findNumOfRowsPerGame := fmt.Sprintf("SELECT COUNT(scores.id) from scores inner join game_players on game_players.id=scores.game_player_id WHERE game_players.game_id = %d;", id)
 	row := db.QueryRow(findNumOfRowsPerGame)
 	err := row.Scan(&numOfRowsPerGame)
@@ -58,10 +46,7 @@ func (DATABASE DataBase) Query(id int, activeRes types.ActiveStatus) (numOfRowsP
 	return numOfRowsPerGame, typeOfGame, status, playersIds
 }
 
-func (DATABASE DataBase) UpdateStatus(id int, status string) error {
-	db := DATABASE.Db
-	//	id := DATABASE.id
-	//	status := DATABASE.status
+func UpdateStatus(db *sql.DB, id int, status string) error {
 	update, err := db.Prepare("UPDATE games set status=? WHERE id = ?")
 	if err != nil {
 		fmt.Println(err)
@@ -75,10 +60,7 @@ func (DATABASE DataBase) UpdateStatus(id int, status string) error {
 	return err
 }
 
-func (DATABASE DataBase) Find(id int, activeRes types.ActiveStatus) (Round int, PlayerId int, Throw int) {
-	db := DATABASE.Db
-	//	id := DATABASE.id
-	//	activeRes := DATABASE.activeRes
+func Find(db *sql.DB, id int, activeRes types.ActiveStatus) (Round int, PlayerId int, Throw int) {
 	findCurrentTurnInfo := fmt.Sprintf("SELECT rounds.round, game_players.user_id as player_id, scores.throw FROM scores INNER JOIN rounds ON scores.round_id = rounds.id INNER JOIN game_players ON scores.game_player_id = game_players.id WHERE rounds.game_id = %d ORDER BY scores.id DESC LIMIT 1 ;", id)
 	row := db.QueryRow(findCurrentTurnInfo)
 	err := row.Scan(&activeRes.Round, &activeRes.PlayerId, &activeRes.Throw)

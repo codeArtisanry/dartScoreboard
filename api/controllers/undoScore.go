@@ -41,7 +41,7 @@ func UndoScoreAPI(ctx *fiber.Ctx) error {
 		})
 	}
 	activeRes := types.ActiveStatus{}
-	currentStateOfGame, err := GetActiveStatusRes(gameId, activeRes)
+	currentStateOfGame, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
 		return ctx.Status(500).JSON(types.StatusCode{
 			StatusCode: 500,
