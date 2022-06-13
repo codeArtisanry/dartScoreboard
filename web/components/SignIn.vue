@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div>
     <center>
       <b-card tag="article" class="card mt-5">
@@ -10,26 +10,15 @@
           class="img-fluid mx-auto d-block w-50"
           alt="Responsive image"
         />
-        <hr />
-        <br />
         <a
-          :href="loginUrl"
+          :href="$config.loginURL"
           class="btn btn-primary mb-5 py-2 px-5"
+          data-test="login-button"
           type="button"
         >
-          Sign In With Google </a
-        ><br />
+          Sign In With Google
+        </a>
       </b-card>
     </center>
   </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      loginUrl: process.env.LOGIN_URL,
-    }
-  },
-}
-</script>

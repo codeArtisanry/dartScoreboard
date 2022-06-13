@@ -37,7 +37,8 @@ export default {
     ],
   },
   publicRuntimeConfig: {
-    logoutURL: process.env.LOGOUT_URL
+    logoutURL: process.env.LOGOUT_URL,
+    loginURL: process.env.LOGIN_URL
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],

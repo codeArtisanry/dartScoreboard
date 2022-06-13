@@ -18,5 +18,6 @@ export const $router = {
 };
 
 export const $config = {
-    logoutURL: "http://localhost:8080/logout/google"
+    logoutURL: "http://localhost:8080/logout/google",
+    loginURL: "http://localhost:8080/auth/google"
 }
