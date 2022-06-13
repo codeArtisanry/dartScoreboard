@@ -20,6 +20,7 @@ import (
 // InsertScore is insert score that post in score api by user
 func InsertScoreAPI(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
+	db := models.Database("dart.db")
 	gameId, err := strconv.Atoi(id)
 	if err != nil {
 		fmt.Println(err)
@@ -85,7 +86,7 @@ func InsertScoreAPI(ctx *fiber.Ctx) error {
 				}
 				fmt.Println(scoreRes)
 			}
-			scoreRes, err := InsertScore(gameId, playerId, round, turn, score)
+			scoreRes, err := InsertScore(db, gameId, playerId, round, turn, score)
 			if err != nil {
 				fmt.Println(err)
 				return ctx.Status(500).JSON(types.StatusCode{
@@ -114,7 +115,7 @@ func InsertScoreAPI(ctx *fiber.Ctx) error {
 	}
 }
 
-func InsertScore(gameId int, playerId int, round int, turnId int, score types.Score) (types.ResScore, error) {
+func InsertScore(db *sql.DB, gameId int, playerId int, round int, turnId int, score types.Score) (types.ResScore, error) {
 	var (
 		totalScore   int
 		roundId      int
@@ -124,22 +125,21 @@ func InsertScore(gameId int, playerId int, round int, turnId int, score types.Sc
 		scoreRes     types.ResScore
 	)
 
-	dbcon := models.DataBase{Db: db}
-	dbcon.VerifyRoundTableQuery(gameId, round, roundId)
-	gamePlayerId, roundId = dbcon.RoundGamePlayerIdQuery(gameId, playerId, round)
-	totalScore, err := dbcon.FindTotalScore(gamePlayerId)
+	models.VerifyRoundTableQuery(db, gameId, round, roundId)
+	gamePlayerId, roundId = models.RoundGamePlayerIdQuery(db, gameId, playerId, round)
+	totalScore, err := models.FindTotalScore(db, gamePlayerId)
 	if err != nil {
 		fmt.Println(err)
 		return scoreRes, err
 	}
-	gameType = dbcon.FindGameTypeQuery(gameId)
+	gameType = models.FindGameTypeQuery(db, gameId)
 	totalScore = totalScore + score.Score
-	rowScore := dbcon.ValidateScoreQuery(gameId, playerId, round, turnId)
+	rowScore := models.ValidateScoreQuery(db, gameId, playerId, round, turnId)
 	err = rowScore.Scan(&scoresId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			if gameType == "High Score" {
-				dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+				models.InsertIntoScoreTableQuery(db, playerId, round, turnId, score, roundId, gamePlayerId)
 				scoreRes = types.ResScore{
 					Score:       score.Score,
 					TotalScore:  totalScore,
@@ -154,7 +154,7 @@ func InsertScore(gameId int, playerId int, round int, turnId int, score types.Sc
 					return scoreRes, err
 				}
 				if totalScore <= targetscore {
-					dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+					models.InsertIntoScoreTableQuery(db, playerId, round, turnId, score, roundId, gamePlayerId)
 					if totalScore == targetscore {
 						status := "Completed"
 						err = models.UpdateStatus(db, gameId, status)
@@ -168,7 +168,7 @@ func InsertScore(gameId int, playerId int, round int, turnId int, score types.Sc
 						}
 						return scoreRes, nil
 					}
-					totalScore, err = dbcon.FindTotalScore(gamePlayerId)
+					totalScore, err = models.FindTotalScore(db, gamePlayerId)
 					if err != nil {
 						fmt.Println(err)
 						return scoreRes, err
@@ -180,14 +180,14 @@ func InsertScore(gameId int, playerId int, round int, turnId int, score types.Sc
 					}
 					return scoreRes, nil
 				} else {
-					dbcon.InsertIntoScoreTableQuery(playerId, round, turnId, score, roundId, gamePlayerId)
+					models.InsertIntoScoreTableQuery(db, playerId, round, turnId, score, roundId, gamePlayerId)
 					for throw := turnId + 1; throw <= 3; throw++ {
-						dbcon.RemoveMultipleEntryInScore(roundId, gamePlayerId, throw)
+						models.RemoveMultipleEntryInScore(db, roundId, gamePlayerId, throw)
 					}
 					for throw := 1; throw <= 3; throw++ {
-						dbcon.QueryForUpdateIsValid(roundId, gamePlayerId, throw)
+						models.QueryForUpdateIsValid(db, roundId, gamePlayerId, throw)
 					}
-					totalScore, err = dbcon.FindTotalScore(gamePlayerId)
+					totalScore, err = models.FindTotalScore(db, gamePlayerId)
 					if err != nil {
 						fmt.Println(err)
 						return scoreRes, err

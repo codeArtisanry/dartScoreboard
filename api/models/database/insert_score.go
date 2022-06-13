@@ -8,9 +8,9 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func (database DataBase) FindTotalScore(gamePlayerId int) (int, error) {
+func FindTotalScore(db *sql.DB, gamePlayerId int) (int, error) {
 	var totalScore int
-	db := database.Db
+	//db := database.Db
 	findTotalScore := fmt.Sprintf("SELECT IFNULL(sum(scores.score),0) from scores where game_player_id = %d AND is_valid = 'VALID';", gamePlayerId)
 	row := db.QueryRow(findTotalScore)
 	err := row.Scan(&totalScore)
@@ -21,8 +21,7 @@ func (database DataBase) FindTotalScore(gamePlayerId int) (int, error) {
 	return totalScore, nil
 }
 
-func (database DataBase) VerifyRoundTableQuery(gameId int, round int, roundId int) {
-	db := database.Db
+func VerifyRoundTableQuery(db *sql.DB, gameId int, round int, roundId int) {
 	verifyRoundTable := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", round, gameId)
 	row := db.QueryRow(verifyRoundTable)
 	err := row.Scan(&roundId)
@@ -40,8 +39,8 @@ func (database DataBase) VerifyRoundTableQuery(gameId int, round int, roundId in
 	}
 }
 
-func (database DataBase) RoundGamePlayerIdQuery(gameId int, playerId int, round int) (gamePlayerId int, roundId int) {
-	db := database.Db
+func RoundGamePlayerIdQuery(db *sql.DB, gameId int, playerId int, round int) (gamePlayerId int, roundId int) {
+	//	db := database.Db
 	findRoundId := fmt.Sprintf("SELECT id FROM rounds WHERE round = %d AND game_id = %d;", round, gameId)
 	row := db.QueryRow(findRoundId)
 	err := row.Scan(&roundId)
@@ -57,8 +56,8 @@ func (database DataBase) RoundGamePlayerIdQuery(gameId int, playerId int, round 
 	return gamePlayerId, roundId
 }
 
-func (database DataBase) FindGameTypeQuery(gameId int) (gameType string) {
-	db := database.Db
+func FindGameTypeQuery(db *sql.DB, gameId int) (gameType string) {
+	//db := database.Db
 	findGameType := fmt.Sprintf("SELECT type FROM games WHERE id = %d;", gameId)
 	row := db.QueryRow(findGameType)
 	err := row.Scan(&gameType)
@@ -68,8 +67,7 @@ func (database DataBase) FindGameTypeQuery(gameId int) (gameType string) {
 	return gameType
 }
 
-func (database DataBase) InsertIntoScoreTableQuery(playerId int, round int, turnId int, score types.Score, roundId int, gamePlayerId int) {
-	db := database.Db
+func InsertIntoScoreTableQuery(db *sql.DB, playerId int, round int, turnId int, score types.Score, roundId int, gamePlayerId int) {
 	insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)
@@ -80,15 +78,14 @@ func (database DataBase) InsertIntoScoreTableQuery(playerId int, round int, turn
 	}
 }
 
-func (database DataBase) ValidateScoreQuery(gameId int, playerId int, round int, turnId int) (rowScore *sql.Row) {
-	db := database.Db
+func ValidateScoreQuery(db *sql.DB, gameId int, playerId int, round int, turnId int) (rowScore *sql.Row) {
+	//db := database.Db
 	validateScore := fmt.Sprintf("SELECT id FROM scores WHERE game_player_id = (SELECT id FROM game_players WHERE game_id = %d AND user_id = %d) AND round_id = (SELECT id FROM rounds WHERE round = %d AND game_id = %d) AND throw = %d", gameId, playerId, round, gameId, turnId)
 	rowScore = db.QueryRow(validateScore)
 	return rowScore
 }
 
-func (database DataBase) QueryForUpdateIsValid(roundId int, gamePlayerId int, throw int) {
-	db := database.Db
+func QueryForUpdateIsValid(db *sql.DB, roundId int, gamePlayerId int, throw int) {
 	query, err := db.Prepare("UPDATE scores SET is_valid = 'INVALID' WHERE round_id = ? AND game_player_id = ? AND throw = ?;")
 	if err != nil {
 		fmt.Println(err)
@@ -99,8 +96,7 @@ func (database DataBase) QueryForUpdateIsValid(roundId int, gamePlayerId int, th
 	}
 }
 
-func (database DataBase) RemoveMultipleEntryInScore(roundId int, gamePlayerId int, throw int) {
-	db := database.Db
+func RemoveMultipleEntryInScore(db *sql.DB, roundId int, gamePlayerId int, throw int) {
 	insert, err := db.Prepare("INSERT INTO scores(round_id, game_player_id, throw, score, is_valid) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		fmt.Println(err)

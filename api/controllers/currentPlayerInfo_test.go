@@ -29,8 +29,6 @@ var CurrentPlayerInfoTests = []CurrentPlayerInfoTest{
 			"payal@improwised.com",
 		},
 		},
-		"",
-		"",
 	},
 		types.CurrentPlayerInfo{
 			4,

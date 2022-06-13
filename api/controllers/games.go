@@ -3,6 +3,7 @@ package controllers
 import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
+	"database/sql"
 	"fmt"
 	"strconv"
 
@@ -32,7 +33,7 @@ func InsertGame(ctx *fiber.Ctx) error {
 	gamePlayerRes := types.GamePlayerResponse{}
 	ctx.BodyParser(&game)
 	if game.Type == "High Score" || game.Type == "Target Score-101" || game.Type == "Target Score-301" || game.Type == "Target Score-501" {
-		gameJson, err := models.InsertGames(db, email, user, game, gameRes, gamePlayer, gamePlayerRes)
+		gameJson, err := InsertGames(db, email, user, game, gameRes, gamePlayer, gamePlayerRes)
 		if err != nil {
 			fmt.Println(err)
 			return ctx.Status(500).JSON(types.StatusCode{
@@ -46,6 +47,34 @@ func InsertGame(ctx *fiber.Ctx) error {
 		StatusCode: 400,
 		Message:    "Can't find your matching game type",
 	})
+}
+
+// Insert Games in to Games Table
+func InsertGames(db *sql.DB, createrEmail string, user types.User, game types.Game, gameRes types.GameResponse, gamePlayer types.GamePlayer, gamePlayerRes types.GamePlayerResponse) (types.GameResponse, error) {
+	var gameResJson types.GameResponse
+	//dbcon := models.DataBase{Db: db}
+	createrInfo, err := models.SelectUserInfoByEmail(db, createrEmail, user)
+	if err != nil {
+		return gameResJson, err
+	}
+	result := models.InserGameQuery(db, createrInfo.Id, game)
+	gameId, err := result.LastInsertId()
+	if err != nil {
+		fmt.Println(err)
+		return gameResJson, err
+	}
+	id := int(gameId)
+	_, err = models.InsertPlayers(db, game, id, gamePlayerRes)
+	if err != nil {
+		fmt.Println(err)
+		return gameResJson, err
+	}
+	gameResJson, err = models.GetGame(db, id, gameRes, user, gamePlayerRes)
+	if err != nil {
+		fmt.Println(err)
+		return gameResJson, err
+	}
+	return gameResJson, nil
 }
 
 // swagger:route DELETE/games/{id} Games deleteGame
