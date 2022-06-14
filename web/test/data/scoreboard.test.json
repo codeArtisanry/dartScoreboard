@@ -1,0 +1,79 @@
+{
+    "players": [
+        {
+            "first_name": "Jeel",
+            "last_name": "Rupapara",
+            "rounds": [
+                {
+                    "round": 1,
+                    "throws_score": [
+                        10,
+                        12,
+                        13
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 35
+                },
+                {
+                    "round": 2,
+                    "throws_score": [
+                        1,
+                        2,
+                        3
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 6
+                },
+                {
+                    "round": 3,
+                    "throws_score": [
+                        2,
+                        32,
+                        12
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 46
+                }
+            ],
+            "total": 87
+        },
+        {
+            "first_name": "Vatsal",
+            "last_name": "Chauhan",
+            "rounds": [
+                {
+                    "round": 1,
+                    "throws_score": [
+                        25,
+                        23,
+                        21
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 69
+                },
+                {
+                    "round": 2,
+                    "throws_score": [
+                        32,
+                        12,
+                        12
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 56
+                },
+                {
+                    "round": 3,
+                    "throws_score": [
+                        32,
+                        44,
+                        43
+                    ],
+                    "check_round": "VALID",
+                    "round_total": 119
+                }
+            ],
+            "total": 244
+        }
+    ],
+    "winner": "Jeel Rupapara"
+}

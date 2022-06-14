@@ -24,7 +24,7 @@ type ActivePlayerInfo struct {
 // swagger:response Scoreboard
 type Scoreboard struct {
 	// in: body
-	PlayersScore []PlayerScore `json:"players_score"`
+	PlayersScore []PlayerScore `json:"players"`
 	Winner       string        `json:"winner,omitempty"`
 }
 

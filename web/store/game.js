@@ -101,8 +101,15 @@ const mutations = {
   },
 };
 
+const getters = {
+  details: (state) => {
+    return state.game
+  },
+};
+
 export default {
   state,
   mutations,
   actions,
+  getters
 };

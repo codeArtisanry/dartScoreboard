@@ -1,19 +1,20 @@
 <template>
-  <client-only>
+  <div>
+    <Speak :text="speak" />
     <div class="text-center mt-5 mb-5">
       <div class="container text-center">
         <div class="text-center">
           <h4>
             Congratulations
             <b
-              ><u>{{ getScoreboardStore.winner }}</u></b
+              ><u data-test="winner-name">{{ scoreboard.winner }}</u></b
             >
           </h4>
           <h5>You Win This Game</h5>
           <br />
 
-          <h3 class="text-center">{{ getGame.game_name }}</h3>
-          <h4 class="text-center">{{ getGame.game_type }}</h4>
+          <h3 class="text-center" data-test="game-title">{{ game.name }}</h3>
+          <h4 class="text-center" data-test="game-type">{{ game.type }}</h4>
           <br />
           <h5 class="text-center">ScoreBoard</h5>
         </div>
@@ -29,12 +30,12 @@
                 </td>
               </tr>
               <tbody
-                v-for="(player, i) in getScoreboardStore.players_score"
+                v-for="(player, i) in scoreboard.players"
                 :key="i"
                 v-b-toggle="`${i}collapse`"
               >
                 <!-- @click="toggleDetails(player)"   @click="toggle(i)"-->
-                <tr>
+                <tr data-test="player-details">
                   <td colspan="2">
                     <div class="justify-content-center">
                       <img
@@ -48,19 +49,23 @@
                   <td colspan="2">
                     {{ player.first_name + " " + player.last_name }}
                   </td>
-                  <td v-if="getGame.game_type == 'High Score'">
+                  <td v-if="game.type === 'High Score'">
                     {{ player.total }}
                   </td>
-                  <td v-else-if="getGame.game_type == 'Target Score-101'">
+                  <td v-else-if="game.type === 'Target Score-101'">
                     {{ 101 - player.total }}
                   </td>
-                  <td v-else-if="getGame.game_type == 'Target Score-301'">
+                  <td v-else-if="game.type === 'Target Score-301'">
                     {{ 301 - player.total }}
                   </td>
                   <td v-else>{{ 501 - player.total }}</td>
                 </tr>
 
-                <td colspan="6" style="padding: inherit">
+                <td
+                  colspan="6"
+                  style="padding: inherit"
+                  data-test="player-score"
+                >
                   <b-collapse :id="`${i}collapse`">
                     <table class="table">
                       <tr>
@@ -73,7 +78,7 @@
                       <tr v-for="(round, j) in player.rounds" :key="j">
                         <td>
                           <mark
-                            v-if="round.check_round == 'INVALID'"
+                            v-if="round.check_round === 'INVALID'"
                             style="background-color: #ffcccb"
                           >
                             {{ round.round }}
@@ -85,23 +90,23 @@
                           :key="index"
                         >
                           <mark
-                            v-if="round.check_round == 'INVALID'"
+                            v-if="round.check_round === 'INVALID'"
                             style="background-color: #ffcccb"
                             >{{ dart }}</mark
                           >
                           <div v-else>{{ dart }}</div>
                         </td>
-                        <td v-if="round.throws_score == null" colspan="3">-</td>
+                        <td v-if="round.throws_score === null" colspan="3">-</td>
                         <td
-                          v-else-if="round.throws_score.length == 1"
+                          v-else-if="round.throws_score.length === 1"
                           colspan="2"
                         >
                           -
                         </td>
-                        <td v-else-if="round.throws_score.length == 2">-</td>
+                        <td v-else-if="round.throws_score.length === 2">-</td>
                         <td>
                           <mark
-                            v-if="round.check_round == 'INVALID'"
+                            v-if="round.check_round === 'INVALID'"
                             style="background-color: #ffcccb"
                             >{{ round.round_total }}</mark
                           >
@@ -118,42 +123,51 @@
         <div class="text-center"></div>
         <br />
         <div class="d-grid gap-2 col-6 mx-auto">
-          <button class="btn btn-secondary" type="button" @click="homepage">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            @click="redirectToHomePage"
+          >
             Home Page
           </button>
         </div>
       </div>
     </div>
-  </client-only>
+  </div>
 </template>
 <script>
 export default {
+  data() {
+    return {
+      speak: "",
+    };
+  },
   computed: {
-    getGame() {
-      return this.$store.state.game.game;
+    game() {
+      return this.$store.getters["game/details"];
     },
-    getScoreboardStore() {
+    scoreboard() {
       return this.$store.state.game.scoreboard;
     },
   },
   async created() {
-    await this.gameApi();
-    await this.scoreboardApi();
+    await this.getGame();
+    await this.getScoreboard();
   },
   mounted() {
-    const SpeakWinnerName = new SpeechSynthesisUtterance(
-      "Congratulations " + this.getScoreboardStore.winner + "You Win This Game"
-    );
-    window.speechSynthesis.speak(SpeakWinnerName);
+    this.speak =
+      "Congratulations " + this.scoreboard.winner + "You Win This Game";
   },
   methods: {
-    homepage() {
+    redirectToHomePage() {
       this.$router.push("/");
     },
-    async gameApi() {
+
+    async getGame() {
       await this.$store.dispatch("game/getGame", this.$route.params.gameid);
     },
-    async scoreboardApi() {
+
+    async getScoreboard() {
       await this.$store.dispatch(
         "game/getScoreboard",
         this.$route.params.gameid
