@@ -1,5 +1,5 @@
 <template>
-  <VerifyGame />
+  <GameDetails />
 </template>
 
 <script>

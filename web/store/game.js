@@ -105,6 +105,13 @@ const getters = {
   details: (state) => {
     return state.game
   },
+  isOwner: (state, _, rootState) => {
+    if (state.game.creater_name === rootState.auth.token.name) {
+      return true
+    } else {
+      return false
+    }
+  }
 };
 
 export default {
