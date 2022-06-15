@@ -2,6 +2,17 @@
   <div>
     <NavBar />
     <main class="container">
+      <div>
+        <b-alert
+          v-model="alert"
+          class="position-fixed fixed-top py-3 rounded-0"
+          style="z-index: 2000"
+          variant="warning"
+          dismissible
+        >
+          Please, add at least one player!!!
+        </b-alert>
+      </div>
       <div class="text-center pt-5">
         <h1 class="font-weight-bolder">Welcome</h1>
         <p class="p-md-2">Let's create a new Game</p>
@@ -16,7 +27,7 @@
       <div class="ml-1">
         <label class="text-muted">Enter Game Name:</label>
         <input
-          v-model="game_responses.game_name"
+          v-model="name"
           class="form-control"
           type="text"
           placeholder="Game Name..."
@@ -26,7 +37,7 @@
           <label class="text-muted"
             >Select Game Type<span style="color: red"> *</span></label
           >
-          <select v-model="game_responses.game_type" class="form-control w-100">
+          <select v-model="type" class="form-control w-100">
             <option value="High Score">High Score</option>
             <option value="Target Score-101">Target Score-101</option>
             <option value="Target Score-301">Target Score-301</option>
@@ -91,15 +102,14 @@
         </small>
       </div>
       <br />
-
       <div>
         <label class="typo__label text-muted mt-3"
           >Select PlayersNames<span style="color: red"> *</span></label
         >
         <multiselect
-          v-model="value"
-          :options="options"
-          :custom-label="nameWithLang"
+          v-model="players"
+          :options="usersList"
+          :custom-label="optionsFormat"
           :multiple="true"
           :close-on-select="false"
           :clear-on-select="true"
@@ -118,7 +128,7 @@
         </multiselect>
         <pre
           class="language-json"
-        ><code v-for="player in value" :key="player.email">{{ player.first_name }} {{player.last_name}}<br></code><br></pre>
+        ><code v-for="player in players" :key="player.email">{{ player.first_name }} {{player.last_name}}<br></code><br></pre>
         <br />
       </div>
 
@@ -127,12 +137,12 @@
           <button
             v-if="$route.params.gameid !== undefined"
             class="btn btn-secondary"
-            @click="updatedata"
+            @click="update"
           >
             Update
           </button>
-          <button v-else class="btn btn-secondary" @click="register">
-            Register Game
+          <button v-else class="btn btn-secondary" @click="registerNewGame">
+            Register
           </button>
         </div>
       </div>
@@ -146,87 +156,111 @@ export default {
   components: { Multiselect },
   data() {
     return {
-      value: [],
-      options: [],
-      registerGames: "",
-      game_responses: {
-        game_name: "",
-        game_type: "High Score",
+      alert: false,
+      usersList: [],
+      name: "",
+      type: "High Score",
+      players: [],
+      game: {
+        name: "",
+        type: "",
         players: [],
       },
-      newPlayer: "",
-      player: [],
-      nameofgame: [],
-      totalplayers: 0,
     };
   },
   computed: {
-    getGame() {
-      return this.$store.state.game.game;
+    gameDetails() {
+      return this.$store.getters["game/details"];
     },
-    getUsers() {
-      return this.$store.state.game.users;
+    users() {
+      return this.$store.getters["users/list"];
     },
   },
+
   async created() {
-    await this.users();
-    if (this.$route.params.gameid !== undefined) {
-      await this.game();
-      this.withUpdate();
+    await this.getUsers();
+    if (this.$route.params.gameid) {
+      await this.getGameById(this.$route.params.gameid);
+      this.name = this.gameDetails.name;
+      this.type = this.gameDetails.type;
+      this.players = this.gameDetails.players;
     }
   },
+
   methods: {
     // eslint-disable-next-line camelcase
-    nameWithLang({ first_name, last_name, email }) {
+    optionsFormat({ first_name, last_name, email }) {
       // eslint-disable-next-line camelcase
       return `${first_name} ${last_name} — [${email}]`;
     },
-    async users() {
-      await this.$store.dispatch("game/getUsers");
-      this.options = this.getUsers.user_responses;
+
+    // get users list from users api
+    async getUsers() {
+      await this.$store.dispatch("users/getUsers");
+      this.usersList = this.users;
     },
-    register() {
-      if (this.value.length === 0) {
-        alert("please enter players name at list one");
-      } else {
-        this.$router.push("/");
-        for (let i = 0; i <= this.value.length - 1; i++) {
-          this.game_responses.players.push(this.value[i].id);
-          this.nameofgame.push(this.value[i].first_name);
-        }
-        if (this.game_responses.game_name === "") {
-          this.totalplayers = this.nameofgame.length - 1;
-          this.game_responses.game_name =
-            this.nameofgame[0] + ` (+${this.totalplayers}  others)`;
-        }
-        this.postGame();
-      }
+
+    // get game details by game id from game api
+    async getGameById(id) {
+      await this.$store.dispatch("game/getGame", id);
+      this.name = this.gameDetails.name;
+      this.type = this.gameDetails.type;
+      this.players = this.gameDetails.players;
     },
-    async postGame() {
-      await this.$store.dispatch("game/postGame", this.game_responses);
-    },
-    async game() {
-      await this.$store.dispatch("game/getGame", this.$route.params.gameid);
-      this.game_responses = this.getGame;
-    },
-    async updatedata() {
-      this.options = this.getUsers.user_responses;
-      this.game_responses.players = [];
-      for (let j = 0; j <= this.value.length - 1; j++) {
-        for (let k = 0; k <= this.options.length - 1; k++) {
-          if (this.value[j].id === this.options[k].id) {
-            this.game_responses.players.push(this.options[k].id);
-          }
-        }
-      }
-      await this.$store.dispatch("game/updateGame", {
-        gameId: this.$route.params.gameid,
-        update: this.game_responses,
-      });
+
+    // redirect to home page
+    redirectToHome() {
       this.$router.push("/");
     },
-    withUpdate() {
-      this.value = this.getGame.players;
+
+    // fill game details in game object to create a game
+    createGameObject() {
+      if (!this.name) {
+        this.generateName();
+      }
+      this.game.name = this.name;
+      this.game.type = this.type;
+      this.players.forEach((player) => {
+        this.game.players.push(player.id);
+      });
+    },
+
+    // generate game name for users don't give any name of game
+    generateName() {
+      const totalPlayers = this.players.length;
+      this.name = `${this.players[0].first_name} (+${totalPlayers - 1} others)`;
+    },
+
+    // create a game using game details
+    async createGame() {
+      this.createGameObject();
+      await this.$store.dispatch("game/createGame", this.game);
+    },
+
+    // register a new game
+    async registerNewGame() {
+      if (!this.players.length) {
+        this.alert = true;
+        setTimeout(() => (this.alert = false), 3000);
+      } else {
+        await this.createGame();
+        this.redirectToHome();
+      }
+    },
+
+    // update a game details
+    async update() {
+      if (!this.players.length) {
+        this.alert = true;
+        setTimeout(() => (this.alert = false), 3000);
+      } else {
+        this.createGameObject();
+        await this.$store.dispatch("game/updateGame", {
+          id: this.gameDetails.id,
+          update: this.game,
+        });
+        this.redirectToHome();
+      }
     },
   },
 };

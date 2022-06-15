@@ -17,7 +17,7 @@ type User struct {
 // swagger:response UsersPaginationResponse
 type UsersPaginationResponse struct {
 	// in: body
-	UserResponses []User `json:"user_responses"`
-	PrePageLink   string `json:"pre_page_link,omitempty"`
-	PostPageLink  string `json:"post_page_link,omitempty"`
+	UserResponses []User `json:"list"`
+	PrePageLink   string `json:"previous,omitempty"`
+	PostPageLink  string `json:"next,omitempty"`
 }
