@@ -12,6 +12,15 @@ const state = {
     game: games.list[0],
 };
 
+const mutations = {
+    CHANGE_STATUS(state, status) {
+        state.game.status = status;
+    },
+    CHANGE_OWNER(state, owner_name) {
+        state.game.creater_name = owner_name
+    }
+}
+
 const store = new Vuex.Store({
     state: {
         auth: {
@@ -24,6 +33,7 @@ const store = new Vuex.Store({
     modules: {
         game: {
             state,
+            mutations,
             getters: _game.getters,
             namespaced: true
         }
@@ -45,14 +55,14 @@ describe('GameDetails', () => {
     let wrapper = null
 
     // SETUP - run before to all unit test are started
-    beforeAll(() => {
+    beforeEach(() => {
 
         // render the component
         wrapper = shallowMount(GameDetails, componentData)
     });
 
     // TEARDOWN - run after to all unit test is complete
-    afterAll(() => {
+    afterEach(() => {
         wrapper.destroy()
     });
 
@@ -96,4 +106,35 @@ describe('GameDetails', () => {
         homeButton.trigger('click')
         expect($router.push).toHaveBeenCalledWith('/')
     });
-})
+
+    test("User can resume game", () => {
+        wrapper.vm.$store.commit("game/CHANGE_STATUS", 'In Progress')
+        wrapper.vm.updateButtonName()
+        expect(wrapper.vm.buttonName).toBe("Resume")
+        const resumeButton = wrapper.find('[data-test="game-state-button"]')
+        resumeButton.trigger('click')
+        expect($router.push).toHaveBeenCalledWith('/games/1/player')
+    });
+
+    test("User can able to see scoreboard if game is completed", () => {
+        wrapper.vm.$store.commit("game/CHANGE_STATUS", 'Completed')
+        wrapper.vm.updateButtonName()
+        expect(wrapper.vm.buttonName).toBe("Scoreboard")
+        const scoreboardButton = wrapper.find('[data-test="game-state-button"]')
+        scoreboardButton.trigger('click')
+        expect($router.push).toHaveBeenCalledWith('/games/1/scoreboard')
+    });
+
+    test("User is game owner or not?", () => {
+        wrapper.vm.$store.commit("game/CHANGE_OWNER", 'Payal Ravya')
+        expect(wrapper.vm.isOwner).toBe(false)
+    });
+
+    test("If user is not create that game then user not able to update and delete game", () => {
+        const deleteButton = wrapper.find('[data-test="delete-button"]')
+        expect(deleteButton.exists()).toBe(false)
+        const updateButton = wrapper.find('[data-test="update-button"]')
+        expect(updateButton.exists()).toBe(false)
+    });
+
+});
