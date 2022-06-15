@@ -1,6 +1,7 @@
 package main
 
 import (
+	models "dartscoreboard/models/database"
 	"dartscoreboard/routes"
 	"log"
 	"os"
@@ -23,6 +24,7 @@ func ConnectENV() {
 }
 
 func main() {
+	models.Migration("dart.db")
 	ConnectENV()
 	goth.UseProviders(
 		google.New(os.ExpandEnv("${CLIENT_KEY}"), os.ExpandEnv("${SECRET_KEY}"), os.ExpandEnv("${PROTOCOL}://${HOST}:${PORT}/auth/google/callback"), "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"))
@@ -31,13 +33,13 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowMethods: strings.Join([]string{
-		fiber.MethodGet,
-		fiber.MethodPost,
-		fiber.MethodHead,
-		fiber.MethodPut,
-		fiber.MethodDelete,
-		fiber.MethodPatch,
-	}, ","),
+			fiber.MethodGet,
+			fiber.MethodPost,
+			fiber.MethodHead,
+			fiber.MethodPut,
+			fiber.MethodDelete,
+			fiber.MethodPatch,
+		}, ","),
 	}))
 
 	app.Use(logger.New())
