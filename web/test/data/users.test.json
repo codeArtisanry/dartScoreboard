@@ -1,0 +1,22 @@
+{
+    "list": [
+        {
+            "id": 1,
+            "first_name": "Jeel",
+            "last_name": "Rupapara",
+            "email": "jeel@improwised.com"
+        },
+        {
+            "id": 2,
+            "first_name": "Payal",
+            "last_name": "Ravya",
+            "email": "payal@improwised.com"
+        },
+        {
+            "id": 3,
+            "first_name": "Vatsal",
+            "last_name": "Chauhan",
+            "email": "vatsal@improwised.com"
+        }
+    ]
+}

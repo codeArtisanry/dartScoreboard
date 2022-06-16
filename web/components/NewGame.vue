@@ -137,11 +137,17 @@
           <button
             v-if="$route.params.gameid !== undefined"
             class="btn btn-secondary"
+            data-test="update"
             @click="update"
           >
             Update
           </button>
-          <button v-else class="btn btn-secondary" @click="registerNewGame">
+          <button
+            v-else
+            class="btn btn-secondary"
+            data-test="register"
+            @click="registerNewGame"
+          >
             Register
           </button>
         </div>
@@ -181,9 +187,6 @@ export default {
     await this.getUsers();
     if (this.$route.params.gameid) {
       await this.getGameById(this.$route.params.gameid);
-      this.name = this.gameDetails.name;
-      this.type = this.gameDetails.type;
-      this.players = this.gameDetails.players;
     }
   },
 
@@ -220,9 +223,9 @@ export default {
       }
       this.game.name = this.name;
       this.game.type = this.type;
-      this.players.forEach((player) => {
-        this.game.players.push(player.id);
-      });
+      for (let i = 0; i < this.players.length; i++) {
+        this.game.players.push(this.players[i].id);
+      }
     },
 
     // generate game name for users don't give any name of game
