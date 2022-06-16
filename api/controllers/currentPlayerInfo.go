@@ -54,35 +54,37 @@ func GetCurrentPlayerInfo(db *sql.DB, gameId int, playerId int, gameRes types.Ga
 	var (
 		CurrentPlayerInfo types.CurrentPlayerInfo
 		activeRes         types.ActiveStatus
-		ActivePlayerInfo  types.ActivePlayerInfo
 	)
-	//dbcon := models.DataBase{Db: db}
-	gameRes.Id, gameRes.Name, gameRes.Type, gameRes.Status = models.GameResQuery(db, gameId, gameRes)
+	game := models.GameResQuery(db, gameId, gameRes)
 	ActiveStatus, err := GetActiveStatusRes(db, gameId, activeRes)
 	if err != nil {
-
 		return CurrentPlayerInfo, err
 	}
-	ActivePlayerInfo.Score = models.ActivePlayerTotal(db, gameId, playerId)
-	ActivePlayerInfo.Score = services.RemainScore(gameRes.Type, ActivePlayerInfo.Score)
-	ActivePlayerInfo.Id, ActivePlayerInfo.FirstName, ActivePlayerInfo.LastName, ActivePlayerInfo.Email = models.QueryForPlayer(db, playerId)
+	id, name, email := models.QueryForPlayer(db, playerId)
+	score := models.ActivePlayerTotal(db, gameId, playerId)
+	score = services.RemainScore(game.Type, score)
 	if ActiveStatus.Round == 0 {
 		CurrentPlayerInfo = types.CurrentPlayerInfo{
-			Id:               gameRes.Id,
-			Name:             gameRes.Name,
-			Type:             gameRes.Type,
-			Status:           gameRes.Status,
-			ActivePlayerInfo: &ActivePlayerInfo,
+			Id:    id,
+			Name:  name,
+			Email: email,
+			Score: score,
+			Game:  game,
+		}
+		return CurrentPlayerInfo, nil
+	} else {
+		round := ActiveStatus.Round
+		throw := ActiveStatus.Throw
+		CurrentPlayerInfo = types.CurrentPlayerInfo{
+			Id:    id,
+			Name:  name,
+			Email: email,
+			Round: round,
+			Throw: throw,
+			Score: score,
+			Game:  game,
 		}
 		return CurrentPlayerInfo, nil
 	}
-	CurrentPlayerInfo = types.CurrentPlayerInfo{
-		Id:               gameRes.Id,
-		Name:             gameRes.Name,
-		Type:             gameRes.Type,
-		Round:            ActiveStatus.Round,
-		Throw:            ActiveStatus.Throw,
-		ActivePlayerInfo: &ActivePlayerInfo,
-	}
-	return CurrentPlayerInfo, nil
+
 }

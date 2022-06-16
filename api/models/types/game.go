@@ -25,9 +25,9 @@ type GameResponse struct {
 	Type          string `json:"type"`
 	Status        string `json:"status"`
 	CreaterUserId int    `json:"creater_user_id,omitempty"`
-	CreaterName   string `json:"creater_name"`
+	CreaterName   string `json:"creater_name,omitempty"`
 	// in: body
-	Players      []GamePlayerResponse `json:"players"`
+	Players []GamePlayerResponse `json:"players,omitempty"`
 }
 
 // swagger:response GamesPaginationResponse
