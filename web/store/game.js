@@ -1,7 +1,7 @@
 const state = () => {
   return {
     game: "",
-    playerInfo: "",
+    player: "",
     scoreboard: "",
     currentTurn: "",
   };
@@ -44,7 +44,7 @@ const actions = {
     );
     commit("GET_CURRENTTURN", curruntTurnRes);
   },
-  async postScore({ commit }, params) {
+  async addScore({ commit }, params) {
     await this.$axios
       .$post(
         `/api/v1/games/${params.gameId}/players/${params.playerId}/rounds/${params.roundId}/turns/${params.turnId}/score`,
@@ -85,8 +85,8 @@ const mutations = {
   GET_SCOREBOARD(state, scoreboard) {
     state.scoreboard = scoreboard;
   },
-  GET_GAMEPLAYERINFO(state, playerInfo) {
-    state.playerInfo = playerInfo;
+  GET_GAMEPLAYERINFO(state, player) {
+    state.player = player;
   },
   GET_CURRENTTURN(state, currentTurn) {
     state.currentTurn = currentTurn;
@@ -95,19 +95,27 @@ const mutations = {
 
 const getters = {
   details: (state) => {
-    return state.game
+    return state.game;
   },
   isOwner: (state, _, rootState) => {
     if (state.game.creater_name === rootState.auth.token.name) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
-  }
-}
+  },
+  rounds: (state) => {
+    if (state.scoreboard.players) {
+      return state.scoreboard.players[0].rounds;
+    }
+  },
+  info: (state) => {
+    return state.player.game;
+  },
+};
 export default {
   state,
   mutations,
   actions,
-  getters
+  getters,
 };

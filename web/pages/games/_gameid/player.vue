@@ -1,7 +1,6 @@
 <template>
   <div>
-    <NavBar />
-    <Startgame />
+    <StartGame />
     <NuxtChild style="height: 0px" />
   </div>
 </template>
