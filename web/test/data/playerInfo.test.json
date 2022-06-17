@@ -1,0 +1,14 @@
+{
+  "id": 3,
+  "name": "Jeel Rupapara",
+  "email": "jeel@improwised.com",
+  "round": 2,
+  "throw": 3,
+  "score": 10,
+  "game": {
+    "id": 1,
+    "name": "Game-Name",
+    "type": "Target Score-101",
+    "status": "In Progress"
+  }
+}

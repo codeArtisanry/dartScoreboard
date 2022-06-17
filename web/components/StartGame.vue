@@ -10,11 +10,7 @@
         <div class="bg-white rounded">
           <!-- dart-board -->
           <div class="text-center">
-            <div
-              id="dartboard"
-              class="d-inline-block"
-              style="width: 22rem; height: 22rem"
-            ></div>
+            <Dartboard id="dartboard" @onAddScore="onAddScore" />
           </div>
           <div
             class="
@@ -169,41 +165,36 @@ export default {
     await this.getScoreboard();
     this.scoreColumnName();
     this.speak = "Now " + this.playerInfo.name + "'s Turn";
-
-    // eslint-disable-next-line no-undef
-    const dartboard = new Dartboard("#dartboard");
-    dartboard.render();
-    document
-      .querySelector("#dartboard")
-      .addEventListener("throw", async (d) => {
-        await this.addScore(d.detail);
-        this.speak = d.detail.score;
-        await this.getCurrentTurn();
-        await this.getPlayerInfo();
-        if (this.turn.throw === 1) {
-          this.speak = "Now " + this.playerInfo.name + "'s Turn";
-        }
-        await this.getScoreboard();
-      });
   },
 
   methods: {
+    async onAddScore(dartScore) {
+      await this.addScore(dartScore);
+      this.speak = dartScore.score;
+      await this.getCurrentTurn();
+      await this.getPlayerInfo();
+      if (this.turn.throw === 1) {
+        this.speak = "Now " + this.playerInfo.name + "'s Turn";
+      }
+      await this.getScoreboard();
+    },
+
+    async addScore(dartScore) {
+      await this.$store.dispatch("game/addScore", {
+        gameId: this.$route.params.gameid,
+        playerId: this.$route.params.playerid,
+        roundId: this.$route.params.roundid,
+        turnId: this.$route.params.turnid,
+        score: dartScore,
+      });
+    },
+
     async getPlayerInfo() {
       await this.$store.dispatch("game/getGamePlayerInfo", {
         gameId: this.$route.params.gameid,
         playerId: this.turn.player_id,
       });
       this.checkGameStatusAndRedirect();
-    },
-
-    async addScore(turnScore) {
-      await this.$store.dispatch("game/addScore", {
-        gameId: this.$route.params.gameid,
-        playerId: this.$route.params.playerid,
-        roundId: this.$route.params.roundid,
-        turnId: this.$route.params.turnid,
-        score: turnScore,
-      });
     },
 
     async getScoreboard() {
