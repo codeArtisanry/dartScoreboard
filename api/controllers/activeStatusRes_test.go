@@ -35,13 +35,17 @@ func TestGetActiveStatusRes(t *testing.T) {
 	if err != nil {
 		fmt.Println(err, resultOfInsertGamePlayer)
 	}
-	resultOfInsertScore, err := dbtest.Exec("INSERT INTO scores(round_id, game_player_id, throw, score) VALUES(1, 2, 1, 11),(2, 2, 2, 11),(3, 2, 3, 11),(4, 4, 1, 11),(5, 4, 2, 11),(6, 4, 3, 11),(7, 5, 1, 11),(8, 5, 2, 11),(9, 5, 3, 11)")
+	resultOfInsertScore, err := dbtest.Exec("INSERT INTO scores(round_id, game_player_id, throw, score,is_valid) VALUES(1, 2, 1, 11,'VALID'),(1, 2, 2, 11,'VALID'),(1, 2, 3, 11,'VALID'),(2, 4, 1, 11,'VALID'),(2, 4, 2, 11,'VALID'),(2, 4, 3, 11,'VALID'),(2, 5, 1, 11,'VALID'),(2, 5, 2, 11,'VALID'),(2, 5, 3, 11,'VALID')")
 	if err != nil {
 		fmt.Println(err, resultOfInsertScore)
 	}
-	resultOfInsertScoreFourthGame, err := dbtest.Exec("INSERT INTO scores(round_id, game_player_id, throw, score) VALUES(10, 6, 1, 11),(11, 6, 2, 11),(12, 6, 3, 11),(13, 6, 1, 11),(14, 6, 2, 11),(15, 6, 3, 11),(16, 6, 1, 11),(17, 6, 2, 11),(18, 6, 3, 11)")
+	resultOfInsertScoreFourthGame, err := dbtest.Exec("INSERT INTO scores(round_id, game_player_id, throw, score,is_valid) VALUES(3, 6, 1, 11,'VALID'),(3, 6, 2, 11,'VALID'),(3, 6, 3, 11,'VALID'),(4, 6, 1, 11,'VALID'),(4, 6, 2, 11,'VALID'),(4, 6, 3, 11,'VALID'),(5, 6, 1, 11,'VALID'),(5, 6, 2, 11,'VALID'),(5, 6, 3, 11,'VALID')")
 	if err != nil {
 		fmt.Println(err, resultOfInsertScoreFourthGame)
+	}
+	resultOfInsertRound, err := dbtest.Exec("INSERT INTO rounds(round,game_id) VALUES(1,2),(1,3),(1,4),(2,4),(3,4)")
+	if err != nil {
+		fmt.Println(err, resultOfInsertRound)
 	}
 
 	for _, test := range ActiveStatusTests {

@@ -4,6 +4,7 @@ import (
 	models "dartscoreboard/models/database"
 	types "dartscoreboard/models/types"
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -16,33 +17,39 @@ type CurrentPlayerInfoTest struct {
 
 var CurrentPlayerInfoTests = []CurrentPlayerInfoTest{
 	CurrentPlayerInfoTest{4, 1, types.GameResponse{
-		4,
-		"Fourth",
-		"High Score",
-		"Completed",
-		1,
-		"Payal Raviya",
-		[]types.GamePlayerResponse{{
-			1,
-			"Payal",
-			"Raviya",
-			"payal@improwised.com",
-		},
-		},
+		Id:            4,
+		Name:          "Fourth",
+		Type:          "High Score",
+		Status:        "Completed",
+		CreaterUserId: 1,
+		CreaterName:   "Payal Raviya",
+		Players: []types.GamePlayerResponse{{
+			Id:        1,
+			FirstName: "Payal",
+			LastName:  "Raviya",
+			Email:     "payal@improwised.com",
+		}},
 	},
 		types.CurrentPlayerInfo{
-			4,
-			"Fourth",
-			"High Score",
-			"",
-			0,
-			0,
-			&types.ActivePlayerInfo{
-				1,
-				"Payal",
-				"Raviya",
-				"payal@improwised.com",
-				99,
+			Id:    1,
+			Name:  "Payal Raviya",
+			Email: "payal@improwised.com",
+			Round: 0,
+			Throw: 0,
+			Score: 99,
+			Game: types.GameResponse{
+				Id:            4,
+				Name:          "Fourth",
+				Type:          "High Score",
+				Status:        "Completed",
+				CreaterUserId: 1,
+				CreaterName:   "Payal Raviya",
+				Players: []types.GamePlayerResponse{{
+					Id:        1,
+					FirstName: "Payal",
+					LastName:  "Raviya",
+					Email:     "payal@improwised.com",
+				}},
 			},
 		},
 	},
@@ -52,9 +59,9 @@ func TestGetCurrentPlayerInfo(t *testing.T) {
 	dbtest := models.Database("test.db")
 	for _, test := range CurrentPlayerInfoTests {
 		output, err := GetCurrentPlayerInfo(dbtest, test.gameId, test.playerid, test.gameRes)
-		if err != nil {
-			t.Errorf("output is not same want %q", err)
-			fmt.Println(output)
+		if !reflect.DeepEqual(output, test.CurrentPlayer) {
+			t.Errorf("output is not same want %v,%v", output, test.CurrentPlayer)
+			fmt.Println(err)
 		}
 	}
 
