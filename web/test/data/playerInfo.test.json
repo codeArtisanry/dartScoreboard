@@ -1,14 +1,72 @@
-{
-  "id": 3,
-  "name": "Jeel Rupapara",
-  "email": "jeel@improwised.com",
-  "round": 2,
-  "throw": 3,
-  "score": 10,
-  "game": {
-    "id": 1,
-    "name": "Game-Name",
-    "type": "Target Score-101",
-    "status": "In Progress"
+[
+  {
+    "id": 3,
+    "name": "Jeel Rupapara",
+    "email": "jeel@improwised.com",
+    "round": 2,
+    "throw": 2,
+    "score": 50,
+    "game": {
+      "id": 1,
+      "name": "Game-Name",
+      "type": "Target Score-101",
+      "status": "In Progress"
+    }
+  },
+  {
+    "id": 3,
+    "name": "Jeel Rupapara",
+    "email": "jeel@improwised.com",
+    "round": 2,
+    "throw": 3,
+    "score": 60,
+    "game": {
+      "id": 1,
+      "name": "Game-Name",
+      "type": "Target Score-101",
+      "status": "In Progress"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Vatsal Chauhan",
+    "email": "vatsal@improwised.com",
+    "round": 3,
+    "throw": 1,
+    "score": 91,
+    "game": {
+      "id": 1,
+      "name": "Game-Name",
+      "type": "Target Score-101",
+      "status": "Completed"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Vatsal Chauhan",
+    "email": "vatsal@improwised.com",
+    "round": 3,
+    "throw": 2,
+    "score": 96,
+    "game": {
+      "id": 1,
+      "name": "Game-Name",
+      "type": "Target Score-101",
+      "status": "Completed"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Vatsal Chauhan",
+    "email": "vatsal@improwised.com",
+    "round": 3,
+    "throw": 3,
+    "score": 100,
+    "game": {
+      "id": 1,
+      "name": "Game-Name",
+      "type": "High Score",
+      "status": "Completed"
+    }
   }
-}
+]

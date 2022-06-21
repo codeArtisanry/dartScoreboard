@@ -1,6 +1,26 @@
-{
-  "game_id": 1,
-  "round": 2,
-  "player_id": 4,
-  "throw": 3
-}
+[
+  {
+    "game_id": 1,
+    "round": 2,
+    "player_id": 4,
+    "throw": 2
+  },
+  {
+    "game_id": 1,
+    "round": 2,
+    "player_id": 4,
+    "throw": 3
+  },
+  {
+    "game_id": 1,
+    "round": 3,
+    "player_id": 3,
+    "throw": 1
+  },
+  {
+    "game_id": 1,
+    "round": 3,
+    "player_id": 3,
+    "throw": 2
+  }
+]

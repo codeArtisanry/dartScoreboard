@@ -38,13 +38,19 @@
             </b-modal>
           </div>
           <div v-if="undo">
-            <button class="btn btn-secondary" @click="undoScore">Undo</button>
+            <button
+              class="btn btn-secondary"
+              test-data="undo"
+              @click="undoScore"
+            >
+              Undo
+            </button>
           </div>
           <table class="table table-striped shadow mt-3">
             <tbody>
               <tr>
                 <th class="text-center" scope="row">Player Name</th>
-                <td scope="col">
+                <td scope="col" test-data="player-name">
                   {{ playerInfo.name }}
                 </td>
               </tr>
@@ -52,7 +58,7 @@
             <tbody>
               <tr>
                 <th class="text-center" scope="row">Round, Turn</th>
-                <td scope="col">
+                <td scope="col" test-data="player-round-turn">
                   {{ playerInfo.round }}, {{ playerInfo.throw }}
                 </td>
               </tr>
@@ -60,7 +66,7 @@
             <tbody>
               <tr>
                 <th class="text-center" scope="row">{{ scoreColName }}</th>
-                <td>{{ playerInfo.score }}</td>
+                <td test-data="player-score">{{ playerInfo.score }}</td>
               </tr>
             </tbody>
           </table>
@@ -82,7 +88,7 @@
           >
           <!-- Element to collapse -->
           <b-collapse id="collapse-2" class="table-responsive">
-            <table class="table container-fluid wrap">
+            <table class="table container-fluid wrap" test-data="scoreboard">
               <thead>
                 <tr>
                   <th scope="col">Name</th>

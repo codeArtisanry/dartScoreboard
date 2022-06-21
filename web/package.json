@@ -11,7 +11,7 @@
     "lint:prettier": "prettier --check .",
     "lint": "npm run lint:js && npm run lint:prettier",
     "lintfix": "prettier --write --list-different . && npm run lint:js -- --fix",
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install web/.husky",
     "test": "jest"
   },
   "lint-staged": {
@@ -37,6 +37,7 @@
     "vue-cookies": "^1.7.4",
     "vue-multiselect": "^2.1.6",
     "vue-server-renderer": "^2.6.14",
+    "vue-spinner": "^1.0.4",
     "vue-template-compiler": "^2.6.14",
     "webpack": "^4.46.0"
   },
