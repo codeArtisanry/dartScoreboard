@@ -222,7 +222,7 @@ describe("StartGame", () => {
     expect(actions["game/getGamePlayerInfo"]).toHaveBeenCalled();
     expect(actions["game/getGamePlayerInfo"].mock.lastCall[1]).toEqual({
       gameId: 1,
-      playerId: 3,
+      playerId: 4,
     });
     // change state player value
     wrapper.vm.$store.commit("game/GET_GAMEPLAYERINFO", player[2]);
