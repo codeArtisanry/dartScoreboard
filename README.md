@@ -1,47 +1,93 @@
-# darts-scoreboard
 
-Dart Scoring application with Nuxt js and Golang To record Score When Playing Dart.
+# Dart-Scoreboard
 
-## Run Using Docker
+Dart-Scoreboard is use for calculating and managing your dart game.
 
-Clone Project
+### Used technology
+- **Front-end** : vue (v4.5.x), nuxt(v2.15.x)
+- **Back-end** : golang (v1.17.x)
+- **Database** : sqlite (v3)
+
+
+### Run Locally (UI)
+
+Clone the project
 
 ```bash
   git clone https://github.com/Improwised/darts-scoreboard.git
 ```
-
-Go to the project directory
-
-```bash
-  cd darts-scoreboard
-```
-
-### Start Backend (_Make sure you have docker installed locally_)
-
-go to backend API directory
+Go to the project web directory (after clone project)
 
 ```bash
-  cd api
+  cd dart-scoreboard/web
 ```
 
-start backend Docker container first time with following commands
+Run project UI locally using nuxt command
 
 ```bash
-  docker build --tag dart-api .
+# install dependencies
+  npm install
+
+# serve with hot reload at localhost:3000
+  npm run dev
+
+# for build app
+  npm run build
+
+# for build app run at localhost:3000
+  npm start
 ```
+
+
+Run project UI using docker command
 
 ```bash
-  docker run --name=dartapi -it --mount type=bind,source="$(pwd)"/dart.db,target=/app/dart.db --publish 8585:8080 dart-api
-```
+# build docker images for app UI
+  docker build . -t dart-app
 
-After first time use below command to run backend
+# run docker build images
+  docker run --add-host=host.docker.internal:host-gateway -p 5000:3000 dart-app
+```
+### Run Locally (Api)
+
+Go to the project api directory (after clone project)
 
 ```bash
-  docker container start dartapi
+  cd darts-scoreboard/api
 ```
 
-## Run Locally
+Run project api locally using go command
 
 ```bash
   go run main.go
 ```
+
+Run project api using docker command
+
+```bash
+# build docker images for app api
+  docker build --tag dart-api .
+
+# run docker build images
+  docker run --name=dartapi -it --mount type=bind,source="$(pwd)"/dart.db,target=/app/dart.db --publish 8585:8080 dart-api
+
+# after first time use below command to run backend
+  docker container start dartapi
+```
+
+
+_You will see the UI running on (with nuxt command)_ :
+
+http://localhost:3000/
+
+_You will see the UI running on (with docker command)_ :
+
+http://127.0.0.1:5000/
+
+_You will see the api running on (with go command)_ :
+
+http://localhost:8080/
+
+_You will see the UI running on (with docker command)_ :
+
+http://localhost:8585/

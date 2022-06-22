@@ -38,7 +38,7 @@ export default {
   },
   publicRuntimeConfig: {
     logoutURL: process.env.LOGOUT_URL,
-    loginURL: process.env.LOGIN_URL
+    loginURL: process.env.LOGIN_URL,
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [],
@@ -106,7 +106,9 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
-
+  server: {
+    host: "0",
+  },
   // middleware configuration: https://go.nuxtjs.dev/config-middleware
   // router: {
   //   middleware: 'auth',

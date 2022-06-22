@@ -30,7 +30,7 @@ COPY --from=build /dartgame/ ./
 # must be supplied to the docker command.
 EXPOSE 8585
 
-RUN cp .env.example .env
+RUN cp .env.docker .env
 
 # Run
 CMD [ "./dart-api" ]
